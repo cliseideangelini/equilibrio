@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AdminNavBar } from "@/components/AdminNavBar";
 
 export const dynamic = "force-dynamic";
 
@@ -37,19 +38,7 @@ export default async function AdminDashboard() {
 
     return (
         <div className="container mx-auto px-6 pt-32 pb-20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-                <div>
-                    <h1 className="text-3xl font-bold">Olá, Cliseide</h1>
-                    <p className="text-muted-foreground">Aqui está o resumo da sua clínica para hoje.</p>
-                </div>
-                <div className="flex gap-3">
-                    <Button variant="outline">Ver Agenda Completa</Button>
-                    <Button className="gap-2">
-                        <CalendarCheck className="w-4 h-4" />
-                        Novo Bloqueio
-                    </Button>
-                </div>
-            </div>
+            <AdminNavBar />
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">

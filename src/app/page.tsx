@@ -8,7 +8,8 @@ import {
   Clock,
   CheckCircle2,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Mail
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -164,6 +165,104 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section id="faq" className="container mx-auto px-6 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Dúvidas Frequentes</h2>
+          <p className="text-muted-foreground text-lg">Tudo o que você precisa saber sobre o processo terapêutico.</p>
+        </div>
+
+        <div className="max-w-3xl mx-auto space-y-4">
+          {[
+            {
+              q: "Quanto tempo dura cada sessão?",
+              a: "As sessões de psicoterapia têm duração aproximada de 50 minutos, tempo ideal para explorarmos as demandas com profundidade."
+            },
+            {
+              q: "Qual o valor e formas de pagamento?",
+              a: "Os valores são informados no momento do agendamento ou via WhatsApp. Aceitamos Pix, Cartão de Crédito e Transferência."
+            },
+            {
+              q: "Atende convênios médicos?",
+              a: "Atualmente os atendimentos são particulares, porém emitimos recibo para que você possa solicitar o reembolso junto ao seu convênio."
+            },
+            {
+              q: "Como é feita a terapia online?",
+              a: "Utilizamos plataformas seguras e criptografadas (Google Meet). Você só precisa de uma boa conexão e um local privativo."
+            }
+          ].map((item, i) => (
+            <div key={i} className="bg-white rounded-2xl border p-6 hover:border-primary/30 transition-colors">
+              <h3 className="font-bold text-lg mb-2">{item.q}</h3>
+              <p className="text-muted-foreground">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Contato Section */}
+      <section id="contato" className="container mx-auto px-6 py-20">
+        <div className="bg-sage-50/50 rounded-[3rem] p-8 md:p-16 lg:p-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Entre em contato</h2>
+              <p className="text-lg text-muted-foreground mb-10 leading-relaxed">
+                Deseja tirar alguma dúvida pontual antes de agendar? Minha equipe e eu estamos à disposição para te acolher da melhor forma possível.
+              </p>
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border w-fit shadow-sm">
+                  <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                    <MessageCircle size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">WhatsApp</p>
+                    <p className="font-bold text-lg">(11) 99999-9999</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border w-fit shadow-sm">
+                  <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                    <Mail size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">E-mail</p>
+                    <p className="font-bold text-lg">contato@cliseidepsicologia.com.br</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/5 rounded-3xl blur-2xl" />
+              <div className="relative bg-white p-8 rounded-3xl border shadow-sm">
+                <form className="space-y-5">
+                  <div className="grid md:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium ml-1">Seu Nome</label>
+                      <input className="w-full h-12 rounded-xl border-input bg-background/50 px-4 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Maria Silva" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium ml-1">E-mail</label>
+                      <input className="w-full h-12 rounded-xl border-input bg-background/50 px-4 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="maria@email.com" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium ml-1">Assunto</label>
+                    <input className="w-full h-12 rounded-xl border-input bg-background/50 px-4 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Dúvida sobre valor" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium ml-1">Mensagem</label>
+                    <textarea className="w-full min-h-[120px] rounded-xl border-input bg-background/50 p-4 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Como posso te ajudar?" />
+                  </div>
+                  <Button className="w-full h-12 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+                    Enviar Mensagem
+                  </Button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA final */}
       <section className="container mx-auto px-6 py-20 pb-0">
         <div className="bg-primary rounded-[3rem] p-12 lg:p-20 relative overflow-hidden text-center text-white">
@@ -181,6 +280,19 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      {/* WhatsApp FAB */}
+      <a
+        href="https://wa.me/5511999999999"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-8 right-8 w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 group"
+      >
+        <span className="absolute right-full mr-4 bg-white text-foreground px-4 py-2 rounded-xl text-sm font-semibold shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border">
+          Como posso te ajudar?
+        </span>
+        <MessageCircle size={32} />
+      </a>
     </div>
   );
 }
