@@ -6,17 +6,35 @@ import { Button } from "@/components/ui/button";
 import { Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
     const [scrolled, setScrolled] = useState(false);
+    const [isPatient, setIsPatient] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
+        const checkAuth = () => {
+            setIsPatient(document.cookie.includes("patient_id="));
+        };
+        checkAuth();
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
         window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        const interval = setInterval(checkAuth, 2000);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            clearInterval(interval);
+        };
     }, []);
+
+    const handleLogout = () => {
+        document.cookie = "patient_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        setIsPatient(false);
+        router.push("/");
+    };
 
     return (
         <header
@@ -27,12 +45,10 @@ export function Navbar() {
         >
             <div className="container mx-auto px-6 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3 group">
-                    <Image
-                        src="/logo.svg"
+                    <img
+                        src="/logo.png"
                         alt="Equilíbrio Logo"
-                        width={32}
-                        height={32}
-                        className="group-hover:scale-110 transition-transform duration-300"
+                        className="w-8 h-8 group-hover:scale-110 transition-transform duration-300 object-contain"
                     />
                     <span className="text-xl font-bold tracking-tight text-foreground">
                         Equilíbrio
@@ -55,9 +71,28 @@ export function Navbar() {
                 </nav>
 
                 <div className="flex items-center gap-3">
+                    {isPatient ? (
+                        <>
+                            <Link href="/paciente/minha-agenda">
+                                <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold">
+                                    <User className="w-4 h-4" />
+                                    Minha Agenda
+                                </Button>
+                            </Link>
+                            <Button variant="ghost" size="sm" onClick={handleLogout} className="hidden sm:flex text-red-500">
+                                Sair
+                            </Button>
+                        </>
+                    ) : (
+                        <Link href="/paciente/login">
+                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold">
+                                <User className="w-4 h-4" />
+                                Portal do Paciente
+                            </Button>
+                        </Link>
+                    )}
                     <Link href="/login">
                         <Button variant="ghost" size="sm" className="hidden sm:flex gap-2">
-                            <User className="w-4 h-4" />
                             Área Clínica
                         </Button>
                     </Link>

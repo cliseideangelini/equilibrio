@@ -16,22 +16,25 @@ function getOAuth2Client() {
     return client;
 }
 
-export async function createGoogleMeetEvent(params: {
+export async function createGoogleCalendarEvent(params: {
     patientName: string;
     startTime: Date;
     durationMinutes: number;
+    type: "ONLINE" | "PRESENCIAL";
 }) {
     const auth = getOAuth2Client();
     const calendar = google.calendar({ version: "v3", auth });
 
     const endTime = addMinutes(params.startTime, params.durationMinutes);
+    const isOnline = params.type === "ONLINE";
 
     const event = await calendar.events.insert({
-        calendarId: "primary", // Calendário principal da Dra. Cliseide
-        conferenceDataVersion: 1,
+        calendarId: "primary",
+        conferenceDataVersion: isOnline ? 1 : 0,
         requestBody: {
-            summary: `Sessão - ${params.patientName}`,
-            description: `Consulta de psicoterapia com Cliseide S. Angelini (CRP 123230)\nWpp: 19 98827-52-90`,
+            summary: `Sessão ${isOnline ? "Online" : "Presencial"} - ${params.patientName}`,
+            description: `Consulta de psicoterapia com Cliseide S. Angelini (CRP 123230)\nTipo: ${params.type}\nWpp: 19 98827-52-90`,
+            location: isOnline ? "Google Meet" : "Consultório Presencial",
             start: {
                 dateTime: params.startTime.toISOString(),
                 timeZone: "America/Sao_Paulo",
@@ -40,24 +43,25 @@ export async function createGoogleMeetEvent(params: {
                 dateTime: endTime.toISOString(),
                 timeZone: "America/Sao_Paulo",
             },
-            conferenceData: {
+            // Só cria o link do Meet se for ONLINE
+            conferenceData: isOnline ? {
                 createRequest: {
-                    // Código único para esta requisição (evita duplicatas)
-                    requestId: `equilibrio-${params.startTime.getTime()}`,
+                    // Ensure requestId is highly unique
+                    requestId: `equilibrio-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
                     conferenceSolutionKey: { type: "hangoutsMeet" },
                 },
-            },
+            } : undefined,
             reminders: {
                 useDefault: false,
                 overrides: [
-                    { method: "email", minutes: 180 },   // 3h antes por e-mail
-                    { method: "popup", minutes: 15 },    // 15min pop-up
+                    { method: "email", minutes: 180 },
+                    { method: "popup", minutes: 15 },
                 ],
             },
         },
     });
 
-    // Extrair o link do Google Meet do evento criado
+    // Extrair o link do Google Meet se existir
     const meetLink =
         event.data.conferenceData?.entryPoints?.find((ep) => ep.entryPointType === "video")?.uri ||
         event.data.hangoutLink ||

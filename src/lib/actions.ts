@@ -1,7 +1,8 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { createGoogleMeetEvent } from "@/lib/google-calendar";
+import bcrypt from "bcryptjs";
+import { createGoogleCalendarEvent } from "@/lib/google-calendar";
 import {
     startOfDay,
     endOfDay,
@@ -10,10 +11,9 @@ import {
     getDay,
     isBefore,
     isAfter,
-    parseISO,
-    subDays,
     setHours,
-    setMinutes
+    setMinutes,
+    subDays
 } from "date-fns";
 
 export async function getAvailableSlots(dateString: string) {
@@ -21,17 +21,15 @@ export async function getAvailableSlots(dateString: string) {
     const dayOfWeek = getDay(date);
     const now = new Date();
 
-    // 1. Buscar as disponibilidades da Cliseide para este dia da semana (pode ter manhã e tarde)
     const availabilities = await prisma.availability.findMany({
         where: {
             dayOfWeek,
-            psychologist: { email: 'crisangelini.silva@gmail.com' }
+            psychologist: { email: 'Cliseideangelini@gmail.com' }
         }
     });
 
     if (availabilities.length === 0) return [];
 
-    // 2. Buscar agendamentos existentes para este dia
     const appointments = await prisma.appointment.findMany({
         where: {
             startTime: {
@@ -42,7 +40,6 @@ export async function getAvailableSlots(dateString: string) {
         }
     });
 
-    // 3. Gerar slots para cada bloco de disponibilidade
     const slots = [];
     const sessionDuration = 30;
     const buffer = 0;
@@ -54,29 +51,22 @@ export async function getAvailableSlots(dateString: string) {
             const slotStart = addMinutes(startOfDay(date), currentMinutes);
             const slotEnd = addMinutes(slotStart, sessionDuration);
 
-            // Regras de Antecedência:
             let isWithinDeadline = true;
 
-            // Horários da manhã (7:00 até 11:30): até as 21:00 do dia anterior
-            if (currentMinutes < 870) { // Antes das 14:30
-                const deadline = setMinutes(setHours(subDays(startOfDay(date), 0), 21), 0);
-                // Espera... "dia anterior" significa subDays(date, 1)
+            if (currentMinutes < 870) {
                 const realDeadline = addMinutes(subDays(startOfDay(date), 1), 21 * 60);
                 if (isAfter(now, realDeadline)) isWithinDeadline = false;
             }
-            // Horários de 14:30: 2 horas de antecedência
-            else if (currentMinutes >= 870 && currentMinutes < 900) { // Bloco das 14:30
+            else if (currentMinutes >= 870 && currentMinutes < 900) {
                 const realDeadline = addMinutes(slotStart, -120);
                 if (isAfter(now, realDeadline)) isWithinDeadline = false;
             }
-            // Demais horários (se houver): 30 minutos
             else {
                 const realDeadline = addMinutes(slotStart, -30);
                 if (isAfter(now, realDeadline)) isWithinDeadline = false;
             }
 
             if (isWithinDeadline) {
-                // Verificar se este slot já está ocupado
                 const isOccupied = appointments.some((app: any) => {
                     const appStart = new Date(app.startTime);
                     const appEnd = new Date(app.endTime);
@@ -103,60 +93,71 @@ export async function createAppointment(formData: {
     name: string;
     email?: string;
     phone: string;
+    password?: string;
     date: string;
     time: string;
     type: "ONLINE" | "PRESENCIAL";
 }) {
-    const { name, email, phone, date, time, type } = formData;
+    const { name, email, phone, password, date, time, type } = formData;
 
-    // Encontrar ou criar paciente pelo TELEFONE (que é o obrigatório agora)
-    // Mas o Upsert do Prisma exige um campo @unique. Vamos usar o telefone como identificador?
-    // Melhor manter o fluxo, mas o email pode ser nulo.
-    let patient = await prisma.patient.findFirst({
+    // Encontrar paciente pelo TELEFONE
+    let patient: any = await prisma.patient.findFirst({
         where: { phone }
     });
 
+    if (patient && patient.password && !password) {
+        throw new Error("Este telefone já possui cadastro. Por favor, faça login para agendar.");
+    }
+
+    let hashedPassword = undefined;
+    if (password && password !== "SESSION_ACTIVE") {
+        hashedPassword = await bcrypt.hash(password, 10);
+    }
+
     if (!patient) {
         patient = await prisma.patient.create({
-            data: { name, email, phone }
+            data: {
+                name,
+                email,
+                phone,
+                password: hashedPassword
+            }
         });
     } else {
+        const updateData: any = { name };
+        if (email) updateData.email = email;
+        if (hashedPassword) updateData.password = hashedPassword;
+
         await prisma.patient.update({
             where: { id: patient.id },
-            data: { name, email }
+            data: updateData
         });
     }
 
-    // Encontrar psicóloga
     const psychologist = await prisma.psychologist.findFirst({
-        where: { email: 'crisangelini.silva@gmail.com' }
+        where: { email: 'Cliseideangelini@gmail.com' }
     });
 
     if (!psychologist) throw new Error("Psicóloga não encontrada");
 
-    // Calcular horários
     const [hours, minutes] = time.split(':').map(Number);
     const startTime = new Date(date);
     startTime.setHours(hours, minutes, 0, 0);
     const endTime = addMinutes(startTime, 30);
 
-    // Criar no Google Calendar + Meet se for ONLINE
     let meetLink: string | null = null;
-    if (type === "ONLINE") {
-        try {
-            const result = await createGoogleMeetEvent({
-                patientName: name,
-                startTime,
-                durationMinutes: 30,
-            });
-            meetLink = result.meetLink ?? null;
-        } catch (err) {
-            // Não interrompe o agendamento se o Calendar falhar
-            console.error("Erro ao criar evento no Google Calendar:", err);
-        }
+    try {
+        const result = await createGoogleCalendarEvent({
+            patientName: name,
+            startTime,
+            durationMinutes: 30,
+            type: type as "ONLINE" | "PRESENCIAL"
+        });
+        meetLink = result.meetLink ?? null;
+    } catch (err) {
+        console.error("Erro ao sincronizar com Google Calendar:", err);
     }
 
-    // Criar agendamento
     const appointment = await prisma.appointment.create({
         data: {
             startTime,
@@ -170,4 +171,64 @@ export async function createAppointment(formData: {
     });
 
     return { success: true, appointmentId: appointment.id, meetLink };
+}
+
+export async function loginPatient(phone: string, password: string) {
+    const patient: any = await prisma.patient.findUnique({
+        where: { phone }
+    });
+
+    if (!patient || !patient.password) {
+        return { success: false, error: "Usuário não encontrado ou sem senha cadastrada." };
+    }
+
+    const isValid = await bcrypt.compare(password, patient.password);
+    if (!isValid) return { success: false, error: "Senha incorreta." };
+
+    return { success: true, patientId: patient.id, name: patient.name };
+}
+
+export async function registerPatient(formData: { name: string, phone: string, password: string, email?: string }) {
+    const existing: any = await prisma.patient.findUnique({ where: { phone: formData.phone } });
+    if (existing && existing.password) throw new Error("Este telefone já possui cadastro.");
+
+    const hashedPassword = await bcrypt.hash(formData.password, 10);
+
+    const patient = existing
+        ? await prisma.patient.update({
+            where: { id: existing.id },
+            data: { password: hashedPassword, name: formData.name, email: formData.email }
+        })
+        : await prisma.patient.create({
+            data: { ...formData, password: hashedPassword }
+        });
+
+    return { success: true, patientId: (patient as any).id };
+}
+
+export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false) {
+    const appointment = await prisma.appointment.findUnique({
+        where: { id: appointmentId },
+        include: { psychologist: true }
+    });
+
+    if (!appointment) throw new Error("Agendamento não encontrado");
+
+    const now = new Date();
+    const hoursUntilSession = (appointment.startTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntilSession <= 3 && !confirmLateCharge) {
+        return {
+            success: false,
+            requiresConfirmation: true,
+            message: "Atenção: Cancelamentos com menos de 3h de antecedência serão cobrados integralmente. Deseja prosseguir?"
+        };
+    }
+
+    await prisma.appointment.update({
+        where: { id: appointmentId },
+        data: { status: "CANCELLED" }
+    });
+
+    return { success: true };
 }

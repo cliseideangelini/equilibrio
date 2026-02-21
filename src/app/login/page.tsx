@@ -35,7 +35,7 @@ export default function LoginPage() {
                 <div className="bg-primary p-8 text-center text-white relative">
                     <div className="flex justify-center mb-4">
                         <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                            <Image src="/logo.svg" alt="Logo" width={40} height={40} className="brightness-0 invert" />
+                            <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
                         </div>
                     </div>
                     <CardTitle className="text-2xl font-bold">Área Clínica</CardTitle>

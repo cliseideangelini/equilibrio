@@ -229,7 +229,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">E-mail</p>
-                    <p className="font-bold text-lg">crisangelini.silva@gmail.com</p>
+                    <p className="font-bold text-lg">Cliseideangelini@gmail.com</p>
                   </div>
                 </div>
               </div>

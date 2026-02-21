@@ -3,7 +3,7 @@ const prisma = new PrismaClient()
 
 async function main() {
     const cliseide = await prisma.psychologist.upsert({
-        where: { email: 'crisangelini.silva@gmail.com' },
+        where: { email: 'Cliseideangelini@gmail.com' },
         update: {
             name: 'Cliseide S. Angelini',
             crp: '123230',
@@ -12,7 +12,7 @@ async function main() {
         },
         create: {
             name: 'Cliseide S. Angelini',
-            email: 'crisangelini.silva@gmail.com',
+            email: 'Cliseideangelini@gmail.com',
             crp: '123230',
             bio: 'Psicóloga clínica - atendimento infantil, adolescentes, adultos, idosos e pacientes oncológicos; especialista em terapia cognitivo comportamental; avaliação psicológica.',
             phone: '19 98827-52-90'
