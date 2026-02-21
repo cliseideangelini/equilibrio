@@ -49,9 +49,7 @@ export default function PatientLoginPage() {
                         <ArrowLeft size={20} />
                     </Link>
                     <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                            <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
-                        </div>
+                        <img src="/logo.png" alt="Logo" className="w-16 h-16 object-contain" />
                     </div>
                     <CardTitle className="text-2xl font-bold">Portal do Paciente</CardTitle>
                     <CardDescription className="text-primary-foreground/80">Gerencie seus agendamentos e histórico</CardDescription>
