@@ -27,7 +27,7 @@ async function main() {
         data: {
             dayOfWeek: 1,
             startTime: 870, // 14:30
-            endTime: 1050,  // 17:30
+            endTime: 1080,  // 18:00  (permite slot das 17:30)
             psychologistId: cliseide.id,
         }
     })
@@ -48,7 +48,7 @@ async function main() {
             data: {
                 dayOfWeek: i,
                 startTime: 870, // 14:30
-                endTime: 1050,  // 17:30
+                endTime: 1080,  // 18:00  (permite slot das 17:30)
                 psychologistId: cliseide.id,
             }
         })

@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { createGoogleMeetEvent } from "@/lib/google-calendar";
 import {
     startOfDay,
     endOfDay,
@@ -14,7 +15,6 @@ import {
     setHours,
     setMinutes
 } from "date-fns";
-import { AppointmentType } from "@prisma/client";
 
 export async function getAvailableSlots(dateString: string) {
     const date = new Date(dateString);
@@ -140,6 +140,22 @@ export async function createAppointment(formData: {
     startTime.setHours(hours, minutes, 0, 0);
     const endTime = addMinutes(startTime, 30);
 
+    // Criar no Google Calendar + Meet se for ONLINE
+    let meetLink: string | null = null;
+    if (type === "ONLINE") {
+        try {
+            const result = await createGoogleMeetEvent({
+                patientName: name,
+                startTime,
+                durationMinutes: 30,
+            });
+            meetLink = result.meetLink ?? null;
+        } catch (err) {
+            // Não interrompe o agendamento se o Calendar falhar
+            console.error("Erro ao criar evento no Google Calendar:", err);
+        }
+    }
+
     // Criar agendamento
     const appointment = await prisma.appointment.create({
         data: {
@@ -147,10 +163,11 @@ export async function createAppointment(formData: {
             endTime,
             psychologistId: psychologist.id,
             patientId: patient.id,
-            status: 'PENDING',
-            type: type as AppointmentType
+            status: "PENDING",
+            type: type as any,
+            meetLink,
         }
     });
 
-    return { success: true, appointmentId: appointment.id };
+    return { success: true, appointmentId: appointment.id, meetLink };
 }

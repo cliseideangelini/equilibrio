@@ -28,6 +28,7 @@ export default function BookingPage() {
     const [appointmentType, setAppointmentType] = useState<"ONLINE" | "PRESENCIAL">("ONLINE");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [meetLink, setMeetLink] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
 
     const [name, setName] = useState("");
@@ -51,7 +52,7 @@ export default function BookingPage() {
         if (!canSubmit) return;
         setIsSubmitting(true);
         try {
-            await createAppointment({
+            const result = await createAppointment({
                 name,
                 email: email || undefined,
                 phone,
@@ -59,6 +60,7 @@ export default function BookingPage() {
                 time: selectedSlot!,
                 type: appointmentType,
             });
+            setMeetLink(result.meetLink ?? null);
             setSuccess(true);
         } catch {
             alert("Erro ao agendar. Tente novamente.");
@@ -66,6 +68,20 @@ export default function BookingPage() {
             setIsSubmitting(false);
         }
     };
+
+    // Mensagem WA pre-formatada
+    const waText = encodeURIComponent(
+        `Olá, Dra. Cliseide! Acabei de agendar uma sessão:
+
+📅 *${format(selectedDate!, "dd/MM/yyyy", { locale: ptBR })}* às *${selectedSlot}*
+🖼️ Formato: *${appointmentType === "ONLINE" ? "Online (Google Meet)" : "Presencial"}*${meetLink ? `
+🔗 Link: ${meetLink}` : ""}
+
+Meu nome: ${name}
+Telefone: ${phone}
+
+Aguardo a confirmação! 🙏`
+    );
 
     // Tela de sucesso
     if (success) {
@@ -77,20 +93,43 @@ export default function BookingPage() {
                     </div>
                     <h1 className="text-3xl font-bold mb-3">Tudo certo!</h1>
                     <p className="text-muted-foreground mb-2">
-                        Seu agendamento para <strong>{format(selectedDate!, "dd/MM/yyyy", { locale: ptBR })}</strong> às <strong>{selectedSlot}</strong> foi solicitado.
+                        Sessão solicitada para <strong>{format(selectedDate!, "dd/MM/yyyy", { locale: ptBR })}</strong> às <strong>{selectedSlot}</strong>.
                     </p>
-                    <p className="text-sm text-muted-foreground mb-8">
-                        Você receberá a confirmação pelo WhatsApp. Lembrete automático 3h antes.
-                    </p>
-                    <div className="flex gap-3">
-                        <Button asChild variant="outline" className="rounded-xl">
-                            <a href="/">Voltar ao site</a>
-                        </Button>
-                        <Button asChild className="rounded-xl">
-                            <a href="https://wa.me/5519988275290" target="_blank" rel="noopener noreferrer">
-                                Falar no WhatsApp
+
+                    {meetLink && (
+                        <div className="w-full bg-blue-50 border border-blue-100 rounded-2xl p-4 my-4 text-left">
+                            <p className="text-sm font-bold text-blue-800 mb-1">🖥️ Link do Google Meet</p>
+                            <a
+                                href={meetLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 text-sm underline break-all"
+                            >
+                                {meetLink}
                             </a>
-                        </Button>
+                            <p className="text-xs text-blue-600 mt-2">Este link foi adicionado automaticamente à agenda da Dra. Cliseide.</p>
+                        </div>
+                    )}
+
+                    <p className="text-sm text-muted-foreground mb-8">
+                        O lembrete automático será enviado 3h antes da sessão.
+                    </p>
+                    <div className="flex gap-3 w-full">
+                        <a href="/" className="flex-1">
+                            <button className="w-full h-11 rounded-xl border text-sm font-medium hover:bg-sage-50 transition-colors">
+                                Voltar ao site
+                            </button>
+                        </a>
+                        <a
+                            href={`https://wa.me/5519988275290?text=${waText}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1"
+                        >
+                            <button className="w-full h-11 rounded-xl bg-[#25D366] text-white text-sm font-bold hover:bg-[#22c55e] transition-colors">
+                                📲 Enviar pelo WhatsApp
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>

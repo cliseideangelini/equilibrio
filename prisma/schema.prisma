@@ -56,6 +56,7 @@ model Appointment {
   endTime        DateTime
   status         AppointmentStatus @default(PENDING)
   type           AppointmentType   @default(ONLINE)
+  meetLink       String?
   psychologist   Psychologist      @relation(fields: [psychologistId], references: [id])
   psychologistId String
   patient        Patient           @relation(fields: [patientId], references: [id])
