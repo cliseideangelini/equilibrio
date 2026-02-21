@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Trees as Tree, Calendar, Info, Phone, User } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
@@ -25,10 +26,14 @@ export function Navbar() {
             )}
         >
             <div className="container mx-auto px-6 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="bg-primary/10 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
-                        <Tree className="text-primary w-6 h-6" />
-                    </div>
+                <Link href="/" className="flex items-center gap-3 group">
+                    <Image
+                        src="/logo.svg"
+                        alt="Equilíbrio Logo"
+                        width={32}
+                        height={32}
+                        className="group-hover:scale-110 transition-transform duration-300"
+                    />
                     <span className="text-xl font-bold tracking-tight text-foreground">
                         Equilíbrio
                     </span>
