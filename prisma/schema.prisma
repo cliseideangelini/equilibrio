@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") // Uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // Uses a direct connection
+}
+
+model Psychologist {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  crp          String
+  bio          String?
+  availabilities Availability[]
+  appointments Appointment[]
+}
+
+model Availability {
+  id             String       @id @default(cuid())
+  dayOfWeek      Int          // 0 (Sunday) to 6 (Saturday)
+  startTime      Int          // Minutes from midnight (e.g., 540 for 09:00)
+  endTime        Int          // Minutes from midnight (e.g., 1080 for 18:00)
+  psychologistId String
+  psychologist   Psychologist @relation(fields: [psychologistId], references: [id])
+}
+
+model Patient {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  phone        String
+  appointments Appointment[]
+}
+
+model Appointment {
+  id             String       @id @default(cuid())
+  startTime      DateTime
+  endTime        DateTime
+  status         String       @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  psychologistId String
+  psychologist   Psychologist @relation(fields: [psychologistId], references: [id])
+  patientId      String
+  patient        Patient      @relation(fields: [patientId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
