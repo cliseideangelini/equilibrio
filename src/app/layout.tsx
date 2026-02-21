@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "Equilíbrio | Psicologia Clínica - Cliseide S. Angelini",
   description: "Atendimento psicológico humanizado com base na Terapia Cognitivo-Comportamental. Agende sua consulta com Cliseide S. Angelini.",
+  icons: {
+    icon: "/favicon.png",
+  }
 };
 
 export default function RootLayout({

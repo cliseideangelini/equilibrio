@@ -174,41 +174,52 @@ function HistorySection({ title, appointments, icon, subtitle }: { title: string
     if (appointments.length === 0) return null;
 
     return (
-        <section>
-            <div className="mb-6 flex flex-col gap-1">
-                <h3 className="text-sm uppercase tracking-[0.2em] font-black text-muted-foreground flex items-center gap-3">
+        <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="mb-4">
+                <h3 className="text-xs uppercase tracking-[0.2em] font-black text-muted-foreground/60 flex items-center gap-2">
                     {icon} {title}
                 </h3>
-                {subtitle && <p className="text-[10px] text-muted-foreground font-medium pl-8">{subtitle}</p>}
+                {subtitle && <p className="text-[10px] text-muted-foreground/50 mt-1 pl-6">{subtitle}</p>}
             </div>
-            <div className="bg-white rounded-[2.5rem] border-2 border-primary/5 shadow-sm overflow-hidden divide-y divide-primary/5">
+            <div className="space-y-3">
                 {appointments.map((app: any) => (
-                    <div key={app.id} className="p-6 flex items-center justify-between transition-colors hover:bg-sage-50/30">
-                        <div className="flex items-center gap-5">
-                            <div className="text-center min-w-[48px] p-2 bg-primary/5 rounded-2xl">
-                                <p className="text-[10px] font-black uppercase text-primary/60">{format(app.startTime, 'MMM', { locale: ptBR })}</p>
-                                <p className="font-extrabold text-lg text-primary">{format(app.startTime, 'dd')}</p>
+                    <div key={app.id} className="group flex items-center justify-between p-4 bg-white/40 hover:bg-white rounded-[1.5rem] border border-transparent hover:border-primary/10 transition-all duration-300">
+                        <div className="flex items-center gap-4">
+                            <div className="flex flex-col items-center justify-center min-w-[3rem] text-muted-foreground/70">
+                                <span className="text-[10px] font-black uppercase leading-none">{format(app.startTime, 'MMM', { locale: ptBR })}</span>
+                                <span className="text-xl font-bold">{format(app.startTime, 'dd')}</span>
                             </div>
+
+                            <div className="w-[1px] h-8 bg-border/50" />
+
                             <div>
-                                <p className="font-black text-foreground">{format(app.startTime, 'HH:mm')} • Psicoterapia</p>
-                                <p className="text-xs font-bold text-muted-foreground uppercase tracking-tight">{app.type === 'ONLINE' ? '🎥 Online' : '🏢 Presencial'}</p>
+                                <div className="flex items-center gap-2">
+                                    <p className="font-bold text-foreground/80">{format(app.startTime, 'HH:mm')}</p>
+                                    <span className="text-[10px] font-bold text-muted-foreground/40">• {app.type === 'ONLINE' ? 'ONLINE' : 'PRESENCIAL'}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground/60 font-medium">Sessão de Psicoterapia</p>
                             </div>
                         </div>
-                        {app.payment ? (
-                            <div className="text-right">
-                                <p className="font-black text-sm text-foreground">R$ {app.payment.amount.toFixed(2)}</p>
-                                <p className={cn(
-                                    "text-[10px] font-black uppercase tracking-widest mt-1",
-                                    app.payment.status === 'PAID' ? 'text-green-600' : 'text-amber-600'
-                                )}>
-                                    {app.payment.status === 'PAID' ? 'Pago' : 'Pendente'}
-                                </p>
+
+                        <div className="flex items-center gap-6">
+                            {app.payment && (
+                                <div className="text-right">
+                                    <p className="font-bold text-xs text-foreground/60">R$ {app.payment.amount.toFixed(2)}</p>
+                                    <div className="flex items-center justify-end gap-1">
+                                        <div className={cn("w-1 h-1 rounded-full", app.payment.status === 'PAID' ? "bg-green-500" : "bg-amber-500")} />
+                                        <p className={cn(
+                                            "text-[9px] font-black uppercase tracking-tighter opacity-50",
+                                            app.payment.status === 'PAID' ? 'text-green-700' : 'text-amber-700'
+                                        )}>
+                                            {app.payment.status === 'PAID' ? 'Liquidado' : 'Pendente'}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Info className="w-3 h-3 text-muted-foreground/30" />
                             </div>
-                        ) : (
-                            <div className="text-right opacity-40">
-                                <CheckCircle2 className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                        )}
+                        </div>
                     </div>
                 ))}
             </div>

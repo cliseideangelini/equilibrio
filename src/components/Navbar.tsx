@@ -45,10 +45,12 @@ export function Navbar() {
         >
             <div className="container mx-auto px-6 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3 group">
-                    <img
+                    <Image
                         src="/logo.png"
                         alt="Equilíbrio Logo"
-                        className="w-8 h-8 group-hover:scale-110 transition-transform duration-300 object-contain"
+                        width={36}
+                        height={36}
+                        className="group-hover:scale-110 transition-transform duration-300 object-contain"
                     />
                     <span className="text-xl font-bold tracking-tight text-foreground">
                         Equilíbrio

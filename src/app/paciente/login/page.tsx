@@ -49,7 +49,7 @@ export default function PatientLoginPage() {
                         <ArrowLeft size={20} />
                     </Link>
                     <div className="flex justify-center mb-4">
-                        <img src="/logo.png" alt="Logo" className="w-16 h-16 object-contain" />
+                        <Image src="/logo.png" alt="Logo" width={48} height={48} className="object-contain" />
                     </div>
                     <CardTitle className="text-2xl font-bold">Portal do Paciente</CardTitle>
                     <CardDescription className="text-primary-foreground/80">Gerencie seus agendamentos e histórico</CardDescription>

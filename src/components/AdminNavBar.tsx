@@ -18,7 +18,7 @@ export function AdminNavBar() {
         <div className="flex items-center justify-between mb-12">
             <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center">
-                    <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+                    <Image src="/logo.png" alt="Logo" width={40} height={40} className="object-contain" />
                 </div>
                 <div>
                     <h1 className="text-3xl font-bold text-foreground">Olá, Dra. Cliseide</h1>
