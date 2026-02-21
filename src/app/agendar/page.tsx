@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useTransition } from "react";
 import { format, startOfToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
