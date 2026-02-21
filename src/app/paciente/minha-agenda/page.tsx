@@ -7,15 +7,16 @@ import {
     Video,
     MapPin,
     AlertTriangle,
-    ArrowLeft,
     CheckCircle2,
     XCircle,
-    Info
+    Info,
+    Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CancellationButton } from "@/components/CancellationButton";
+import { AppointmentHistory } from "@/components/AppointmentHistory";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +43,12 @@ export default async function PatientDashboard() {
         redirect("/paciente/login");
     }
 
-    const futureAppointments = patient.appointments.filter((app: any) => new Date(app.startTime) > new Date() && app.status !== 'CANCELLED');
+    const now = new Date();
+    const futureAppointments = patient.appointments.filter((app: any) => new Date(app.startTime) > now && app.status !== 'CANCELLED');
+    const pastOrCancelled = patient.appointments.filter((app: any) => new Date(app.startTime) <= now || app.status === 'CANCELLED');
+
+    const lastPastAppointment = pastOrCancelled[0];
+    const remainingHistory = pastOrCancelled.slice(1);
 
     return (
         <div className="min-h-screen bg-sage-50/30 pt-32 pb-20">
@@ -51,7 +57,7 @@ export default async function PatientDashboard() {
                 {/* Header */}
                 <div className="mb-12 text-center md:text-left">
                     <h1 className="text-4xl md:text-5xl font-black text-foreground mb-3 leading-tight">Olá, {patient.name}!</h1>
-                    <p className="text-muted-foreground font-medium text-lg">Gerencie aqui suas sessões e histórico de atendimento.</p>
+                    <p className="text-muted-foreground font-medium text-lg italic">"Cuidar da mente é o primeiro passo para o equilíbrio."</p>
                 </div>
 
                 <div className="grid lg:grid-cols-[1fr_320px] gap-12">
@@ -112,27 +118,48 @@ export default async function PatientDashboard() {
                             </div>
                         </section>
 
-                        {/* Histórico Segmentado */}
-                        <div className="space-y-12">
-                            <HistorySection
-                                title="Sessões Realizadas"
-                                appointments={patient.appointments.filter((app: any) => app.status === 'CONFIRMED' && new Date(app.startTime) < new Date())}
-                                icon={<CheckCircle2 className="w-5 h-5 text-green-500" />}
-                            />
+                        {/* Última Atividade e Histórico Oculto */}
+                        <section>
+                            <h3 className="text-xs uppercase tracking-[0.2em] font-black text-muted-foreground/40 mb-8 flex items-center gap-3">
+                                <div className="w-8 h-[2px] bg-muted-foreground/10" />
+                                Última Consulta
+                            </h3>
 
-                            <HistorySection
-                                title="Canceladas"
-                                appointments={patient.appointments.filter((app: any) => app.status === 'CANCELLED' && !app.payment)}
-                                icon={<XCircle className="w-5 h-5 text-gray-400" />}
-                            />
+                            {lastPastAppointment ? (
+                                <div className="bg-white/40 border border-primary/5 rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 transition-all hover:bg-white shadow-sm">
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-16 h-16 bg-sage-100/50 text-primary rounded-2xl flex flex-col items-center justify-center">
+                                            <span className="text-[10px] font-black uppercase leading-none opacity-50">{format(lastPastAppointment.startTime, 'MMM', { locale: ptBR })}</span>
+                                            <span className="text-2xl font-black">{format(lastPastAppointment.startTime, 'dd')}</span>
+                                        </div>
+                                        <div>
+                                            <p className="font-black text-foreground/70">{format(lastPastAppointment.startTime, 'HH:mm')} • Psicoterapia</p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                {lastPastAppointment.status === 'CANCELLED' ? (
+                                                    <span className="text-[10px] font-black uppercase text-red-500 bg-red-50 px-2 py-0.5 rounded-md">Cancelada</span>
+                                                ) : (
+                                                    <span className="text-[10px] font-black uppercase text-green-600 bg-green-50 px-2 py-0.5 rounded-md">Realizada</span>
+                                                )}
+                                                <span className="text-[10px] font-bold text-muted-foreground/30">• {lastPastAppointment.type}</span>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                            <HistorySection
-                                title="Canceladas Porém terá que pagar"
-                                appointments={patient.appointments.filter((app: any) => app.status === 'CANCELLED' && app.payment)}
-                                icon={<AlertTriangle className="w-5 h-5 text-amber-500" />}
-                                subtitle="Cancelamentos feitos fora do prazo de 3h, gerando cobrança integral."
-                            />
-                        </div>
+                                    {lastPastAppointment.payment && (
+                                        <div className="text-right">
+                                            <p className="text-xs font-black text-muted-foreground/60">VALOR DA SESSÃO</p>
+                                            <p className="text-lg font-black text-primary/80 leading-none">R$ {lastPastAppointment.payment.amount.toFixed(2)}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <p className="text-center text-muted-foreground font-medium italic py-10">Ainda não há histórico de sessões.</p>
+                            )}
+
+                            {remainingHistory.length > 0 && (
+                                <AppointmentHistory appointments={remainingHistory} />
+                            )}
+                        </section>
                     </div>
 
                     {/* Sidebar */}
@@ -140,89 +167,26 @@ export default async function PatientDashboard() {
                         <div className="bg-sage-800 text-white rounded-[3rem] p-10 shadow-2xl shadow-sage-900/20 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl transition-all group-hover:bg-white/10" />
                             <h4 className="font-black text-2xl mb-4 relative z-10">Dúvidas?</h4>
-                            <p className="text-sage-200 font-medium text-sm mb-8 relative z-10 leading-relaxed">Precisa falar sobre um agendamento ou tirar dúvidas técnicas? A Dra. Cliseide atende diretamente pelo WhatsApp.</p>
+                            <p className="text-sage-200 font-medium text-sm mb-8 relative z-10 leading-relaxed">Fale no WhatsApp para dúvidas urgentes.</p>
                             <a
                                 href="https://wa.me/5519988275290"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex w-full items-center justify-center gap-3 bg-white text-sage-900 h-14 rounded-[1.25rem] font-black hover:bg-sage-50 transition-all relative z-10 shadow-xl active:scale-95"
                             >
-                                <span className="text-xl leading-none">💬</span> Abrir WhatsApp
+                                💬 WhatsApp
                             </a>
                         </div>
 
                         <div className="p-8 bg-white border-2 border-primary/5 rounded-[3rem] text-center shadow-sm">
-                            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <Info size={24} />
-                            </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed font-bold uppercase tracking-wider">
-                                Atencão às Regras
-                            </p>
-                            <div className="h-[2px] w-8 bg-amber-200 mx-auto my-3" />
-                            <p className="text-[11px] text-muted-foreground/70 font-semibold leading-relaxed">
-                                Cancelamentos com menos de 3 horas de antecedência serão cobrados no valor integral da sessão.
+                            <Clock className="w-8 h-8 text-amber-500/30 mx-auto mb-4" />
+                            <p className="text-[11px] text-muted-foreground/70 font-bold uppercase tracking-widest leading-relaxed">
+                                Lembrete: Cancelamentos com menos de 3h geram cobrança.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    );
-}
-
-function HistorySection({ title, appointments, icon, subtitle }: { title: string, appointments: any[], icon: React.ReactNode, subtitle?: string }) {
-    if (appointments.length === 0) return null;
-
-    return (
-        <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="mb-4">
-                <h3 className="text-xs uppercase tracking-[0.2em] font-black text-muted-foreground/60 flex items-center gap-2">
-                    {icon} {title}
-                </h3>
-                {subtitle && <p className="text-[10px] text-muted-foreground/50 mt-1 pl-6">{subtitle}</p>}
-            </div>
-            <div className="space-y-3">
-                {appointments.map((app: any) => (
-                    <div key={app.id} className="group flex items-center justify-between p-4 bg-white/40 hover:bg-white rounded-[1.5rem] border border-transparent hover:border-primary/10 transition-all duration-300">
-                        <div className="flex items-center gap-4">
-                            <div className="flex flex-col items-center justify-center min-w-[3rem] text-muted-foreground/70">
-                                <span className="text-[10px] font-black uppercase leading-none">{format(app.startTime, 'MMM', { locale: ptBR })}</span>
-                                <span className="text-xl font-bold">{format(app.startTime, 'dd')}</span>
-                            </div>
-
-                            <div className="w-[1px] h-8 bg-border/50" />
-
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <p className="font-bold text-foreground/80">{format(app.startTime, 'HH:mm')}</p>
-                                    <span className="text-[10px] font-bold text-muted-foreground/40">• {app.type === 'ONLINE' ? 'ONLINE' : 'PRESENCIAL'}</span>
-                                </div>
-                                <p className="text-xs text-muted-foreground/60 font-medium">Sessão de Psicoterapia</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-6">
-                            {app.payment && (
-                                <div className="text-right">
-                                    <p className="font-bold text-xs text-foreground/60">R$ {app.payment.amount.toFixed(2)}</p>
-                                    <div className="flex items-center justify-end gap-1">
-                                        <div className={cn("w-1 h-1 rounded-full", app.payment.status === 'PAID' ? "bg-green-500" : "bg-amber-500")} />
-                                        <p className={cn(
-                                            "text-[9px] font-black uppercase tracking-tighter opacity-50",
-                                            app.payment.status === 'PAID' ? 'text-green-700' : 'text-amber-700'
-                                        )}>
-                                            {app.payment.status === 'PAID' ? 'Liquidado' : 'Pendente'}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Info className="w-3 h-3 text-muted-foreground/30" />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
     );
 }
