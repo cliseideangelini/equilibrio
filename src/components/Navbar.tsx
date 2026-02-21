@@ -70,19 +70,14 @@ export function Navbar() {
                     </Link>
                 </nav>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                     {isPatient ? (
-                        <>
-                            <Link href="/paciente/minha-agenda">
-                                <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold">
-                                    <User className="w-4 h-4" />
-                                    Minha Agenda
-                                </Button>
-                            </Link>
-                            <Button variant="ghost" size="sm" onClick={handleLogout} className="hidden sm:flex text-red-500">
-                                Sair
+                        <Link href="/paciente/minha-agenda">
+                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold bg-primary/5 rounded-xl">
+                                <User className="w-4 h-4" />
+                                Minha Agenda
                             </Button>
-                        </>
+                        </Link>
                     ) : (
                         <Link href="/paciente/login">
                             <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold">
@@ -91,15 +86,11 @@ export function Navbar() {
                             </Button>
                         </Link>
                     )}
-                    <Link href="/login">
-                        <Button variant="ghost" size="sm" className="hidden sm:flex gap-2">
-                            Área Clínica
-                        </Button>
-                    </Link>
+
                     <Link href="/agendar">
-                        <Button className="shadow-lg shadow-primary/20 gap-2">
+                        <Button className="shadow-lg shadow-primary/20 gap-2 rounded-xl">
                             <Calendar className="w-4 h-4" />
-                            Agendar Consulta
+                            Agendar
                         </Button>
                     </Link>
                 </div>
