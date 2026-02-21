@@ -40,16 +40,16 @@ export function Navbar() {
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link href="#sobre" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#sobre" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
                         Sobre
                     </Link>
-                    <Link href="#servicos" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#servicos" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
                         Serviços
                     </Link>
-                    <Link href="#faq" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#faq" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
                         Dúvidas
                     </Link>
-                    <Link href="#contato" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#contato" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
                         Contato
                     </Link>
                 </nav>

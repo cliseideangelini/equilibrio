@@ -25,7 +25,7 @@ export async function getAvailableSlots(dateString: string) {
     const availabilities = await prisma.availability.findMany({
         where: {
             dayOfWeek,
-            psychologist: { email: 'cliseide@exemplo.com' }
+            psychologist: { email: 'crisangelini.silva@gmail.com' }
         }
     });
 
@@ -129,7 +129,7 @@ export async function createAppointment(formData: {
 
     // Encontrar psicóloga
     const psychologist = await prisma.psychologist.findFirst({
-        where: { email: 'cliseide@exemplo.com' }
+        where: { email: 'crisangelini.silva@gmail.com' }
     });
 
     if (!psychologist) throw new Error("Psicóloga não encontrada");
