@@ -69,19 +69,10 @@ export default function BookingPage() {
         }
     };
 
-    // Mensagem WA pre-formatada
-    const waText = encodeURIComponent(
-        `Olá, Dra. Cliseide! Acabei de agendar uma sessão:
-
-📅 *${format(selectedDate!, "dd/MM/yyyy", { locale: ptBR })}* às *${selectedSlot}*
-🖼️ Formato: *${appointmentType === "ONLINE" ? "Online (Google Meet)" : "Presencial"}*${meetLink ? `
-🔗 Link: ${meetLink}` : ""}
-
-Meu nome: ${name}
-Telefone: ${phone}
-
-Aguardo a confirmação! 🙏`
-    );
+    // Mensagem WA pre-formatada (só calculada quando temos data e horário)
+    const waText = selectedDate && selectedSlot ? encodeURIComponent(
+        `Olá, Dra. Cliseide! Acabei de agendar uma sessão:\n\n📅 *${format(selectedDate, "dd/MM/yyyy", { locale: ptBR })}* às *${selectedSlot}*\n🖼️ Formato: *${appointmentType === "ONLINE" ? "Online (Google Meet)" : "Presencial"}*${meetLink ? `\n🔗 Link: ${meetLink}` : ""}\n\nMeu nome: ${name}\nTelefone: ${phone}\n\nAguardo a confirmação! 🙏`
+    ) : "";
 
     // Tela de sucesso
     if (success) {
