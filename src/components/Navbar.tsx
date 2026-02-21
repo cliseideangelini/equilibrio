@@ -87,6 +87,12 @@ export function Navbar() {
                         </Link>
                     )}
 
+                    <Link href="/login">
+                        <Button variant="ghost" size="sm" className="hidden sm:flex text-muted-foreground hover:text-primary transition-colors font-medium">
+                            Área Clínica
+                        </Button>
+                    </Link>
+
                     <Link href="/agendar">
                         <Button className="shadow-lg shadow-primary/20 gap-2 rounded-xl">
                             <Calendar className="w-4 h-4" />
