@@ -79,7 +79,7 @@ export default function Home() {
                 Acredito que a terapia é um processo colaborativo, onde trabalhamos juntos para compreender seus padrões de pensamento e comportamento.
               </p>
               <p>
-                Com especialização em Terapia Cognitivo-Comportamental (TCC), meu foco é oferecer ferramentas práticas e acolhimento humano para que você possa enfrentar a ansiedade, depressão, conflitos de relacionamento e outras questões que impactam sua qualidade de vida.
+                Com especialização em Terapia Cognitivo-Comportamental (TCC), meu foco é oferecer ferramentas práticas e acolhimento humano para pacientes de todas as idades, incluindo atendimentos infantis, adultos, idosos e acompanhamento para pacientes oncológicos.
               </p>
             </div>
 
@@ -88,14 +88,14 @@ export default function Home() {
                 <CheckCircle2 className="text-primary w-6 h-6 shrink-0 mt-1" />
                 <div>
                   <h4 className="font-semibold">Abordagem TCC</h4>
-                  <p className="text-sm">Focada em resultados e autoconhecimento.</p>
+                  <p className="text-sm">Especialista em Terapia Cognitivo-Comportamental.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="text-primary w-6 h-6 shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-semibold">Sigilo Total</h4>
-                  <p className="text-sm">Ambiente seguro e ético conforme o CFP.</p>
+                  <h4 className="font-semibold">Avaliação Psicológica</h4>
+                  <p className="text-sm">Processos minuciosos de avaliação clínica.</p>
                 </div>
               </div>
             </div>
@@ -106,8 +106,8 @@ export default function Home() {
               <div className="space-y-6">
                 {[
                   { title: "Sessões Online e Presenciais", desc: "Flexibilidade para o seu dia a dia." },
-                  { title: "+10 Anos de Experiência", desc: "Histórico de acolhimento e escuta ativa." },
-                  { title: "Especialização em Ansiedade", desc: "Tratamento focado em demandas emocionais modernas." }
+                  { title: "Atendimento Humanizado", desc: "Foco no acolhimento e escuta ativa." },
+                  { title: "Diversas Faixas Etárias", desc: "Crianças, adolescentes, adultos e idosos." }
                 ].map((item, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary shrink-0">
@@ -176,7 +176,11 @@ export default function Home() {
           {[
             {
               q: "Quanto tempo dura cada sessão?",
-              a: "As sessões de psicoterapia têm duração aproximada de 50 minutos, tempo ideal para explorarmos as demandas com profundidade."
+              a: "As sessões de psicoterapia têm duração aproximada de 30 minutos."
+            },
+            {
+              q: "Quais são as regras para cancelamento?",
+              a: "Cancelamentos devem ser feitos com no mínimo 3 horas de antecedência, ou a sessão será cobrada normalmente."
             },
             {
               q: "Qual o valor e formas de pagamento?",
@@ -216,7 +220,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">WhatsApp</p>
-                    <p className="font-bold text-lg">(11) 99999-9999</p>
+                    <p className="font-bold text-lg">(19) 98827-5290</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border w-fit shadow-sm">
@@ -283,7 +287,7 @@ export default function Home() {
 
       {/* WhatsApp FAB */}
       <a
-        href="https://wa.me/5511999999999"
+        href="https://wa.me/5519988275290"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-8 right-8 w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 group"

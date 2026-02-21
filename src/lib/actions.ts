@@ -9,23 +9,27 @@ import {
     getDay,
     isBefore,
     isAfter,
-    parseISO
+    parseISO,
+    subDays,
+    setHours,
+    setMinutes
 } from "date-fns";
-
+import { AppointmentType } from "@prisma/client";
 
 export async function getAvailableSlots(dateString: string) {
     const date = new Date(dateString);
     const dayOfWeek = getDay(date);
+    const now = new Date();
 
-    // 1. Buscar a disponibilidade da Cliseide para este dia da semana
-    const availability = await prisma.availability.findFirst({
+    // 1. Buscar as disponibilidades da Cliseide para este dia da semana (pode ter manhã e tarde)
+    const availabilities = await prisma.availability.findMany({
         where: {
             dayOfWeek,
             psychologist: { email: 'cliseide@exemplo.com' }
         }
     });
 
-    if (!availability) return [];
+    if (availabilities.length === 0) return [];
 
     // 2. Buscar agendamentos existentes para este dia
     const appointments = await prisma.appointment.findMany({
@@ -38,52 +42,90 @@ export async function getAvailableSlots(dateString: string) {
         }
     });
 
-    // 3. Gerar slots
+    // 3. Gerar slots para cada bloco de disponibilidade
     const slots = [];
-    let currentMinutes = availability.startTime;
-    const sessionDuration = 50;
-    const buffer = 10;
+    const sessionDuration = 30;
+    const buffer = 0;
 
-    while (currentMinutes + sessionDuration <= availability.endTime) {
-        const slotStart = addMinutes(startOfDay(date), currentMinutes);
-        const slotEnd = addMinutes(slotStart, sessionDuration);
+    for (const availability of availabilities) {
+        let currentMinutes = availability.startTime;
 
-        // Verificar se este slot já está ocupado
-        const isOccupied = appointments.some((app: any) => {
-            const appStart = new Date(app.startTime);
-            const appEnd = new Date(app.endTime);
-            return (
-                (isAfter(slotStart, appStart) && isBefore(slotStart, appEnd)) ||
-                (isAfter(slotEnd, appStart) && isBefore(slotEnd, appEnd)) ||
-                (format(slotStart, 'HH:mm') === format(appStart, 'HH:mm'))
-            );
-        });
+        while (currentMinutes + sessionDuration <= availability.endTime) {
+            const slotStart = addMinutes(startOfDay(date), currentMinutes);
+            const slotEnd = addMinutes(slotStart, sessionDuration);
 
-        if (!isOccupied) {
-            slots.push(format(slotStart, 'HH:mm'));
+            // Regras de Antecedência:
+            let isWithinDeadline = true;
+
+            // Horários da manhã (7:00 até 11:30): até as 21:00 do dia anterior
+            if (currentMinutes < 870) { // Antes das 14:30
+                const deadline = setMinutes(setHours(subDays(startOfDay(date), 0), 21), 0);
+                // Espera... "dia anterior" significa subDays(date, 1)
+                const realDeadline = addMinutes(subDays(startOfDay(date), 1), 21 * 60);
+                if (isAfter(now, realDeadline)) isWithinDeadline = false;
+            }
+            // Horários de 14:30: 2 horas de antecedência
+            else if (currentMinutes >= 870 && currentMinutes < 900) { // Bloco das 14:30
+                const realDeadline = addMinutes(slotStart, -120);
+                if (isAfter(now, realDeadline)) isWithinDeadline = false;
+            }
+            // Demais horários (se houver): 30 minutos
+            else {
+                const realDeadline = addMinutes(slotStart, -30);
+                if (isAfter(now, realDeadline)) isWithinDeadline = false;
+            }
+
+            if (isWithinDeadline) {
+                // Verificar se este slot já está ocupado
+                const isOccupied = appointments.some((app: any) => {
+                    const appStart = new Date(app.startTime);
+                    const appEnd = new Date(app.endTime);
+                    return (
+                        (isAfter(slotStart, appStart) && isBefore(slotStart, appEnd)) ||
+                        (isAfter(slotEnd, appStart) && isBefore(slotEnd, appEnd)) ||
+                        (format(slotStart, 'HH:mm') === format(appStart, 'HH:mm'))
+                    );
+                });
+
+                if (!isOccupied) {
+                    slots.push(format(slotStart, 'HH:mm'));
+                }
+            }
+
+            currentMinutes += (sessionDuration + buffer);
         }
-
-        currentMinutes += (sessionDuration + buffer);
     }
 
-    return slots;
+    return slots.sort();
 }
 
 export async function createAppointment(formData: {
     name: string;
-    email: string;
+    email?: string;
     phone: string;
     date: string;
     time: string;
+    type: "ONLINE" | "PRESENCIAL";
 }) {
-    const { name, email, phone, date, time } = formData;
+    const { name, email, phone, date, time, type } = formData;
 
-    // Encontrar ou criar paciente
-    const patient = await prisma.patient.upsert({
-        where: { email },
-        update: { name, phone },
-        create: { name, email, phone },
+    // Encontrar ou criar paciente pelo TELEFONE (que é o obrigatório agora)
+    // Mas o Upsert do Prisma exige um campo @unique. Vamos usar o telefone como identificador?
+    // Melhor manter o fluxo, mas o email pode ser nulo.
+    let patient = await prisma.patient.findFirst({
+        where: { phone }
     });
+
+    if (!patient) {
+        patient = await prisma.patient.create({
+            data: { name, email, phone }
+        });
+    } else {
+        await prisma.patient.update({
+            where: { id: patient.id },
+            data: { name, email }
+        });
+    }
 
     // Encontrar psicóloga
     const psychologist = await prisma.psychologist.findFirst({
@@ -96,7 +138,7 @@ export async function createAppointment(formData: {
     const [hours, minutes] = time.split(':').map(Number);
     const startTime = new Date(date);
     startTime.setHours(hours, minutes, 0, 0);
-    const endTime = addMinutes(startTime, 50);
+    const endTime = addMinutes(startTime, 30);
 
     // Criar agendamento
     const appointment = await prisma.appointment.create({
@@ -105,7 +147,8 @@ export async function createAppointment(formData: {
             endTime,
             psychologistId: psychologist.id,
             patientId: patient.id,
-            status: 'PENDING'
+            status: 'PENDING',
+            type: type as AppointmentType
         }
     });
 

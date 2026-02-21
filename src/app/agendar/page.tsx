@@ -16,7 +16,8 @@ import {
     Phone,
     CheckCircle2,
     ChevronLeft,
-    Loader2
+    Loader2,
+    Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +33,8 @@ export default function BookingPage() {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        phone: ""
+        phone: "",
+        type: "ONLINE" as "ONLINE" | "PRESENCIAL"
     });
 
     // Buscar horários quando a data mudar
@@ -75,7 +77,7 @@ export default function BookingPage() {
                     </div>
                     <h1 className="text-3xl font-bold mb-4">Agendamento Realizado!</h1>
                     <p className="text-muted-foreground mb-8">
-                        Sua solicitação enviada com sucesso. Você receberá uma confirmação em breve no seu WhatsApp e e-mail.
+                        Pedido de agendamento enviado com sucesso. Aguarde a confirmação que será enviada diretamente no seu WhatsApp (com lembrete 3h antes da sessão).
                     </p>
                     <Button asChild size="lg">
                         <a href="/">Voltar para o início</a>
@@ -89,17 +91,51 @@ export default function BookingPage() {
         <div className="container mx-auto px-6 pt-32 pb-20 max-w-4xl">
             <div className="mb-12 text-center">
                 <h1 className="text-3xl font-bold mb-2">Agende sua sessão</h1>
-                <p className="text-muted-foreground">Escolha o melhor momento para caminharmos juntos.</p>
+                <p className="text-muted-foreground">Escolha o melhor momento para sua caminhada de autoconhecimento.</p>
             </div>
 
             <div className="grid lg:grid-cols-[1fr_350px] gap-8">
                 <div className="space-y-6">
-                    {/* Step 1: Data */}
+                    {/* Step 1: Tipo */}
                     <Card className={cn("transition-opacity", step !== 1 && "opacity-50 pointer-events-none")}>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-primary" />
+                                1. Formato do atendimento
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-2 gap-4">
+                            <Button
+                                variant={formData.type === "ONLINE" ? "default" : "outline"}
+                                className="h-16 rounded-2xl flex flex-col gap-1"
+                                onClick={() => {
+                                    setFormData({ ...formData, type: "ONLINE" });
+                                    setStep(2);
+                                }}
+                            >
+                                <span>Online</span>
+                                <span className="text-[10px] opacity-70">Via Google Meet</span>
+                            </Button>
+                            <Button
+                                variant={formData.type === "PRESENCIAL" ? "default" : "outline"}
+                                className="h-16 rounded-2xl flex flex-col gap-1"
+                                onClick={() => {
+                                    setFormData({ ...formData, type: "PRESENCIAL" });
+                                    setStep(2);
+                                }}
+                            >
+                                <span>Presencial</span>
+                                <span className="text-[10px] opacity-70">No consultório</span>
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    {/* Step 2: Data */}
+                    <Card className={cn("transition-opacity", step !== 2 && "opacity-50 pointer-events-none")}>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
                                 <CalendarIcon className="w-5 h-5 text-primary" />
-                                1. Escolha a data
+                                2. Escolha a data
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex justify-center">
@@ -108,24 +144,21 @@ export default function BookingPage() {
                                 selected={selectedDate}
                                 onSelect={(date) => {
                                     setSelectedDate(date);
-                                    if (date) setStep(2);
+                                    if (date) setStep(3);
                                 }}
                                 disabled={{ before: startOfToday() }}
                                 locale={ptBR}
                                 className="mx-auto"
-                                modifiersStyles={{
-                                    selected: { backgroundColor: 'var(--primary)', color: 'white' }
-                                }}
                             />
                         </CardContent>
                     </Card>
 
-                    {/* Step 2: Horário */}
-                    <Card className={cn("transition-opacity", step !== 2 && "opacity-50 pointer-events-none")}>
+                    {/* Step 3: Horário */}
+                    <Card className={cn("transition-opacity", step !== 3 && "opacity-50 pointer-events-none")}>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-primary" />
-                                2. Horários disponíveis
+                                3. Horários disponíveis
                             </CardTitle>
                             <CardDescription>
                                 {selectedDate ? format(selectedDate, "PPPP", { locale: ptBR }) : "Selecione uma data acima"}
@@ -145,7 +178,7 @@ export default function BookingPage() {
                                             className="h-12"
                                             onClick={() => {
                                                 setSelectedSlot(slot);
-                                                setStep(3);
+                                                setStep(4);
                                             }}
                                         >
                                             {slot}
@@ -154,24 +187,24 @@ export default function BookingPage() {
                                 </div>
                             ) : selectedDate ? (
                                 <p className="text-center py-10 text-muted-foreground italic">
-                                    Infelizmente não há mais horários disponíveis para este dia.
+                                    Não há mais horários disponíveis com essa antecedência mínima.
                                 </p>
                             ) : null}
                         </CardContent>
                     </Card>
 
-                    {/* Step 3: Dados */}
-                    <Card className={cn("transition-opacity", step !== 3 && "opacity-50 pointer-events-none")}>
+                    {/* Step 4: Dados */}
+                    <Card className={cn("transition-opacity", step !== 4 && "opacity-50 pointer-events-none")}>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <User className="w-5 h-5 text-primary" />
-                                3. Seus dados
+                                4. Seus dados
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form id="booking-form" onSubmit={handleSubmit} className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Nome completo</label>
+                                    <label className="text-sm font-medium">Nome completo*</label>
                                     <div className="relative">
                                         <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                                         <input
@@ -186,21 +219,7 @@ export default function BookingPage() {
                                 </div>
                                 <div className="grid sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">E-mail</label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                                            <input
-                                                required
-                                                type="email"
-                                                className="w-full pl-10 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                                placeholder="maria@email.com"
-                                                value={formData.email}
-                                                onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">WhatsApp</label>
+                                        <label className="text-sm font-medium">WhatsApp*</label>
                                         <div className="relative">
                                             <Phone className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                                             <input
@@ -210,6 +229,19 @@ export default function BookingPage() {
                                                 placeholder="(00) 00000-0000"
                                                 value={formData.phone}
                                                 onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">E-mail (opcional)</label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                                            <input
+                                                type="email"
+                                                className="w-full pl-10 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                placeholder="maria@email.com"
+                                                value={formData.email}
+                                                onChange={e => setFormData({ ...formData, email: e.target.value })}
                                             />
                                         </div>
                                     </div>
@@ -223,16 +255,16 @@ export default function BookingPage() {
                 <div className="space-y-6">
                     <Card className="sticky top-24 bg-sage-50 border-sage-200">
                         <CardHeader>
-                            <CardTitle>Resumo do Agendamento</CardTitle>
+                            <CardTitle>Resumo</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Profissional:</span>
-                                <span className="font-medium text-right">Cliseide S. Angelini</span>
+                                <span className="text-muted-foreground">Formato:</span>
+                                <span className="font-medium">{formData.type === "ONLINE" ? "💻 Online" : "🏢 Presencial"}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Duração:</span>
-                                <span className="font-medium">50 minutos</span>
+                                <span className="font-medium">30 minutos</span>
                             </div>
                             <div className="h-px bg-sage-200 my-2" />
                             <div className="flex justify-between text-sm">
@@ -248,9 +280,15 @@ export default function BookingPage() {
                                 </span>
                             </div>
 
+                            <div className="bg-yellow-50 border border-yellow-100 p-3 rounded-xl">
+                                <p className="text-[10px] text-yellow-800 leading-tight">
+                                    <strong>Política:</strong> Cancelamentos devem ser feitos com no mínimo 3h de antecedência, caso contrário a sessão será cobrada.
+                                </p>
+                            </div>
+
                             <Button
                                 form="booking-form"
-                                disabled={step !== 3 || isSubmitting}
+                                disabled={step !== 4 || isSubmitting}
                                 className="w-full mt-6 h-12 text-base font-bold"
                             >
                                 {isSubmitting && <Loader2 className="mr-2 animate-spin w-4 h-4" />}

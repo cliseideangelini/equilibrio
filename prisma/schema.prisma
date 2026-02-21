@@ -11,42 +11,55 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // Uses a direct connection
 }
 
+enum AppointmentType {
+  ONLINE
+  PRESENCIAL
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
 model Psychologist {
-  id           String         @id @default(cuid())
-  name         String
-  email        String         @unique
-  crp          String
-  bio          String?
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  crp           String
+  bio           String
+  phone         String?
   availabilities Availability[]
-  appointments Appointment[]
+  appointments  Appointment[]
 }
 
 model Availability {
   id             String       @id @default(cuid())
-  dayOfWeek      Int          // 0 (Sunday) to 6 (Saturday)
-  startTime      Int          // Minutes from midnight (e.g., 540 for 09:00)
-  endTime        Int          // Minutes from midnight (e.g., 1080 for 18:00)
-  psychologistId String
+  dayOfWeek      Int          // 0 = Domingo, 1 = Segunda...
+  startTime      Int          // Minutos desde a meia-noite
+  endTime        Int          // Minutos desde a meia-noite
   psychologist   Psychologist @relation(fields: [psychologistId], references: [id])
+  psychologistId String
 }
 
 model Patient {
   id           String        @id @default(cuid())
   name         String
-  email        String        @unique
+  email        String?       @unique
   phone        String
   appointments Appointment[]
 }
 
 model Appointment {
-  id             String       @id @default(cuid())
+  id             String            @id @default(cuid())
   startTime      DateTime
   endTime        DateTime
-  status         String       @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  status         AppointmentStatus @default(PENDING)
+  type           AppointmentType   @default(ONLINE)
+  psychologist   Psychologist      @relation(fields: [psychologistId], references: [id])
   psychologistId String
-  psychologist   Psychologist @relation(fields: [psychologistId], references: [id])
+  patient        Patient           @relation(fields: [patientId], references: [id])
   patientId      String
-  patient        Patient      @relation(fields: [patientId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 }

@@ -99,7 +99,7 @@ export default async function AdminDashboard() {
                                             "w-2 h-2 rounded-full",
                                             app.status === 'PENDING' ? "bg-yellow-500" : "bg-green-500"
                                         )} />
-                                        {app.status === 'PENDING' ? 'Pendente' : 'Confirmado'} • Psicoterapia (50min)
+                                        {app.status === 'PENDING' ? 'Pendente' : 'Confirmado'} • {app.type === 'ONLINE' ? '💻 Online' : '🏢 Presencial'} (30min)
                                     </p>
                                 </div>
 

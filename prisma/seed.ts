@@ -4,24 +4,53 @@ const prisma = new PrismaClient()
 async function main() {
     const cliseide = await prisma.psychologist.upsert({
         where: { email: 'cliseide@exemplo.com' },
-        update: {},
+        update: {
+            name: 'Cliseide S. Angelini',
+            crp: '123230',
+            bio: 'Psicóloga clínica - atendimento infantil, adolescentes, adultos, idosos e pacientes oncológicos; especialista em terapia cognitivo comportamental; avaliação psicológica.',
+            phone: '19 98827-52-90'
+        },
         create: {
             name: 'Cliseide S. Angelini',
             email: 'cliseide@exemplo.com',
             crp: '123230',
-            bio: 'Especialista em TCC',
+            bio: 'Psicóloga clínica - atendimento infantil, adolescentes, adultos, idosos e pacientes oncológicos; especialista em terapia cognitivo comportamental; avaliação psicológica.',
+            phone: '19 98827-52-90'
         },
     })
 
-    // Segunda a Sexta, 09:00 às 18:00 (540 min às 1080 min)
-    for (let i = 1; i <= 5; i++) {
+    // Limpar disponibilidades antigas
+    await prisma.availability.deleteMany({ where: { psychologistId: cliseide.id } })
+
+    // Segunda (1): 14:30 às 17:30
+    await prisma.availability.create({
+        data: {
+            dayOfWeek: 1,
+            startTime: 870, // 14:30
+            endTime: 1050,  // 17:30
+            psychologistId: cliseide.id,
+        }
+    })
+
+    // Terça (2) a Sexta (5)
+    for (let i = 2; i <= 5; i++) {
+        // Manhã: 07:00 às 11:30
         await prisma.availability.create({
             data: {
                 dayOfWeek: i,
-                startTime: 540,
-                endTime: 1080,
+                startTime: 420, // 07:00
+                endTime: 690,  // 11:30
                 psychologistId: cliseide.id,
-            },
+            }
+        })
+        // Tarde: 14:30 às 17:30
+        await prisma.availability.create({
+            data: {
+                dayOfWeek: i,
+                startTime: 870, // 14:30
+                endTime: 1050,  // 17:30
+                psychologistId: cliseide.id,
+            }
         })
     }
 
