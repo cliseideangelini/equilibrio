@@ -106,7 +106,7 @@ export async function createAppointment(formData: {
     });
 
     if (patient && patient.password && !password) {
-        throw new Error("Este telefone já possui cadastro. Por favor, faça login para agendar.");
+        return { success: false, error: "Este telefone já possui cadastro. Por favor, faça login preenchendo sua senha para agendar." };
     }
 
     let hashedPassword: string | undefined = undefined;
@@ -118,7 +118,7 @@ export async function createAppointment(formData: {
         patient = await prisma.patient.create({
             data: {
                 name,
-                email,
+                email: email || null,
                 phone,
                 password: hashedPassword
             }
@@ -138,7 +138,7 @@ export async function createAppointment(formData: {
         where: { email: 'Cliseideangelini@gmail.com' }
     });
 
-    if (!psychologist) throw new Error("Psicóloga não encontrada no sistema.");
+    if (!psychologist) return { success: false, error: "Psicóloga não encontrada no sistema. Verifique o cadastro." };
 
     const [hours, mins] = time.split(':').map(Number);
     const startTime = new Date(date);

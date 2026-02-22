@@ -76,12 +76,20 @@ export default function BookingForm() {
                 time: selectedSlot!,
                 type: appointmentType,
             });
+
+            if (!result.success) {
+                alert(result.error || "Erro ao agendar. Tente novamente.");
+                setIsSubmitting(false);
+                return;
+            }
+
             localStorage.setItem('patient_name', name);
             localStorage.setItem('patient_phone', phone);
-            setMeetLink(result.meetLink ?? null);
+            setMeetLink((result as any).meetLink ?? null);
             setSuccess(true);
         } catch (err: any) {
-            alert(err.message || "Erro ao agendar. Tente novamente.");
+            console.error(err);
+            alert("Erro de comunicação com o servidor. Tente novamente.");
         } finally {
             setIsSubmitting(false);
         }
