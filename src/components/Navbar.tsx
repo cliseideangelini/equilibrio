@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Navbar() {
+    const pathname = usePathname();
     const [scrolled, setScrolled] = useState(false);
     const [isPatient, setIsPatient] = useState(false);
     const router = useRouter();
-    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
     if (pathname === '/paciente/minha-agenda') return null;
 
