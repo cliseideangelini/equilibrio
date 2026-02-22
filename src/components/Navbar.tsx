@@ -12,6 +12,9 @@ export function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [isPatient, setIsPatient] = useState(false);
     const router = useRouter();
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    if (pathname === '/paciente/minha-agenda') return null;
 
     useEffect(() => {
         const checkAuth = () => {
