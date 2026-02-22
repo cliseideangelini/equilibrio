@@ -63,7 +63,7 @@ export default async function PatientDashboard() {
     else if (currentHour >= 18 || currentHour < 5) saudacao = "Boa noite";
 
     return (
-        <div className="fixed inset-0 bg-white z-[60] flex flex-col md:flex-row overflow-hidden font-sans">
+        <div className="fixed inset-0 bg-white z-40 flex flex-col md:flex-row overflow-hidden font-sans">
 
             {/* Sidebar Lateral - Desktop */}
             <aside className="w-full md:w-96 bg-sage-50 border-r border-sage-100 flex flex-col p-8 shrink-0 overflow-y-auto">
