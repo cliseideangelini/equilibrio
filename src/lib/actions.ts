@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { createGoogleCalendarEvent } from "@/lib/google-calendar";
+import { cookies } from "next/headers";
 import {
     startOfDay,
     endOfDay,
@@ -105,7 +106,10 @@ export async function createAppointment(formData: {
         where: { phone }
     });
 
-    if (patient && patient.password && !password) {
+    const cookieStore = await cookies();
+    const isOwner = patient && cookieStore.get("patient_id")?.value === patient.id;
+
+    if (patient && patient.password && !password && !isOwner) {
         return { success: false, error: "Este telefone já possui cadastro. Por favor, faça login preenchendo sua senha para agendar." };
     }
 
