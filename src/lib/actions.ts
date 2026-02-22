@@ -150,8 +150,9 @@ export async function createAppointment(formData: {
     startTime.setHours(hours, mins, 0, 0);
     const endTime = addMinutes(startTime, 30);
 
-    // Google Calendar — erros não bloqueiam o agendamento
-    let meetLink: string | null = null;
+    // Google Calendar — Tentativa de criação dinâmica (opcional)
+    let meetLink: string | null = "https://meet.google.com/wnx-geqg-wgs";
+
     try {
         const result = await createGoogleCalendarEvent({
             patientName: name,
@@ -159,15 +160,13 @@ export async function createAppointment(formData: {
             durationMinutes: 30,
             type: type as "ONLINE" | "PRESENCIAL"
         });
-        meetLink = result.meetLink ?? null;
+        if (result.meetLink) meetLink = result.meetLink;
     } catch (err: any) {
-        console.error("[Google Calendar] Falhou:", err?.message ?? err);
+        // Falha silenciosa, usaremos o link fixo padrão definido acima
     }
 
-    // Fallback para link estático se a criação dinâmica falhar ou não retornar link
-    if (type === "ONLINE" && !meetLink) {
-        meetLink = process.env.STATIC_MEET_LINK || null;
-    }
+    // Se for presencial, não salva link
+    if (type !== "ONLINE") meetLink = null;
 
     const appointment = await prisma.appointment.create({
         data: {
