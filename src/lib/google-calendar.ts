@@ -28,44 +28,51 @@ export async function createGoogleCalendarEvent(params: {
     const endTime = addMinutes(params.startTime, params.durationMinutes);
     const isOnline = params.type === "ONLINE";
 
-    const event = await calendar.events.insert({
-        calendarId: "primary",
-        conferenceDataVersion: isOnline ? 1 : 0,
-        requestBody: {
-            summary: `Sessão ${isOnline ? "Online" : "Presencial"} - ${params.patientName}`,
-            description: `Consulta de psicoterapia com Cliseide S. Angelini (CRP 123230)\nTipo: ${params.type}\nWpp: 19 98827-52-90`,
-            location: isOnline ? "Google Meet" : "Consultório Presencial",
-            start: {
-                dateTime: params.startTime.toISOString(),
-                timeZone: "America/Sao_Paulo",
-            },
-            end: {
-                dateTime: endTime.toISOString(),
-                timeZone: "America/Sao_Paulo",
-            },
-            // Só cria o link do Meet se for ONLINE
-            conferenceData: isOnline ? {
-                createRequest: {
-                    // Ensure requestId is highly unique
-                    requestId: `equilibrio-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                    conferenceSolutionKey: { type: "hangoutsMeet" },
+    try {
+        const event = await calendar.events.insert({
+            calendarId: "primary",
+            conferenceDataVersion: isOnline ? 1 : 0,
+            requestBody: {
+                summary: `Sessão ${isOnline ? "Online" : "Presencial"} - ${params.patientName}`,
+                description: `Consulta de psicoterapia com Cliseide S. Angelini (CRP 123230)\nTipo: ${params.type}\nWpp: 19 98827-52-90`,
+                location: isOnline ? "Google Meet" : "Consultório Presencial",
+                start: {
+                    dateTime: params.startTime.toISOString(),
+                    timeZone: "America/Sao_Paulo",
                 },
-            } : undefined,
-            reminders: {
-                useDefault: false,
-                overrides: [
-                    { method: "email", minutes: 180 },
-                    { method: "popup", minutes: 15 },
-                ],
+                end: {
+                    dateTime: endTime.toISOString(),
+                    timeZone: "America/Sao_Paulo",
+                },
+                conferenceData: isOnline ? {
+                    createRequest: {
+                        requestId: `equilibrio-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                        conferenceSolutionKey: { type: "hangoutsMeet" },
+                    },
+                } : undefined,
+                reminders: {
+                    useDefault: false,
+                    overrides: [
+                        { method: "email", minutes: 180 },
+                        { method: "popup", minutes: 15 },
+                    ],
+                },
             },
-        },
-    });
+        });
 
-    // Extrair o link do Google Meet se existir
-    const meetLink =
-        event.data.conferenceData?.entryPoints?.find((ep) => ep.entryPointType === "video")?.uri ||
-        event.data.hangoutLink ||
-        null;
+        // Extrair o link do Google Meet se existir
+        const meetLink =
+            event.data.conferenceData?.entryPoints?.find((ep: any) => ep.entryPointType === "video")?.uri ||
+            event.data.hangoutLink ||
+            null;
 
-    return { eventId: event.data.id, meetLink };
+        if (isOnline && !meetLink) {
+            console.warn("[Google Calendar] Evento criado, mas nenhum meetLink foi gerado. Verifique as permissões de conferência da conta.");
+        }
+
+        return { eventId: event.data.id, meetLink };
+    } catch (error: any) {
+        console.error("Erro completo do Google Calendar:", JSON.stringify(error, null, 2));
+        throw error;
+    }
 }

@@ -160,7 +160,12 @@ export async function createAppointment(formData: {
         });
         meetLink = result.meetLink ?? null;
     } catch (err: any) {
-        console.error("[Google Calendar] Falhou, agendamento continua:", err?.message ?? err);
+        console.error("[Google Calendar] Falhou:", err?.message ?? err);
+    }
+
+    // Fallback para link estático se a criação dinâmica falhar ou não retornar link
+    if (type === "ONLINE" && !meetLink) {
+        meetLink = process.env.STATIC_MEET_LINK || null;
     }
 
     const appointment = await prisma.appointment.create({

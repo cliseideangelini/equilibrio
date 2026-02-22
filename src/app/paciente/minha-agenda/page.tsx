@@ -113,12 +113,7 @@ export default async function PatientDashboard() {
                     )}
 
                     <nav className="space-y-2">
-                        <Link href="/agendar" className="block">
-                            <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-2xl text-muted-foreground hover:text-primary hover:bg-white transition-all">
-                                <Calendar size={20} />
-                                Novo Agendamento
-                            </Button>
-                        </Link>
+
                         <a href="https://wa.me/5519988275290" target="_blank" className="block">
                             <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-2xl text-muted-foreground hover:text-green-600 hover:bg-white transition-all">
                                 <MessageCircle size={20} />
