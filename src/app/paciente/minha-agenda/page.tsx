@@ -217,7 +217,7 @@ export default async function PatientDashboard() {
                                                     <div className="flex flex-col gap-4 w-full md:w-auto min-w-[220px]">
                                                         {app.type === 'ONLINE' && (
                                                             <Button asChild size="lg" className="rounded-2xl h-16 font-black bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 uppercase tracking-widest text-xs">
-                                                                <a href={app.meetLink || '#'} target="_blank">Entrar na Sessão</a>
+                                                                <a href={app.meetLink ? (app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`) : '#'} target="_blank" rel="noopener noreferrer">Entrar na Sessão</a>
                                                             </Button>
                                                         )}
                                                         <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
