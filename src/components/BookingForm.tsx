@@ -85,58 +85,16 @@ export default function BookingForm() {
 
             localStorage.setItem('patient_name', name);
             localStorage.setItem('patient_phone', phone);
-            setMeetLink((result as any).meetLink ?? null);
-            setSuccess(true);
+
+            // Redireciona diretamente para a agenda
+            window.location.href = '/paciente/minha-agenda';
+
         } catch (err: any) {
             console.error(err);
             alert("Erro de comunicação com o servidor. Tente novamente.");
-        } finally {
             setIsSubmitting(false);
         }
     };
-
-    const waText = selectedDate && selectedSlot ? encodeURIComponent(
-        `Olá, Dra. Cliseide! Acabei de agendar uma sessão:\n\n📅 *${format(selectedDate, "dd/MM/yyyy", { locale: ptBR })}* às *${selectedSlot}*\n🖼️ Formato: *${appointmentType === "ONLINE" ? "Online (Google Meet)" : "Presencial"}*${meetLink ? `\n🔗 Link: ${meetLink}` : ""}\n\nMeu nome: ${name}\nTelefone: ${phone}\n\nAguardo a confirmação! 🙏`
-    ) : "";
-
-    if (success) {
-        return (
-            <div className="bg-white rounded-[3rem] p-10 md:p-16 shadow-2xl border border-sage-100 flex flex-col items-center text-center max-w-lg w-full animate-in fade-in zoom-in-95 duration-500">
-                <div className="w-24 h-24 bg-green-50 text-green-600 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner">
-                    <CheckCircle2 size={48} />
-                </div>
-                <h1 className="text-4xl font-black mb-4 tracking-tight">Tudo pronto!</h1>
-                <p className="text-muted-foreground font-medium mb-10 italic">
-                    Sua sessão foi solicitada para <strong>{format(selectedDate!, "dd/MM/yyyy", { locale: ptBR })}</strong> às <strong>{selectedSlot}</strong>.
-                </p>
-
-                {meetLink && (
-                    <div className="w-full bg-blue-50 border border-blue-100 rounded-[2rem] p-8 mb-10 text-left relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100/50 rounded-full -mr-12 -mt-12 blur-2xl" />
-                        <p className="text-xs font-black text-blue-800 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <Monitor size={14} /> Link do Google Meet
-                        </p>
-                        <a href={meetLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold block truncate hover:underline text-sm">
-                            clique para abrir sala
-                        </a>
-                    </div>
-                )}
-
-                <div className="flex flex-col gap-4 w-full">
-                    <a href={`https://wa.me/5519988275290?text=${waText}`} target="_blank" className="w-full">
-                        <Button className="w-full h-16 rounded-2xl bg-[#25D366] hover:bg-[#22c55e] text-white font-black shadow-xl shadow-green-100 uppercase tracking-widest text-xs">
-                            Confirmar pelo WhatsApp
-                        </Button>
-                    </a>
-                    <a href="/" className="w-full">
-                        <Button variant="ghost" className="w-full h-14 rounded-2xl font-bold text-muted-foreground hover:text-primary">
-                            Voltar ao início
-                        </Button>
-                    </a>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="grid lg:grid-cols-[auto_1fr] gap-12">

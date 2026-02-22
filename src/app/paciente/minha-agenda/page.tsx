@@ -21,6 +21,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CancellationButton } from "@/components/CancellationButton";
 import { AppointmentHistory } from "@/components/AppointmentHistory";
+import { LogoutButton } from "@/components/LogoutButton";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -126,12 +127,7 @@ export default async function PatientDashboard() {
                         </a>
                     </nav>
 
-                    <Link href="/" className="block">
-                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-2xl text-red-500/40 hover:text-red-500 hover:bg-red-50 transition-all font-bold">
-                            <LogOut size={20} />
-                            Sair do Portal
-                        </Button>
-                    </Link>
+                    <LogoutButton />
                 </div>
             </aside>
 
