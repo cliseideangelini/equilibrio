@@ -256,16 +256,6 @@ export default async function PatientDashboard() {
                     </div>
                 </div>
             </main>
-
-            <style jsx global>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-20%); }
-                }
-                .animate-marquee {
-                    animation: marquee 15s linear infinite;
-                }
-            `}</style>
         </div>
     );
 }
