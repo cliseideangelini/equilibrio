@@ -47,7 +47,7 @@ export function AppointmentHistory({ appointments, isSidebar }: AppointmentHisto
                         activeTab === 'tardias' ? "bg-white text-primary shadow-sm" : "text-muted-foreground/30 hover:text-primary"
                     )}
                 >
-                    Com Taxa ({tardias.length})
+                    Ausências ({tardias.length})
                 </button>
             </div>
 
@@ -62,7 +62,7 @@ export function AppointmentHistory({ appointments, isSidebar }: AppointmentHisto
                 )}
                 {activeTab === 'tardias' && (
                     tardias.length > 0 ? tardias.map((app) => <HistoryItem key={app.id} app={app} icon={<AlertTriangle className="w-3 h-3 text-amber-500/30" />} />)
-                        : <EmptyState message="Sem cancelamentos tardios." />
+                        : <EmptyState message="Sem ausências registradas." />
                 )}
             </div>
         </div>

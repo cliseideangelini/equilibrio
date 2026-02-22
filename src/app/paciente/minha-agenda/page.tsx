@@ -84,8 +84,34 @@ export default async function PatientDashboard() {
                     </section>
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-sage-200">
-                    <nav className="space-y-2 mb-8">
+                <div className="mt-8 pt-8 border-t border-sage-200 space-y-8">
+                    {/* Última Sessão na Sidebar */}
+                    {lastPastAppointment && (
+                        <div className="bg-white rounded-2xl p-4 border border-sage-200 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150" />
+                            <h5 className="font-black uppercase tracking-widest text-muted-foreground/50 text-[9px] mb-3 flex items-center gap-1.5 relative z-10">
+                                <BellRing size={10} /> Última Atividade
+                            </h5>
+                            <div className="flex items-center gap-3 relative z-10">
+                                <div className="w-10 h-10 bg-sage-50 rounded-xl flex flex-col items-center justify-center text-primary border border-sage-100/50">
+                                    <span className="text-[8px] font-black uppercase opacity-60 leading-none">{format(lastPastAppointment.startTime, 'MMM', { locale: ptBR })}</span>
+                                    <span className="text-sm font-black leading-none mt-0.5">{format(lastPastAppointment.startTime, 'dd')}</span>
+                                </div>
+                                <div>
+                                    <p className="font-black text-xs text-foreground/80">{format(lastPastAppointment.startTime, 'HH:mm')}</p>
+                                    <p className={cn(
+                                        "text-[8px] font-black uppercase px-1.5 py-0.5 rounded flex items-center gap-1",
+                                        lastPastAppointment.status === 'CANCELLED' ? "bg-red-50 text-red-500" : "bg-green-50 text-green-600"
+                                    )}>
+                                        {lastPastAppointment.status === 'CANCELLED' ? <XCircle size={8} /> : <CheckCircle2 size={8} />}
+                                        {lastPastAppointment.status === 'CANCELLED' ? 'Cancelada' : 'Realizada'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <nav className="space-y-2">
                         <Link href="/agendar" className="block">
                             <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-2xl text-muted-foreground hover:text-primary hover:bg-white transition-all">
                                 <Calendar size={20} />
@@ -234,30 +260,6 @@ export default async function PatientDashboard() {
                                         </a>
                                     </div>
                                 </div>
-
-                                {/* Última Sessão (Resumo Pequeno) */}
-                                {lastPastAppointment && (
-                                    <div className="p-10 bg-sage-50/50 rounded-[3.5rem] border border-primary/5">
-                                        <h5 className="font-black uppercase tracking-widest text-muted-foreground/30 text-[10px] mb-6 flex items-center gap-2">
-                                            <BellRing size={12} /> Última Atividade
-                                        </h5>
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 bg-white rounded-2xl flex flex-col items-center justify-center shadow-sm text-primary">
-                                                <span className="text-[10px] font-black uppercase opacity-40 leading-none">{format(lastPastAppointment.startTime, 'MMM', { locale: ptBR })}</span>
-                                                <span className="text-2xl font-black">{format(lastPastAppointment.startTime, 'dd')}</span>
-                                            </div>
-                                            <div>
-                                                <p className="font-black text-sm text-foreground/70">{format(lastPastAppointment.startTime, 'HH:mm')}</p>
-                                                <p className={cn(
-                                                    "text-[9px] font-black uppercase px-2 py-0.5 rounded-md inline-block",
-                                                    lastPastAppointment.status === 'CANCELLED' ? "bg-red-50 text-red-500" : "bg-green-50 text-green-600"
-                                                )}>
-                                                    {lastPastAppointment.status === 'CANCELLED' ? 'Cancelada' : 'Realizada'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>
