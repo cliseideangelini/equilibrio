@@ -185,59 +185,76 @@ export default async function PatientDashboard() {
                                         <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Suas Próximas Consultas</h3>
                                     </div>
 
-                                    <div className="grid md:grid-cols-2 gap-8 w-full">
-                                        {futureAppointments.length > 0 ? futureAppointments.map((app: any) => (
-                                            <div key={app.id} className="relative group perspective-1000 h-full">
-                                                <div className="h-full bg-white rounded-[3.5rem] border-2 border-primary/5 shadow-sm p-10 flex flex-col xl:flex-row items-center justify-center gap-8 transition-all duration-500 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/10">
-                                                    {/* Data Gigante */}
-                                                    <div className="flex flex-col items-center justify-center shrink-0">
-                                                        <div className="w-32 h-32 bg-primary text-white rounded-[3rem] flex flex-col items-center justify-center shadow-2xl shadow-primary/20 transform group-hover:-rotate-3 transition-transform duration-500">
-                                                            <span className="text-sm font-black uppercase opacity-60 mb-1">{format(app.startTime, 'MMM', { locale: ptBR })}</span>
-                                                            <span className="text-6xl font-black leading-none">{format(app.startTime, 'dd')}</span>
-                                                        </div>
-                                                        <span className="mt-4 font-black text-primary/40 text-xs italic tracking-widest">{format(app.startTime, 'EEEE', { locale: ptBR })}</span>
-                                                    </div>
-
-                                                    <div className="flex-1 text-center md:text-left">
-                                                        <div className="flex flex-col md:flex-row md:items-center gap-5 mb-5">
-                                                            <h4 className="text-5xl font-black text-foreground tracking-tighter">
-                                                                {format(app.startTime, 'HH:mm')}
-                                                            </h4>
-                                                            <div className="flex items-center gap-2 px-5 py-2.5 bg-sage-50 text-primary rounded-full w-fit mx-auto md:mx-0 border border-primary/10">
-                                                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                                                <span className="text-[10px] font-black uppercase tracking-widest">Atendimento {app.type}</span>
+                                    <div className="w-full overflow-x-auto bg-white border border-sage-200 rounded-[2rem] shadow-sm">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="bg-sage-50/50 border-b border-sage-200/50">
+                                                    <th className="py-5 px-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Data</th>
+                                                    <th className="py-5 px-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Horário</th>
+                                                    <th className="py-5 px-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Modalidade</th>
+                                                    <th className="py-5 px-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Local / Link</th>
+                                                    <th className="py-5 px-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 text-right">Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-sage-100/50">
+                                                {futureAppointments.length > 0 ? futureAppointments.map((app: any) => (
+                                                    <tr key={app.id} className="hover:bg-sage-50/30 transition-colors group">
+                                                        <td className="py-6 px-8 whitespace-nowrap">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 bg-primary/10 rounded-xl flex flex-col items-center justify-center text-primary font-black leading-none">
+                                                                    <span className="text-[10px] uppercase opacity-70 mb-0.5">{format(app.startTime, 'MMM', { locale: ptBR })}</span>
+                                                                    <span className="text-sm">{format(app.startTime, 'dd')}</span>
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <span className="font-bold text-foreground text-sm">{format(app.startTime, 'dd/MM/yyyy')}</span>
+                                                                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-black">{format(app.startTime, 'EEEE', { locale: ptBR })}</span>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <p className="text-muted-foreground/80 font-semibold text-lg flex items-center justify-center md:justify-start gap-4">
-                                                            {app.type === 'ONLINE' ? <Video size={20} className="text-blue-500" /> : <MapPin size={20} className="text-sage-600" />}
-                                                            {app.type === 'ONLINE' ? 'Google Meet (Link Privativo)' : 'Presencial (Unidade Equilíbrio)'}
-                                                        </p>
-                                                    </div>
-
-                                                    <div className="flex flex-col gap-4 w-full md:w-auto min-w-[220px]">
-                                                        {app.type === 'ONLINE' && (
-                                                            <Button asChild size="lg" className="rounded-2xl h-16 font-black bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 uppercase tracking-widest text-xs">
-                                                                <a href={app.meetLink ? (app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`) : '#'} target="_blank" rel="noopener noreferrer">Entrar na Sessão</a>
-                                                            </Button>
-                                                        )}
-                                                        <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )) : (
-                                            <div className="py-32 text-center border-4 border-dashed border-primary/5 rounded-[4rem] bg-sage-50/20">
-                                                <Calendar className="w-20 h-20 text-primary/10 mx-auto mb-8" />
-                                                <p className="text-muted-foreground font-black italic text-3xl mb-10 max-w-sm mx-auto">Você ainda não tem novas consultas agendadas.</p>
-                                                <Link href="/agendar">
-                                                    <Button size="lg" className="rounded-3xl font-black px-16 h-16 uppercase tracking-widest text-xs bg-primary hover:scale-105 transition-transform shadow-xl">Agendar Agora</Button>
-                                                </Link>
-                                            </div>
-                                        )}
+                                                        </td>
+                                                        <td className="py-6 px-8 whitespace-nowrap">
+                                                            <span className="text-xl font-black text-foreground">{format(app.startTime, 'HH:mm')}</span>
+                                                        </td>
+                                                        <td className="py-6 px-8 whitespace-nowrap">
+                                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-sage-50 text-sage-700 rounded-md border border-sage-200/50">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                                                <span className="text-[9px] font-black uppercase tracking-widest">{app.type}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-6 px-8 whitespace-nowrap text-sm font-semibold text-muted-foreground">
+                                                            <div className="flex items-center gap-2">
+                                                                {app.type === 'ONLINE' ? <Video size={16} className="text-blue-500" /> : <MapPin size={16} className="text-sage-600" />}
+                                                                {app.type === 'ONLINE' ? 'Google Meet' : 'Presencial'}
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-6 px-8 whitespace-nowrap text-right">
+                                                            <div className="flex items-center justify-end gap-3">
+                                                                {app.type === 'ONLINE' && (
+                                                                    <Button asChild size="sm" className="rounded-xl h-10 font-black bg-blue-600 hover:bg-blue-700 shadow-sm uppercase tracking-widest text-[9px] px-4">
+                                                                        <a href={app.meetLink ? (app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`) : '#'} target="_blank" rel="noopener noreferrer">Entrar</a>
+                                                                    </Button>
+                                                                )}
+                                                                <div className="scale-75 origin-right">
+                                                                    <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )) : (
+                                                    <tr>
+                                                        <td colSpan={5} className="py-32 text-center bg-sage-50/10">
+                                                            <Calendar className="w-16 h-16 text-primary/10 mx-auto mb-6" />
+                                                            <p className="text-muted-foreground font-black italic text-xl mb-8">Nenhuma consulta futura.</p>
+                                                            <Link href="/agendar">
+                                                                <Button size="lg" className="rounded-2xl font-black px-12 h-12 uppercase tracking-widest text-[10px] bg-primary shadow-lg">Agendar Agora</Button>
+                                                            </Link>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </section>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
