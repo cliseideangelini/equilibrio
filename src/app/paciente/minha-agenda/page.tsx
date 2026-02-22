@@ -106,14 +106,14 @@ export default async function PatientDashboard() {
             {/* Conteúdo Principal Fullscreen */}
             <main className="flex-1 overflow-y-auto bg-white flex flex-col">
 
-                {/* Banner de Aviso de Política (Movendo) */}
-                <div className="bg-amber-500 py-3 relative overflow-hidden shrink-0">
+                {/* Banner de Aviso de Política (Verde Água) */}
+                <div className="bg-primary/5 border-b border-primary/5 py-2 relative overflow-hidden shrink-0">
                     <div className="whitespace-nowrap flex animate-marquee">
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="inline-flex items-center gap-4 mx-8 text-white font-black text-xs tracking-widest">
-                                <AlertTriangle size={14} className="animate-pulse" />
-                                ATENCÃO: CANCELAMENTOS COM MENOS DE 3H DE ANTECEDÊNCIA SERÃO COBRADOS INTEGRALMENTE
-                                <div className="w-2 h-2 rounded-full bg-white/30" />
+                            <div key={i} className="inline-flex items-center gap-6 mx-8 text-primary/60 font-black text-[10px] tracking-[0.3em] uppercase">
+                                <Info size={14} />
+                                Cancelamentos com menos de 3h de antecedência serão cobrados integralmente
+                                <div className="w-1 h-1 rounded-full bg-primary/20" />
                             </div>
                         ))}
                     </div>
@@ -121,19 +121,20 @@ export default async function PatientDashboard() {
 
                 <div className="flex-1 p-6 md:p-12 lg:p-16">
                     <div className="max-w-6xl mx-auto">
-                        {/* Header Interno */}
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+                        {/* Header Interno Redesenhado */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-20">
                             <div>
-                                <h1 className="text-5xl md:text-7xl font-black text-foreground tracking-tight leading-none italic mb-4">
-                                    Olá, <span className="text-primary not-italic">{patient.name.split(' ')[0]}</span>.
+                                <h1 className="text-4xl md:text-6xl font-light text-foreground tracking-tight leading-tight">
+                                    Bom dia, <span className="font-semibold text-primary">{patient.name.split(' ')[0]}</span>.
                                 </h1>
-                                <p className="text-muted-foreground font-medium text-xl max-w-xl italic border-l-4 border-primary/20 pl-6">
-                                    "O maior passo para o equilíbrio é decidir começar o cuidado."
+                                <div className="h-[2px] w-12 bg-primary/20 mt-6 mb-4" />
+                                <p className="text-muted-foreground/60 font-medium text-lg leading-relaxed max-w-md italic">
+                                    Como você está se sentindo hoje?
                                 </p>
                             </div>
                             <div className="flex h-fit">
                                 <Link href="/agendar">
-                                    <Button size="lg" className="rounded-[2rem] h-20 px-12 font-black text-xl shadow-2xl shadow-primary/30 hover:scale-[1.05] transition-all active:scale-95 bg-primary text-white">
+                                    <Button size="lg" className="rounded-2xl h-14 px-10 font-black text-xs tracking-[0.2em] uppercase shadow-xl shadow-primary/5 hover:shadow-primary/10 transition-all bg-primary text-white border-0">
                                         Novo Agendamento
                                     </Button>
                                 </Link>
