@@ -14,8 +14,6 @@ export function Navbar() {
     const [isPatient, setIsPatient] = useState(false);
     const router = useRouter();
 
-    if (pathname === '/paciente/minha-agenda') return null;
-
     useEffect(() => {
         const checkAuth = () => {
             setIsPatient(document.cookie.includes("patient_id="));
@@ -38,6 +36,8 @@ export function Navbar() {
         setIsPatient(false);
         router.push("/");
     };
+
+    if (pathname === '/paciente/minha-agenda') return null;
 
     return (
         <header
