@@ -37,8 +37,9 @@ export function CancellationButton({ appointmentId, startTime }: CancellationBut
                 setIsOpen(false);
                 window.location.reload();
             }
-        } catch (error) {
-            alert("Erro ao cancelar. Tente novamente.");
+        } catch (error: any) {
+            console.error("Erro ao cancelar:", error);
+            alert("Erro ao cancelar: " + (error.message || "Tente novamente."));
         } finally {
             setIsPending(false);
         }
