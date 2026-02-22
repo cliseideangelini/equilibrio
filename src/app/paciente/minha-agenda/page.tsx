@@ -225,9 +225,15 @@ export default async function PatientDashboard() {
                                                         <td className="py-6 px-8 whitespace-nowrap text-right">
                                                             <div className="flex items-center justify-end gap-3">
                                                                 {app.type === 'ONLINE' && (
-                                                                    <Button asChild size="sm" className="rounded-xl h-10 font-black bg-blue-600 hover:bg-blue-700 shadow-sm uppercase tracking-widest text-[9px] px-4">
-                                                                        <a href={app.meetLink ? (app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`) : '#'} target="_blank" rel="noopener noreferrer">Entrar</a>
-                                                                    </Button>
+                                                                    app.meetLink ? (
+                                                                        <Button asChild size="sm" className="rounded-xl h-10 font-black bg-blue-600 hover:bg-blue-700 shadow-sm uppercase tracking-widest text-[9px] px-4">
+                                                                            <a href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`} target="_blank" rel="noopener noreferrer">Entrar</a>
+                                                                        </Button>
+                                                                    ) : (
+                                                                        <Button size="sm" disabled className="rounded-xl h-10 font-black bg-sage-100 text-sage-400 shadow-none uppercase tracking-widest text-[9px] px-4 cursor-not-allowed">
+                                                                            Aguardando Link
+                                                                        </Button>
+                                                                    )
                                                                 )}
                                                                 <div className="scale-75 origin-right">
                                                                     <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
