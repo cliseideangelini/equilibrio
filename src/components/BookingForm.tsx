@@ -25,7 +25,7 @@ export default function BookingForm() {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [slots, setSlots] = useState<string[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-    const [appointmentType, setAppointmentType] = useState<"ONLINE" | "PRESENCIAL">("ONLINE");
+    const [appointmentType, setAppointmentType] = useState<"ONLINE" | "PRESENCIAL">("PRESENCIAL");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [meetLink, setMeetLink] = useState<string | null>(null);
