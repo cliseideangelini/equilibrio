@@ -49,7 +49,7 @@ export default async function PatientDashboard() {
     }
 
     const now = new Date();
-    const futureAppointments = patient.appointments.filter((app: any) => new Date(app.startTime) > now && app.status !== 'CANCELLED');
+    const futureAppointments = patient.appointments.filter((app: any) => new Date(app.startTime) > now && app.status !== 'CANCELLED').reverse();
     const pastOrCancelled = patient.appointments.filter((app: any) => new Date(app.startTime) <= now || app.status === 'CANCELLED');
 
     const lastPastAppointment = pastOrCancelled[0];
