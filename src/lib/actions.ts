@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { createGoogleCalendarEvent } from "@/lib/google-calendar";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import {
     startOfDay,
     endOfDay,
@@ -180,6 +181,7 @@ export async function createAppointment(formData: {
         }
     });
 
+    revalidatePath('/paciente/minha-agenda');
     return { success: true, appointmentId: appointment.id, meetLink };
 }
 
@@ -239,6 +241,8 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         where: { id: appointmentId },
         data: { status: "CANCELLED" }
     });
+
+    revalidatePath('/paciente/minha-agenda');
 
     return { success: true };
 }

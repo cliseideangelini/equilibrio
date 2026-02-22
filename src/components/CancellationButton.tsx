@@ -35,7 +35,7 @@ export function CancellationButton({ appointmentId, startTime }: CancellationBut
                 setRequiresLateConfirmation(true);
             } else if (result.success) {
                 setIsOpen(false);
-                router.refresh();
+                window.location.reload();
             }
         } catch (error) {
             alert("Erro ao cancelar. Tente novamente.");
