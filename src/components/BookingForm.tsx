@@ -40,13 +40,20 @@ export default function BookingForm() {
     // Checar se já está logado
     useEffect(() => {
         const patientId = document.cookie.split('; ').find(row => row.startsWith('patient_id='))?.split('=')[1];
-        if (patientId) {
+        const savedName = localStorage.getItem('patient_name');
+        const savedPhone = localStorage.getItem('patient_phone');
+
+        if (patientId && savedName) {
             setIsLoggedIn(true);
-            const savedName = localStorage.getItem('patient_name');
-            const savedPhone = localStorage.getItem('patient_phone');
-            if (savedName) setName(savedName);
+            setName(savedName);
             if (savedPhone) setPhone(savedPhone);
             setPassword("SESSION_ACTIVE");
+        } else {
+            setIsLoggedIn(false);
+            // Se o cookie existir mas os dados não, limpa o cookie para evitar inconsistências
+            if (patientId && !savedName) {
+                document.cookie = "patient_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            }
         }
     }, []);
 
