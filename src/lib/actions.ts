@@ -109,7 +109,7 @@ export async function createAppointment(formData: {
         throw new Error("Este telefone já possui cadastro. Por favor, faça login para agendar.");
     }
 
-    let hashedPassword = undefined;
+    let hashedPassword: string | undefined = undefined;
     if (password && password !== "SESSION_ACTIVE") {
         hashedPassword = await bcrypt.hash(password, 10);
     }
@@ -138,13 +138,14 @@ export async function createAppointment(formData: {
         where: { email: 'Cliseideangelini@gmail.com' }
     });
 
-    if (!psychologist) throw new Error("Psicóloga não encontrada");
+    if (!psychologist) throw new Error("Psicóloga não encontrada no sistema.");
 
-    const [hours, minutes] = time.split(':').map(Number);
+    const [hours, mins] = time.split(':').map(Number);
     const startTime = new Date(date);
-    startTime.setHours(hours, minutes, 0, 0);
+    startTime.setHours(hours, mins, 0, 0);
     const endTime = addMinutes(startTime, 30);
 
+    // Google Calendar — erros não bloqueiam o agendamento
     let meetLink: string | null = null;
     try {
         const result = await createGoogleCalendarEvent({
@@ -154,8 +155,8 @@ export async function createAppointment(formData: {
             type: type as "ONLINE" | "PRESENCIAL"
         });
         meetLink = result.meetLink ?? null;
-    } catch (err) {
-        console.error("Erro ao sincronizar com Google Calendar:", err);
+    } catch (err: any) {
+        console.error("[Google Calendar] Falhou, agendamento continua:", err?.message ?? err);
     }
 
     const appointment = await prisma.appointment.create({
