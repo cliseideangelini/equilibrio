@@ -173,7 +173,7 @@ export default async function PatientDashboard() {
                             </div>
                         </div>
 
-                        <div className="grid lg:grid-cols-[1fr_380px] gap-16">
+                        <div>
                             {/* Coluna Central */}
                             <div className="space-y-20">
                                 {/* Sessões Futuras */}
@@ -185,10 +185,10 @@ export default async function PatientDashboard() {
                                         <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Suas Próximas Consultas</h3>
                                     </div>
 
-                                    <div className="space-y-8">
+                                    <div className="grid md:grid-cols-2 gap-8 w-full">
                                         {futureAppointments.length > 0 ? futureAppointments.map((app: any) => (
-                                            <div key={app.id} className="relative group perspective-1000">
-                                                <div className="bg-white rounded-[3.5rem] border-2 border-primary/5 shadow-sm p-12 flex flex-col md:flex-row items-center gap-12 transition-all duration-500 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/10">
+                                            <div key={app.id} className="relative group perspective-1000 h-full">
+                                                <div className="h-full bg-white rounded-[3.5rem] border-2 border-primary/5 shadow-sm p-10 flex flex-col xl:flex-row items-center justify-center gap-8 transition-all duration-500 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/10">
                                                     {/* Data Gigante */}
                                                     <div className="flex flex-col items-center justify-center shrink-0">
                                                         <div className="w-32 h-32 bg-primary text-white rounded-[3rem] flex flex-col items-center justify-center shadow-2xl shadow-primary/20 transform group-hover:-rotate-3 transition-transform duration-500">
@@ -237,30 +237,7 @@ export default async function PatientDashboard() {
                                 </section>
                             </div>
 
-                            {/* Sidebar Interna dE apoio */}
-                            <div className="space-y-12">
-                                <div className="bg-sage-900 text-white rounded-[3.5rem] p-12 shadow-2xl relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl transition-all group-hover:bg-white/10" />
 
-                                    <div className="relative z-10 text-center">
-                                        <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center backdrop-blur-md mb-8 mx-auto">
-                                            <MessageCircle size={36} />
-                                        </div>
-                                        <h4 className="font-black text-3xl mb-4 tracking-tight">Dra. Cliseide</h4>
-                                        <p className="text-sage-200/60 font-medium text-sm mb-10 leading-relaxed">
-                                            Ficou com alguma dúvida sobre o atendimento? O contato direto é feito pelo WhatsApp.
-                                        </p>
-                                        <a
-                                            href="https://wa.me/5519988275290"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex w-full items-center justify-center gap-3 bg-white text-sage-900 h-16 rounded-[1.5rem] font-black hover:bg-sage-50 transition-all shadow-xl active:scale-95"
-                                        >
-                                            <span className="text-xl">💬</span> Falar agora
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
