@@ -55,6 +55,12 @@ export default async function PatientDashboard() {
     const lastPastAppointment = pastOrCancelled[0];
     const remainingHistory = pastOrCancelled.slice(1);
 
+    const nowHora = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+    const currentHour = new Date(nowHora).getHours();
+    let saudacao = "Bom dia";
+    if (currentHour >= 12 && currentHour < 18) saudacao = "Boa tarde";
+    else if (currentHour >= 18 || currentHour < 5) saudacao = "Boa noite";
+
     return (
         <div className="fixed inset-0 bg-white z-[60] flex flex-col md:flex-row overflow-hidden font-sans">
 
@@ -125,7 +131,7 @@ export default async function PatientDashboard() {
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-20">
                             <div>
                                 <h1 className="text-4xl md:text-6xl font-light text-foreground tracking-tight leading-tight">
-                                    Bom dia, <span className="font-semibold text-primary">{patient.name.split(' ')[0]}</span>.
+                                    {saudacao}, <span className="font-semibold text-primary">{patient.name.split(' ')[0]}</span>.
                                 </h1>
                                 <div className="h-[2px] w-12 bg-primary/20 mt-6 mb-4" />
                                 <p className="text-muted-foreground/60 font-medium text-lg leading-relaxed max-w-md italic">
