@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, Calendar, Users, Home, Settings, Bell } from "lucide-react";
+import { LogOut, LayoutDashboard, Calendar, Users, Home, Settings, Bell, User } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
