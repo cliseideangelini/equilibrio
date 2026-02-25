@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -15,8 +16,14 @@ interface EvolutionHistoryProps {
 export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryProps) {
     const [search, setSearch] = useState("");
     const [dateFilter, setDateFilter] = useState("");
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const filteredAppointments = useMemo(() => {
+        if (!mounted) return [];
         return appointments.filter(app => {
             const matchesSearch = app.evolution?.content?.toLowerCase().includes(search.toLowerCase()) ||
                 format(app.startTime, "MMMM", { locale: ptBR }).toLowerCase().includes(search.toLowerCase());
@@ -67,10 +74,10 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                                     {appointments.length - appointments.indexOf(app)}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-stone-800 tracking-tight">
+                                    <p className="text-sm font-bold text-stone-800 tracking-tight" suppressHydrationWarning>
                                         Sessão de {format(app.startTime, "eeee, dd 'de' MMMM", { locale: ptBR })}
                                     </p>
-                                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
+                                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest" suppressHydrationWarning>
                                         {format(app.startTime, "HH:mm")} às {format(app.endTime, "HH:mm")} • Modalidade {app.type}
                                     </p>
                                 </div>

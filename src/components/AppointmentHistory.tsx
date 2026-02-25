@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CheckCircle2, XCircle, AlertTriangle, ChevronDown, ChevronUp, History } from "lucide-react";
@@ -13,10 +13,17 @@ interface AppointmentHistoryProps {
 
 export function AppointmentHistory({ appointments, isSidebar }: AppointmentHistoryProps) {
     const [activeTab, setActiveTab] = useState<'realizadas' | 'canceladas' | 'tardias'>('realizadas');
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const realizadas = appointments.filter((app: any) => app.status === 'CONFIRMED' && new Date(app.startTime) < new Date());
     const canceladas = appointments.filter((app: any) => app.status === 'CANCELLED' && !app.payment);
     const tardias = appointments.filter((app: any) => app.status === 'CANCELLED' && app.payment);
+
+    if (!mounted) return <div className="animate-pulse bg-sage-50 h-32 rounded-2xl" />;
 
     return (
         <div className={cn("space-y-6", isSidebar ? "w-full" : "mt-8")}>
@@ -73,12 +80,12 @@ function HistoryItem({ app, icon }: { app: any, icon: React.ReactNode }) {
     return (
         <div className="flex items-center justify-between p-4 bg-white hover:bg-sage-50 rounded-2xl border border-primary/5 transition-all group">
             <div className="flex items-center gap-3">
-                <div className="flex flex-col items-center justify-center min-w-[2rem]">
+                <div className="flex flex-col items-center justify-center min-w-[2rem]" suppressHydrationWarning>
                     <span className="text-[8px] font-black uppercase text-muted-foreground/30 leading-none">{format(new Date(app.startTime), 'MMM', { locale: ptBR })}</span>
                     <span className="text-base font-black text-muted-foreground/60 leading-none mt-1">{format(new Date(app.startTime), 'dd')}</span>
                 </div>
                 <div className="w-[1px] h-6 bg-sage-100" />
-                <div>
+                <div suppressHydrationWarning>
                     <p className="font-bold text-xs text-foreground/60">{format(new Date(app.startTime), 'HH:mm')}</p>
                     <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-tighter">{app.type}</p>
                 </div>

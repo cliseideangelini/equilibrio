@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "Equilíbrio | Psicologia Clínica - Cliseide S. Angelini",
   description: "Atendimento psicológico humanizado com base na Terapia Cognitivo-Comportamental. Agende sua consulta com Cliseide S. Angelini.",
   icons: {
-    icon: "/favicon.png",
+    icon: "/icon.svg",
   }
 };
 
@@ -25,7 +25,7 @@ export default function RootLayout({
       <body
         className={cn(
           inter.variable,
-          "min-height-screen bg-background font-sans antialiased"
+          "min-h-screen bg-background font-sans antialiased"
         )}
       >
         <Navbar />
