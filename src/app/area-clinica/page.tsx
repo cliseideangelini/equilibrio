@@ -85,7 +85,12 @@ export default async function AreaClinicaDashboard() {
                                         {format(app.startTime, "HH:mm")}
                                     </td>
                                     <td className="py-2.5 px-4 font-medium text-stone-700">
-                                        {app.patient.name}
+                                        <Link
+                                            href={`/area-clinica/prontuarios/${app.patient.id}`}
+                                            className="hover:text-stone-900 hover:underline decoration-stone-200 underline-offset-4 transition-all"
+                                        >
+                                            {app.patient.name}
+                                        </Link>
                                     </td>
                                     <td className="py-2.5 px-4">
                                         <span className="inline-flex items-center gap-1.5 text-stone-500">
@@ -165,7 +170,12 @@ export default async function AreaClinicaDashboard() {
                                         {format(app.startTime, "HH:mm")}
                                     </td>
                                     <td className="py-2.5 px-4 font-medium text-stone-700">
-                                        {app.patient.name}
+                                        <Link
+                                            href={`/area-clinica/prontuarios/${app.patient.id}`}
+                                            className="hover:text-stone-900 hover:underline decoration-stone-200 underline-offset-4 transition-all"
+                                        >
+                                            {app.patient.name}
+                                        </Link>
                                     </td>
                                     <td className="py-2.5 px-4">
                                         <span className="inline-flex items-center gap-1.5 text-stone-500">
