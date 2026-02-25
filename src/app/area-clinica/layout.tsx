@@ -13,6 +13,7 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
         { label: "Painel", href: "/area-clinica" },
         { label: "Agenda", href: "/area-clinica/agenda" },
         { label: "Pacientes", href: "/area-clinica/pacientes" },
+        { label: "Prontuários", href: "/area-clinica/prontuarios" },
     ];
 
     return (

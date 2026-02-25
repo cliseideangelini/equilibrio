@@ -242,6 +242,16 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
     });
 
     revalidatePath('/paciente/minha-agenda');
-
     return { success: true };
+}
+
+export async function confirmAppointment(id: string) {
+    const app = await prisma.appointment.update({
+        where: { id },
+        data: { status: "CONFIRMED" },
+        select: { patientId: true }
+    });
+
+    revalidatePath('/area-clinica');
+    return { success: true, patientId: app.patientId };
 }

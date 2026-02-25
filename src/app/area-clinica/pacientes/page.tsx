@@ -1,3 +1,4 @@
+import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Users, Search, Filter, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -72,9 +73,11 @@ export default async function PatientsList() {
                                         {new Date(patient.createdAt).toLocaleDateString('pt-BR')}
                                     </td>
                                     <td className="py-3 px-4 text-center">
-                                        <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold uppercase tracking-widest text-primary">
-                                            Ver Prontuário
-                                        </Button>
+                                        <Link href={`/area-clinica/prontuarios/${patient.id}`}>
+                                            <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold uppercase tracking-widest text-primary">
+                                                Ver Prontuário
+                                            </Button>
+                                        </Link>
                                     </td>
                                 </tr>
                             )) : (

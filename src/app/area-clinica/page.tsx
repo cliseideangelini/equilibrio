@@ -4,6 +4,7 @@ import { ptBR } from "date-fns/locale";
 import { Video, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { ConfirmAppointmentButton } from "@/components/ConfirmAppointmentButton";
 
 export const dynamic = "force-dynamic";
 
@@ -95,15 +96,17 @@ export default async function AreaClinicaDashboard() {
                                         </span>
                                     </td>
                                     <td className="py-2.5 px-4">
-                                        <span className={cn(
-                                            "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide",
-                                            app.status === "CONFIRMED" ? "bg-emerald-50 text-emerald-600" :
-                                                app.status === "CANCELLED" ? "bg-red-50 text-red-600" :
-                                                    "bg-amber-50 text-amber-600"
-                                        )}>
-                                            {app.status === "CONFIRMED" ? "Confirmado" :
-                                                app.status === "CANCELLED" ? "Cancelado" : "Pendente"}
-                                        </span>
+                                        {app.status === "PENDING" ? (
+                                            <ConfirmAppointmentButton appointmentId={app.id} />
+                                        ) : (
+                                            <span className={cn(
+                                                "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide",
+                                                app.status === "CONFIRMED" ? "bg-emerald-50 text-emerald-600" :
+                                                    "bg-red-50 text-red-600"
+                                            )}>
+                                                {app.status === "CONFIRMED" ? "Confirmado" : "Cancelado"}
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="py-2.5 px-4">
                                         <span className={cn(
@@ -176,9 +179,7 @@ export default async function AreaClinicaDashboard() {
                                         {app.patient.phone}
                                     </td>
                                     <td className="py-2.5 px-4 text-right">
-                                        <button className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700">
-                                            Confirmar
-                                        </button>
+                                        <ConfirmAppointmentButton appointmentId={app.id} />
                                     </td>
                                 </tr>
                             )) : (
