@@ -38,6 +38,9 @@ export function Navbar() {
     };
 
     if (pathname === '/paciente/minha-agenda') return null;
+    if (pathname.startsWith('/area-clinica')) return null;
+    if (pathname === '/login') return null;
+
 
     return (
         <header
