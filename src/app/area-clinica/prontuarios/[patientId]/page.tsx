@@ -9,12 +9,16 @@ import {
     Clock,
     FileText,
     History,
-    DollarSign,
-    ArrowLeft
+    ArrowLeft,
+    TrendingUp,
+    CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { EvolutionDialog } from "@/components/EvolutionDialog";
+import { AttachmentUpload } from "@/components/AttachmentUpload";
+import { EvolutionHistory } from "@/components/EvolutionHistory";
 
 export const dynamic = "force-dynamic";
 
@@ -25,8 +29,14 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
         where: { id: patientId },
         include: {
             appointments: {
-                include: { payment: true },
+                include: {
+                    payment: true,
+                    evolution: true
+                },
                 orderBy: { startTime: 'desc' }
+            },
+            attachments: {
+                orderBy: { createdAt: 'desc' }
             }
         }
     });
@@ -42,9 +52,14 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
         );
     }
 
+    const now = new Date();
+    const pastAppointments = (patient.appointments as any[]).filter(a => new Date(a.startTime) < now);
+    const futureAppointments = (patient.appointments as any[]).filter(a => new Date(a.startTime) >= now).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+
     const totalSessions = patient.appointments.length;
-    const confirmedSessions = patient.appointments.filter(a => a.status === 'CONFIRMED').length;
-    const lastSession = patient.appointments[0];
+    const confirmedSessions = (patient.appointments as any[]).filter(a => a.status === 'CONFIRMED').length;
+    const lastSession = pastAppointments[0];
+    const nextSession = futureAppointments[0];
 
     return (
         <div className="max-w-5xl mx-auto space-y-8 pb-20">
@@ -62,9 +77,8 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button className="rounded-xl bg-stone-900 text-white font-bold text-[10px] uppercase tracking-widest h-10 px-6 border-0">
-                        <Plus size={14} className="mr-2" /> Nova Evolução
-                    </Button>
+                    {/* Habilitamos a nova evolução aqui */}
+                    <EvolutionDialog patientId={patient.id} appointmentId={lastSession?.id || "new"} />
                 </div>
             </div>
 
@@ -87,7 +101,7 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
                             </div>
                         )}
                         <div className="text-[10px] text-stone-400 font-bold uppercase tracking-tight mt-2">
-                            Paciente desde {format(patient.createdAt, 'MMMM/yyyy', { locale: ptBR })}
+                            Desde {format(patient.createdAt, 'dd/MM/yyyy')}
                         </div>
                     </div>
                 </div>
@@ -95,7 +109,7 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
                 <div className="bg-white border border-stone-200 rounded-2xl p-6 space-y-4 shadow-sm">
                     <div className="flex items-center gap-3 text-stone-400">
                         <History size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Atendimento</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Frequência</span>
                     </div>
                     <div className="space-y-1">
                         <p className="text-3xl font-light text-stone-900">{totalSessions}</p>
@@ -106,102 +120,87 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
                     </div>
                 </div>
 
-                <div className="bg-white border border-stone-200 rounded-2xl p-6 space-y-4 shadow-sm">
-                    <div className="flex items-center gap-3 text-stone-400">
-                        <Calendar size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Última Sessão</span>
-                    </div>
-                    {lastSession ? (
-                        <div className="space-y-1">
-                            <p className="text-xl font-bold text-stone-800 tracking-tight">
-                                {format(lastSession.startTime, "dd 'de' MMMM", { locale: ptBR })}
-                            </p>
-                            <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
-                                {format(lastSession.startTime, "HH:mm")} • {lastSession.type}
-                            </p>
-                            <span className={cn(
-                                "inline-block px-2 py-0.5 rounded-[4px] text-[8px] font-black uppercase tracking-widest mt-2 border",
-                                lastSession.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-stone-50 text-stone-400 border-stone-100"
-                            )}>
-                                {lastSession.status}
-                            </span>
+                {/* Card Unificado: Última e Próxima Sessão */}
+                <div className="bg-white border border-stone-200 rounded-2xl p-6 space-y-4 shadow-sm col-span-1 md:col-span-2 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-stone-50 rounded-full -mr-16 -mt-16 z-0" />
+                    <div className="relative z-10 flex flex-col md:flex-row gap-8">
+                        <div className="flex-1 space-y-3">
+                            <div className="flex items-center gap-3 text-stone-400">
+                                <History size={16} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Última</span>
+                            </div>
+                            {lastSession ? (
+                                <div className="space-y-1">
+                                    <p className="text-lg font-bold text-stone-800 tracking-tight">
+                                        {format(new Date(lastSession.startTime), "dd 'de' MMM", { locale: ptBR })}
+                                    </p>
+                                    <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest">
+                                        {format(new Date(lastSession.startTime), "HH:mm")} • {lastSession.type}
+                                    </p>
+                                </div>
+                            ) : (
+                                <p className="text-xs text-stone-300 italic">Sem histórico.</p>
+                            )}
                         </div>
-                    ) : (
-                        <p className="text-xs text-stone-400 italic">Nenhum histórico.</p>
-                    )}
-                </div>
 
-                <div className="bg-stone-900 border-none rounded-2xl p-6 space-y-4 shadow-xl">
-                    <div className="flex items-center gap-3 text-stone-500">
-                        <FileText size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Status Clínico</span>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="h-1.5 w-full bg-stone-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-emerald-500 w-[70%]" />
+                        <div className="w-px bg-stone-100 hidden md:block" />
+
+                        <div className="flex-1 space-y-3">
+                            <div className="flex items-center gap-3 text-amber-600">
+                                <Calendar size={16} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Próxima</span>
+                            </div>
+                            {nextSession ? (
+                                <div className="space-y-1">
+                                    <p className="text-lg font-bold text-stone-900 tracking-tight">
+                                        {format(new Date(nextSession.startTime), "dd 'de' MMM", { locale: ptBR })}
+                                    </p>
+                                    <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest">
+                                        {format(new Date(nextSession.startTime), "HH:mm")} • {nextSession.type}
+                                    </p>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                        <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest">Agendado</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <p className="text-xs text-stone-300 italic">Nenhuma marcada.</p>
+                                    <Link href="/area-clinica/agenda">
+                                        <Button variant="outline" className="h-7 text-[8px] font-black uppercase tracking-widest rounded-lg px-3 border-stone-200">Agendar</Button>
+                                    </Link>
+                                </div>
+                            )}
                         </div>
-                        <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Prontuário Completo</p>
-                        <p className="text-stone-300 text-xs font-medium leading-relaxed italic">Atendimento contínuo em evolução...</p>
                     </div>
                 </div>
             </div>
 
             {/* Main Tabs Simulation / Content Sections */}
             <div className="grid lg:grid-cols-3 gap-8">
-                {/* Evolution History */}
-                <div className="lg:col-span-2 space-y-4">
-                    <div className="flex items-center justify-between px-1">
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-stone-900">Linha do Tempo / Evoluções</h3>
-                        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Filtrar por data</span>
-                    </div>
-                    <div className="space-y-4">
-                        {patient.appointments.map((app, i) => (
-                            <div key={app.id} className="bg-white border border-stone-200 rounded-2xl p-6 transition-all hover:border-stone-300 shadow-sm relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-stone-100 group-hover:bg-stone-900 transition-colors" />
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 font-black text-xs">
-                                            {patient.appointments.length - i}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold text-stone-800 tracking-tight">
-                                                Sessão de {format(app.startTime, "eeee, dd 'de' MMMM", { locale: ptBR })}
-                                            </p>
-                                            <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
-                                                {format(app.startTime, "HH:mm")} às {format(app.endTime, "HH:mm")} • Modalidade {app.type}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span className={cn(
-                                        "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border",
-                                        app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-stone-50 text-stone-400 border-stone-100"
-                                    )}>
-                                        {app.status}
-                                    </span>
-                                </div>
-                                <div className="bg-stone-50/50 rounded-xl p-4 mt-4 border border-stone-100/50">
-                                    <p className="text-xs text-stone-500 leading-relaxed italic">
-                                        Nenhuma nota registrada para esta sessão ainda. Clique para adicionar observações clínicas.
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                {/* Evolution History with Filter */}
+                <div className="lg:col-span-2">
+                    <EvolutionHistory appointments={patient.appointments} patientId={patient.id} />
                 </div>
 
                 {/* Sidebar Info: Files, Finance, etc */}
                 <div className="space-y-8">
                     {/* Finance Card */}
                     <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-900">Financeiro</h3>
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-900">Financeiro</h3>
+                            <TrendingUp size={14} className="text-emerald-500" />
+                        </div>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <span className="text-xs text-stone-500 font-medium">Valor por Sessão</span>
+                                <span className="text-xs text-stone-500 font-medium">Valor/Sessão</span>
                                 <span className="text-sm font-bold text-stone-900">R$ 180,00</span>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-xs text-stone-500 font-medium">Situação Atual</span>
-                                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-widest">Em dia</span>
+                                <span className="text-xs text-stone-500 font-medium">Situação</span>
+                                <span className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-widest border border-emerald-100/50">
+                                    <CheckCircle2 size={10} /> Em dia
+                                </span>
                             </div>
                         </div>
                         <Button variant="outline" className="w-full rounded-xl h-10 border-stone-200 text-stone-600 font-bold text-[10px] uppercase tracking-widest hover:bg-stone-50">
@@ -209,22 +208,34 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
                         </Button>
                     </div>
 
-                    {/* Files/Attachments Card */}
-                    <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-900">Documentos</h3>
-                        <div className="p-10 text-center border-2 border-dashed border-stone-50 rounded-xl">
-                            <p className="text-[10px] text-stone-300 font-black uppercase tracking-widest">Nenhum arquivo anexado</p>
-                        </div>
-                        <Button variant="ghost" className="w-full text-stone-400 hover:text-stone-900 font-bold text-[10px] uppercase tracking-widest gap-2">
-                            <Plus size={14} /> Fazer upload
-                        </Button>
+                    {/* Files/Attachments Card - Habilitado */}
+                    <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
+                        <AttachmentUpload patientId={patient.id} />
+
+                        {/* Listagem de arquivos se houver */}
+                        {patient.attachments.length > 0 && (
+                            <div className="mt-6 space-y-2">
+                                {patient.attachments.map(file => (
+                                    <div key={file.id} className="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100 hover:border-stone-200 transition-all group">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-stone-400 shadow-sm">
+                                                <FileText size={16} />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-stone-800 tracking-tight line-clamp-1">{file.name}</p>
+                                                <p className="text-[8px] text-stone-400 font-black uppercase tracking-widest">{format(new Date(file.createdAt), 'dd MMM yyyy')}</p>
+                                            </div>
+                                        </div>
+                                        <a href={file.url} className="text-stone-300 hover:text-stone-900 transition-colors opacity-0 group-hover:opacity-100">
+                                            <Clock size={14} />
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
         </div>
     );
-}
-
-function Plus({ size, className }: { size?: number, className?: string }) {
-    return <svg xmlns="http://www.w3.org/2000/svg" width={size || 24} height={size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14" /><path d="M12 5v14" /></svg>;
 }

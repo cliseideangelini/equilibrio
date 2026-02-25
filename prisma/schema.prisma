@@ -44,11 +44,13 @@ model Availability {
 
 model Patient {
   id           String        @id @default(cuid())
-  name         String
+  name          String
   email        String?       @unique
   phone        String        @unique
   password     String?       // Opcional para pacientes antigos, obrigatório para novos
   appointments Appointment[]
+  evolutions   Evolution[]
+  attachments  Attachment[]
   createdAt    DateTime      @default(now())
 }
 
@@ -64,8 +66,30 @@ model Appointment {
   patient        Patient           @relation(fields: [patientId], references: [id])
   patientId      String
   payment        Payment?
+  evolution      Evolution?
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
+}
+
+model Evolution {
+  id            String      @id @default(cuid())
+  content       String      @db.Text
+  patient       Patient     @relation(fields: [patientId], references: [id])
+  patientId     String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String      @unique
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  type      String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  patientId String
+  createdAt DateTime @default(now())
 }
 
 model Payment {

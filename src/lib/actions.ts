@@ -255,3 +255,32 @@ export async function confirmAppointment(id: string) {
     revalidatePath('/area-clinica');
     return { success: true, patientId: app.patientId };
 }
+
+export async function saveEvolution(patientId: string, appointmentId: string, content: string) {
+    const evolution = await prisma.evolution.upsert({
+        where: { appointmentId },
+        update: { content },
+        create: {
+            content,
+            patientId,
+            appointmentId
+        }
+    });
+
+    revalidatePath(`/area-clinica/prontuarios/${patientId}`);
+    return { success: true, evolutionId: evolution.id };
+}
+
+export async function addAttachment(patientId: string, name: string, url: string, type: string) {
+    const attachment = await prisma.attachment.create({
+        data: {
+            name,
+            url,
+            type,
+            patientId
+        }
+    });
+
+    revalidatePath(`/area-clinica/prontuarios/${patientId}`);
+    return { success: true, attachmentId: attachment.id };
+}
