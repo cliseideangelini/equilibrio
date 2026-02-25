@@ -257,6 +257,18 @@ export async function confirmAppointment(id: string) {
 }
 
 export async function saveEvolution(patientId: string, appointmentId: string, content: string) {
+    if (!content.trim()) {
+        try {
+            await prisma.evolution.delete({
+                where: { appointmentId }
+            });
+        } catch (e) {
+            // Ignore if it doesn't exist
+        }
+        revalidatePath(`/area-clinica/prontuarios/${patientId}`);
+        return { success: true };
+    }
+
     const evolution = await prisma.evolution.upsert({
         where: { appointmentId },
         update: { content },

@@ -27,7 +27,7 @@ export function EvolutionDialog({ patientId, appointmentId, initialContent = "",
     const [isPending, setIsPending] = useState(false);
 
     const handleSave = async () => {
-        if (!content.trim()) return;
+        if (!content.trim() && !initialContent) return;
         setIsPending(true);
         try {
             await saveEvolution(patientId, appointmentId, content);

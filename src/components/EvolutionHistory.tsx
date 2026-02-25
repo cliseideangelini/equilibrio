@@ -66,56 +66,12 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
 
             <div className="space-y-4">
                 {filteredAppointments.length > 0 ? filteredAppointments.map((app, i) => (
-                    <div key={app.id} className="bg-white border border-stone-200 rounded-2xl p-6 transition-all hover:border-stone-300 shadow-sm relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-stone-100 group-hover:bg-stone-900 transition-colors" />
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 font-black text-xs">
-                                    {appointments.length - appointments.indexOf(app)}
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-stone-800 tracking-tight" suppressHydrationWarning>
-                                        Sessão de {format(app.startTime, "eeee, dd 'de' MMMM", { locale: ptBR })}
-                                    </p>
-                                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest" suppressHydrationWarning>
-                                        {format(app.startTime, "HH:mm")} às {format(app.endTime, "HH:mm")} • Modalidade {app.type}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <EvolutionDialog
-                                    patientId={patientId}
-                                    appointmentId={app.id}
-                                    initialContent={app.evolution?.content}
-                                    trigger={
-                                        <button className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors">
-                                            {app.evolution ? "Editar" : "+ Nota"}
-                                        </button>
-                                    }
-                                />
-                                <span className={cn(
-                                    "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border",
-                                    app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-stone-50 text-stone-400 border-stone-100"
-                                )}>
-                                    {app.status}
-                                </span>
-                            </div>
-                        </div>
-                        <div className={cn(
-                            "rounded-xl p-4 mt-4 border transition-colors",
-                            app.evolution ? "bg-stone-50/30 border-stone-100/50" : "bg-stone-50/50 border-dashed border-stone-200"
-                        )}>
-                            {app.evolution ? (
-                                <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-wrap">
-                                    {app.evolution.content}
-                                </p>
-                            ) : (
-                                <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest italic">
-                                    Nenhuma nota registrada para esta sessão.
-                                </p>
-                            )}
-                        </div>
-                    </div>
+                    <EvolutionItem
+                        key={app.id}
+                        app={app}
+                        appointments={appointments}
+                        patientId={patientId}
+                    />
                 )) : (
                     <div className="py-20 text-center bg-white border border-stone-100 rounded-3xl border-dashed">
                         <p className="text-stone-300 italic font-medium">Nenhum registro encontrado para os filtros aplicados.</p>
@@ -129,6 +85,66 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                             </Button>
                         )}
                     </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function EvolutionItem({ app, appointments, patientId }: { app: any, appointments: any[], patientId: string }) {
+    const [expanded, setExpanded] = useState(false);
+    return (
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 transition-all hover:border-stone-300 shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-1 h-full bg-stone-100 group-hover:bg-stone-900 transition-colors" />
+            <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 font-black text-xs">
+                        {appointments.length - appointments.indexOf(app)}
+                    </div>
+                    <div>
+                        <p className="text-sm font-bold text-stone-800 tracking-tight" suppressHydrationWarning>
+                            Sessão de {format(new Date(app.startTime), "eeee, dd 'de' MMMM", { locale: ptBR })}
+                        </p>
+                        <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest" suppressHydrationWarning>
+                            {format(new Date(app.startTime), "HH:mm")} às {format(new Date(app.endTime), "HH:mm")} • Modalidade {app.type}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <EvolutionDialog
+                        patientId={patientId}
+                        appointmentId={app.id}
+                        initialContent={app.evolution?.content}
+                        trigger={
+                            <button className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors">
+                                {app.evolution ? "Editar" : "+ Nota"}
+                            </button>
+                        }
+                    />
+                    <span className={cn(
+                        "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border hidden sm:inline-block",
+                        app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-stone-50 text-stone-400 border-stone-100"
+                    )}>
+                        {app.status}
+                    </span>
+                </div>
+            </div>
+            <div className={cn(
+                "rounded-xl p-4 mt-4 border transition-colors cursor-pointer",
+                app.evolution ? "bg-stone-50/30 border-stone-100/50 hover:bg-stone-100/50" : "bg-stone-50/50 border-dashed border-stone-200 cursor-default"
+            )}
+                onClick={() => { if (app.evolution) setExpanded(!expanded) }}>
+                {app.evolution ? (
+                    <p className={cn(
+                        "text-sm text-stone-600 leading-relaxed whitespace-pre-wrap transition-all",
+                        !expanded && "line-clamp-1"
+                    )}>
+                        {app.evolution.content}
+                    </p>
+                ) : (
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest italic">
+                        Nenhuma nota registrada para esta sessão.
+                    </p>
                 )}
             </div>
         </div>
