@@ -15,6 +15,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -177,6 +179,4 @@ export default async function AreaClinicaDashboard() {
     );
 }
 
-function cn(...inputs: any[]) {
-    return inputs.filter(Boolean).join(" ");
-}
+

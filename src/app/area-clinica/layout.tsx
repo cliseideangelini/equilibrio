@@ -112,19 +112,4 @@ export default function AreaClinicaLayout({
     );
 }
 
-// Custom scrollbar styling
-const style = `
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #EBE9E6;
-  border-radius: 10px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #D8D5D0;
-}
-`;
+
