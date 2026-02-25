@@ -18,7 +18,7 @@ export default function LoginPage() {
         // Simplificado para esta versão (senha fixa da profissional)
         if (password === "cliseide2025") {
             document.cookie = "auth_token=cliseide_admin_session; path=/; max-age=86400";
-            router.push("/admin");
+            router.push("/area-clinica");
         } else {
             setError("Senha incorreta. Tente novamente.");
         }
