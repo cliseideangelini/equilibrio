@@ -1,21 +1,13 @@
 name: Deploy to Vercel
+
 on:
   push:
     branches: ['**']
-  pull_request:
-    branches: ['**']
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Vercel CLI
-        run: npm i -g vercel
-      - name: Pull Vercel Project Settings
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: vercel pull --yes --environment production --token ${{ secrets.VERCEL_TOKEN }}
-      - name: Build and Deploy
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+      - name: Trigger Vercel Deploy Hook
+        run: |
+          curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_Jnikq89EVCAOOxARKWWmpZgNbgTH/lLznMeSfu1"
