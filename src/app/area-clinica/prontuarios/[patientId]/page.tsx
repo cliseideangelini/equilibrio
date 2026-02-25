@@ -18,8 +18,8 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export default async function PatientRecordPage({ params }: { params: { patientId: string } }) {
-    const { patientId } = params;
+export default async function PatientRecordPage({ params }: { params: Promise<{ patientId: string }> }) {
+    const { patientId } = await params;
 
     const patient = await prisma.patient.findUnique({
         where: { id: patientId },
