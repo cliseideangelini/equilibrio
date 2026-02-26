@@ -11,14 +11,16 @@ export const dynamic = "force-dynamic";
 export default async function AreaClinicaDashboard() {
     const today = new Date();
 
-    const todayAppointments = await prisma.appointment.findMany({
+    const dailyAppointments = await prisma.appointment.findMany({
         where: {
             startTime: { gte: startOfDay(today), lte: endOfDay(today) },
-            status: { not: "CANCELLED" },
         },
         include: { patient: true, payment: true },
         orderBy: { startTime: "asc" },
     });
+
+    // Filtro para a tabela de hoje (exclui os cancelados para não poluir a visualização principal)
+    const todayAppointments = dailyAppointments.filter(a => a.status !== "CANCELLED");
 
     const pendingAppointments = await prisma.appointment.findMany({
         where: { status: "PENDING" },
@@ -28,17 +30,20 @@ export default async function AreaClinicaDashboard() {
 
     const pendingCount = pendingAppointments.length;
     const totalPatients = await prisma.patient.count();
-    const confirmedToday = todayAppointments.filter(a => a.status === "CONFIRMED").length;
+    const aRealizar = dailyAppointments.filter(a => a.status === "PENDING" || a.status === "CONFIRMED").length;
+    const realizadas = dailyAppointments.filter(a => a.status === "CONFIRMED").length;
+    const ausentes = dailyAppointments.filter(a => a.status === "ABSENT").length;
+    const canceladas = dailyAppointments.filter(a => a.status === "CANCELLED").length;
 
     const stats = [
-        { label: "Sessões Hoje", value: todayAppointments.length },
-        { label: "Confirmadas", value: confirmedToday },
-        { label: "Aguardando confirm.", value: pendingCount },
-        { label: "Total Pacientes", value: totalPatients },
+        { label: "Consultas a Realizar", value: aRealizar },
+        { label: "Consultas Realizadas", value: realizadas },
+        { label: "Consultas Ausentes", value: ausentes },
+        { label: "Consultas Canceladas", value: canceladas },
     ];
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-12">
+        <div className="w-full space-y-10 pb-12 animate-in fade-in duration-500">
 
             {/* 4 stat cards — small and clean */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

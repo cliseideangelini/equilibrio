@@ -11,7 +11,7 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
     const pathname = usePathname();
 
     const nav = [
-        { label: "Painel", href: "/area-clinica" },
+        { label: "Hoje", href: "/area-clinica" },
         { label: "Agenda", href: "/area-clinica/agenda" },
         { label: "Pacientes", href: "/area-clinica/pacientes" },
         { label: "Prontuários", href: "/area-clinica/prontuarios" },
@@ -76,7 +76,7 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
 
             {/* Page content */}
             <main className="flex-1 p-8 overflow-auto">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-none px-2 md:px-0">
                     {children}
                 </div>
             </main>
