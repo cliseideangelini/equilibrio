@@ -267,6 +267,17 @@ export async function setAbsent(id: string) {
     return { success: true };
 }
 
+export async function completeAppointment(id: string) {
+    await prisma.appointment.update({
+        where: { id },
+        data: { status: "COMPLETED" }
+    });
+
+    revalidatePath('/area-clinica');
+    revalidatePath('/area-clinica/agenda');
+    return { success: true };
+}
+
 export async function saveEvolution(patientId: string, appointmentId: string, content: string) {
     if (!content.trim()) {
         try {

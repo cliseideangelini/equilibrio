@@ -35,7 +35,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
             }
 
             let matchesStatus = true;
-            if (activeTab === 'realizadas') matchesStatus = app.status === 'CONFIRMED';
+            if (activeTab === 'realizadas') matchesStatus = app.status === 'CONFIRMED' || app.status === 'COMPLETED';
             else if (activeTab === 'pendentes') matchesStatus = app.status === 'PENDING';
             else if (activeTab === 'canceladas') matchesStatus = app.status === 'CANCELLED';
             else if (activeTab === 'ausentes') matchesStatus = app.status === 'ABSENT';
@@ -46,7 +46,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
 
     const stats = useMemo(() => {
         return {
-            realizadas: appointments.filter(a => a.status === 'CONFIRMED').length,
+            realizadas: appointments.filter(a => a.status === 'CONFIRMED' || a.status === 'COMPLETED').length,
             pendentes: appointments.filter(a => a.status === 'PENDING').length,
             canceladas: appointments.filter(a => a.status === 'CANCELLED').length,
             ausentes: appointments.filter(a => a.status === 'ABSENT').length,
@@ -163,13 +163,15 @@ function EvolutionItem({ app, appointments, patientId }: { app: any, appointment
                     </p>
                     <span className={cn(
                         "px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border inline-block mt-0.5",
-                        app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                        (app.status === 'CONFIRMED' || app.status === 'COMPLETED') ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                             app.status === 'ABSENT' ? "bg-amber-50 text-amber-600 border-amber-100" :
-                                "bg-stone-50 text-stone-400 border-stone-100"
+                                app.status === 'CANCELLED' ? "bg-red-50 text-red-600 border-red-100" :
+                                    "bg-stone-50 text-stone-400 border-stone-100"
                     )}>
-                        {app.status === 'CONFIRMED' ? 'Realizada' :
+                        {(app.status === 'CONFIRMED' || app.status === 'COMPLETED') ? 'Realizada' :
                             app.status === 'ABSENT' ? 'Ausente' :
-                                'Pendente'}
+                                app.status === 'CANCELLED' ? 'Cancelada' :
+                                    'Pendente'}
                     </span>
                 </div>
             </td>

@@ -21,6 +21,7 @@ enum AppointmentStatus {
   CONFIRMED
   CANCELLED
   ABSENT
+  COMPLETED
 }
 
 model Psychologist {

@@ -5,6 +5,10 @@ import { Video, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ConfirmAppointmentButton } from "@/components/ConfirmAppointmentButton";
+import { CompleteAppointmentButton } from "@/components/CompleteAppointmentButton";
+import { AbsentButton } from "@/components/AbsentButton";
+import { CancellationButton } from "@/components/CancellationButton";
+import { NotifyAbsentButton } from "@/components/NotifyAbsentButton";
 
 export const dynamic = "force-dynamic";
 
@@ -19,20 +23,15 @@ export default async function AreaClinicaDashboard() {
         orderBy: { startTime: "asc" },
     });
 
-    // Filtro para a tabela de hoje (exclui os cancelados para não poluir a visualização principal)
-    const todayAppointments = dailyAppointments.filter(a => a.status !== "CANCELLED");
+    // Filtro para a tabela de hoje (Somente o que ainda vai acontecer ou está em aberto)
+    const todayToPerform = dailyAppointments.filter(a => a.status === "PENDING" || a.status === "CONFIRMED");
 
-    const pendingAppointments = await prisma.appointment.findMany({
-        where: { status: "PENDING" },
-        include: { patient: true, payment: true },
-        orderBy: { startTime: "asc" },
-    });
+    // Filtro para a tabela de ausências de hoje
+    const todayAbsents = dailyAppointments.filter(a => a.status === "ABSENT");
 
-    const pendingCount = pendingAppointments.length;
-    const totalPatients = await prisma.patient.count();
-    const aRealizar = dailyAppointments.filter(a => a.status === "PENDING" || a.status === "CONFIRMED").length;
-    const realizadas = dailyAppointments.filter(a => a.status === "CONFIRMED").length;
-    const ausentes = dailyAppointments.filter(a => a.status === "ABSENT").length;
+    const aRealizar = todayToPerform.length;
+    const realizadas = dailyAppointments.filter(a => a.status === "COMPLETED").length;
+    const ausentes = todayAbsents.length;
     const canceladas = dailyAppointments.filter(a => a.status === "CANCELLED").length;
 
     const stats = [
@@ -73,12 +72,11 @@ export default async function AreaClinicaDashboard() {
                                 <th className="text-left py-2 px-4 font-bold text-stone-400 w-24">Horário</th>
                                 <th className="text-left py-2 px-4 font-bold text-stone-400">Paciente</th>
                                 <th className="text-left py-2 px-4 font-bold text-stone-400 w-28">Modalidade</th>
-                                <th className="text-left py-2 px-4 font-bold text-stone-400 w-28">Status</th>
-                                <th className="text-left py-2 px-4 font-bold text-stone-400 w-24">Pagamento</th>
+                                <th className="text-right py-2 px-4 font-bold text-stone-400">Ações Rápidas</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {todayAppointments.length > 0 ? todayAppointments.map((app, i) => (
+                            {todayToPerform.length > 0 ? todayToPerform.map((app, i) => (
                                 <tr
                                     key={app.id}
                                     className={cn(
@@ -105,34 +103,18 @@ export default async function AreaClinicaDashboard() {
                                             {app.type === "ONLINE" ? "Online" : "Presencial"}
                                         </span>
                                     </td>
-                                    <td className="py-2.5 px-4">
-                                        {app.status === "PENDING" ? (
-                                            <ConfirmAppointmentButton appointmentId={app.id} />
-                                        ) : (
-                                            <span className={cn(
-                                                "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide",
-                                                app.status === "CONFIRMED" ? "bg-emerald-50 text-emerald-600" :
-                                                    "bg-red-50 text-red-600"
-                                            )}>
-                                                {app.status === "CONFIRMED" ? "Confirmado" : "Cancelado"}
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="py-2.5 px-4">
-                                        <span className={cn(
-                                            "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide",
-                                            app.payment?.status === "PAID"
-                                                ? "bg-stone-100 text-stone-600"
-                                                : "text-stone-300"
-                                        )}>
-                                            {app.payment?.status === "PAID" ? "Pago" : "—"}
-                                        </span>
+                                    <td className="py-2.5 px-4 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <CompleteAppointmentButton appointmentId={app.id} />
+                                            <AbsentButton appointmentId={app.id} />
+                                            <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
+                                        </div>
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-stone-300 italic">
-                                        Sem agendamentos para hoje.
+                                    <td colSpan={4} className="py-12 text-center text-stone-300 italic">
+                                        Sem agendamentos pendentes para hoje.
                                     </td>
                                 </tr>
                             )}
@@ -144,9 +126,9 @@ export default async function AreaClinicaDashboard() {
             {/* Pending Confirmation Grid */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between px-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-stone-900 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                        Aguardando Confirmação
+                    <p className="text-[10px] font-black uppercase tracking-widest text-red-500 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                        Ausências de Hoje
                     </p>
                 </div>
                 <div className="bg-white border border-stone-200 rounded-lg overflow-hidden">
@@ -155,13 +137,12 @@ export default async function AreaClinicaDashboard() {
                             <tr className="border-b border-stone-100 bg-stone-50/50">
                                 <th className="text-left py-2 px-4 font-bold text-stone-400 w-32">Data/Hora</th>
                                 <th className="text-left py-2 px-4 font-bold text-stone-400">Paciente</th>
-                                <th className="text-left py-2 px-4 font-bold text-stone-400 w-28">Modalidade</th>
                                 <th className="text-left py-2 px-4 font-bold text-stone-400 w-28">WhatsApp</th>
-                                <th className="text-right py-2 px-4 font-bold text-stone-400 w-24">Ações</th>
+                                <th className="text-right py-2 px-4 font-bold text-stone-400 w-24">Ação</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {pendingAppointments.length > 0 ? pendingAppointments.map((app, i) => (
+                            {todayAbsents.length > 0 ? todayAbsents.map((app, i) => (
                                 <tr
                                     key={app.id}
                                     className={cn(
@@ -170,37 +151,22 @@ export default async function AreaClinicaDashboard() {
                                     )}
                                 >
                                     <td className="py-2.5 px-4 font-mono text-stone-800">
-                                        <span className="font-bold">{format(app.startTime, "dd/MM")}</span>
-                                        <span className="text-stone-400 mx-1">·</span>
-                                        {format(app.startTime, "HH:mm")}
+                                        <span className="font-bold">{format(app.startTime, "HH:mm")}</span>
                                     </td>
                                     <td className="py-2.5 px-4 font-medium text-stone-700">
-                                        <Link
-                                            href={`/area-clinica/prontuarios/${app.patient.id}`}
-                                            className="hover:text-stone-900 hover:underline decoration-stone-200 underline-offset-4 transition-all"
-                                        >
-                                            {app.patient.name}
-                                        </Link>
-                                    </td>
-                                    <td className="py-2.5 px-4">
-                                        <span className="inline-flex items-center gap-1.5 text-stone-500">
-                                            {app.type === "ONLINE"
-                                                ? <Video size={10} className="text-blue-400" />
-                                                : <MapPin size={10} className="text-stone-400" />}
-                                            {app.type === "ONLINE" ? "Online" : "Presencial"}
-                                        </span>
+                                        {app.patient.name}
                                     </td>
                                     <td className="py-2.5 px-4 text-stone-400 font-mono">
                                         {app.patient.phone}
                                     </td>
                                     <td className="py-2.5 px-4 text-right">
-                                        <ConfirmAppointmentButton appointmentId={app.id} />
+                                        <NotifyAbsentButton phone={app.patient.phone} patientName={app.patient.name} />
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-stone-300 italic">
-                                        Nenhuma consulta pendente de confirmação.
+                                    <td colSpan={4} className="py-12 text-center text-stone-300 italic">
+                                        Nenhuma ausência registrada hoje.
                                     </td>
                                 </tr>
                             )}
