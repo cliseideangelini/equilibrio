@@ -64,28 +64,42 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                 </div>
             </div>
 
-            <div className="space-y-4">
-                {filteredAppointments.length > 0 ? filteredAppointments.map((app, i) => (
-                    <EvolutionItem
-                        key={app.id}
-                        app={app}
-                        appointments={appointments}
-                        patientId={patientId}
-                    />
-                )) : (
-                    <div className="py-20 text-center bg-white border border-stone-100 rounded-3xl border-dashed">
-                        <p className="text-stone-300 italic font-medium">Nenhum registro encontrado para os filtros aplicados.</p>
-                        {(search || dateFilter) && (
-                            <Button
-                                variant="link"
-                                onClick={() => { setSearch(""); setDateFilter(""); }}
-                                className="text-[10px] font-black uppercase tracking-widest text-stone-900 mt-2"
-                            >
-                                Limpar filtros
-                            </Button>
+            <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm">
+                <table className="w-full text-left border-collapse">
+                    <thead className="bg-stone-50/50 border-b border-stone-100">
+                        <tr>
+                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest w-12 text-center">#</th>
+                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest w-40">Data/Hora</th>
+                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest">Evolução</th>
+                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest w-24 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100">
+                        {filteredAppointments.length > 0 ? filteredAppointments.map((app, i) => (
+                            <EvolutionItem
+                                key={app.id}
+                                app={app}
+                                appointments={appointments}
+                                patientId={patientId}
+                            />
+                        )) : (
+                            <tr>
+                                <td colSpan={4} className="py-12 text-center bg-stone-50/30">
+                                    <p className="text-stone-400 font-medium text-sm">Nenhum registro encontrado.</p>
+                                    {(search || dateFilter) && (
+                                        <Button
+                                            variant="link"
+                                            onClick={() => { setSearch(""); setDateFilter(""); }}
+                                            className="text-[10px] font-black uppercase tracking-widest text-stone-900 mt-2"
+                                        >
+                                            Limpar filtros
+                                        </Button>
+                                    )}
+                                </td>
+                            </tr>
                         )}
-                    </div>
-                )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
@@ -94,59 +108,58 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
 function EvolutionItem({ app, appointments, patientId }: { app: any, appointments: any[], patientId: string }) {
     const [expanded, setExpanded] = useState(false);
     return (
-        <div className="bg-white border border-stone-200 rounded-2xl p-6 transition-all hover:border-stone-300 shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1 h-full bg-stone-100 group-hover:bg-stone-900 transition-colors" />
-            <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 font-black text-xs">
-                        {appointments.length - appointments.indexOf(app)}
-                    </div>
-                    <div>
-                        <p className="text-sm font-bold text-stone-800 tracking-tight" suppressHydrationWarning>
-                            Sessão de {format(new Date(app.startTime), "eeee, dd 'de' MMMM", { locale: ptBR })}
-                        </p>
-                        <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest" suppressHydrationWarning>
-                            {format(new Date(app.startTime), "HH:mm")} às {format(new Date(app.endTime), "HH:mm")} • Modalidade {app.type}
-                        </p>
-                    </div>
+        <tr className="hover:bg-stone-50/50 transition-colors group">
+            <td className="py-3 px-4 text-center align-top">
+                <div className="w-6 h-6 mx-auto rounded bg-stone-100 flex items-center justify-center text-stone-500 font-black text-[10px]">
+                    {appointments.length - appointments.indexOf(app)}
                 </div>
-                <div className="flex items-center gap-3">
-                    <EvolutionDialog
-                        patientId={patientId}
-                        appointmentId={app.id}
-                        initialContent={app.evolution?.content}
-                        trigger={
-                            <button className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors">
-                                {app.evolution ? "Editar" : "+ Nota"}
-                            </button>
-                        }
-                    />
+            </td>
+            <td className="py-3 px-4 align-top">
+                <p className="text-xs font-bold text-stone-800" suppressHydrationWarning>
+                    {format(new Date(app.startTime), "dd/MM/yyyy")}
+                </p>
+                <div className="flex flex-col items-start gap-1 mt-1" suppressHydrationWarning>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
+                        {format(new Date(app.startTime), "HH:mm")} • {app.type.charAt(0)}
+                    </p>
                     <span className={cn(
-                        "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border hidden sm:inline-block",
+                        "px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border inline-block mt-0.5",
                         app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-stone-50 text-stone-400 border-stone-100"
                     )}>
-                        {app.status}
+                        {app.status === 'CONFIRMED' ? 'Realizada' : 'Pendente'}
                     </span>
                 </div>
-            </div>
-            <div className={cn(
-                "rounded-xl p-4 mt-4 border transition-colors cursor-pointer",
-                app.evolution ? "bg-stone-50/30 border-stone-100/50 hover:bg-stone-100/50" : "bg-stone-50/50 border-dashed border-stone-200 cursor-default"
+            </td>
+            <td className={cn(
+                "py-3 px-4 align-top",
+                app.evolution ? "cursor-pointer" : ""
             )}
                 onClick={() => { if (app.evolution) setExpanded(!expanded) }}>
                 {app.evolution ? (
                     <p className={cn(
-                        "text-sm text-stone-600 leading-relaxed whitespace-pre-wrap transition-all",
-                        !expanded && "line-clamp-1"
+                        "text-xs text-stone-600 leading-relaxed whitespace-pre-wrap transition-all",
+                        !expanded && "line-clamp-2"
                     )}>
                         {app.evolution.content}
                     </p>
                 ) : (
-                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest italic">
-                        Nenhuma nota registrada para esta sessão.
+                    <p className="text-[10px] text-stone-300 font-bold uppercase tracking-widest italic pt-0.5">
+                        Sem nota
                     </p>
                 )}
-            </div>
-        </div>
+            </td>
+            <td className="py-3 px-4 align-top text-right">
+                <EvolutionDialog
+                    patientId={patientId}
+                    appointmentId={app.id}
+                    initialContent={app.evolution?.content}
+                    trigger={
+                        <button className="text-[9px] font-black uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors bg-white border border-stone-200 px-3 py-1.5 rounded shadow-sm hover:border-stone-400 whitespace-nowrap">
+                            {app.evolution ? "Editar" : "+ Nota"}
+                        </button>
+                    }
+                />
+            </td>
+        </tr>
     );
 }

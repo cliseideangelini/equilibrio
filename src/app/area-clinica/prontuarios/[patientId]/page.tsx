@@ -83,91 +83,91 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
             </div>
 
             {/* Top Info Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white border border-stone-200 rounded-2xl p-6 space-y-4 shadow-sm">
-                    <div className="flex items-center gap-3 text-stone-400">
-                        <User size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Identificação</span>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="bg-white border border-stone-200 rounded-2xl p-4 space-y-2 shadow-sm">
+                    <div className="flex items-center gap-2 text-stone-400">
+                        <User size={14} />
+                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Identificação</span>
                     </div>
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-stone-600">
-                            <Phone size={14} className="text-stone-300" />
+                    <div className="space-y-1.5 pt-1">
+                        <div className="flex items-center gap-2 text-xs text-stone-600">
+                            <Phone size={12} className="text-stone-300" />
                             {patient.phone}
                         </div>
                         {patient.email && (
-                            <div className="flex items-center gap-2 text-sm text-stone-600">
-                                <Mail size={14} className="text-stone-300" />
+                            <div className="flex items-center gap-2 text-xs text-stone-600">
+                                <Mail size={12} className="text-stone-300" />
                                 {patient.email}
                             </div>
                         )}
-                        <div className="text-[10px] text-stone-400 font-bold uppercase tracking-tight mt-2">
+                        <div className="text-[9px] text-stone-400 font-bold uppercase tracking-tight mt-1">
                             Desde {format(patient.createdAt, 'dd/MM/yyyy')}
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white border border-stone-200 rounded-2xl p-6 space-y-4 shadow-sm">
-                    <div className="flex items-center gap-3 text-stone-400">
-                        <History size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Frequência</span>
+                <div className="bg-white border border-stone-200 rounded-2xl p-4 space-y-2 shadow-sm">
+                    <div className="flex items-center gap-2 text-stone-400">
+                        <History size={14} />
+                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Frequência</span>
                     </div>
-                    <div className="space-y-1">
-                        <p className="text-3xl font-light text-stone-900">{totalSessions}</p>
-                        <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">Sessões Totais</p>
-                        <p className="text-xs text-stone-500 font-medium mt-1">
+                    <div className="pt-1">
+                        <p className="text-2xl font-light text-stone-900 leading-none">{totalSessions}</p>
+                        <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest mt-1">Sessões Totais</p>
+                        <p className="text-[10px] text-stone-500 font-medium mt-1">
                             <span className="text-emerald-600 font-bold">{confirmedSessions}</span> confirmadas
                         </p>
                     </div>
                 </div>
 
                 {/* Card Unificado: Última e Próxima Sessão */}
-                <div className="bg-white border border-stone-200 rounded-2xl p-6 space-y-4 shadow-sm col-span-1 md:col-span-2 relative overflow-hidden">
+                <div className="bg-white border border-stone-200 rounded-2xl px-5 py-4 space-y-2 shadow-sm col-span-1 md:col-span-2 relative overflow-hidden flex items-center">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-stone-50 rounded-full -mr-16 -mt-16 z-0" />
-                    <div className="relative z-10 flex flex-col md:flex-row gap-8">
-                        <div className="flex-1 space-y-3">
-                            <div className="flex items-center gap-3 text-stone-400">
-                                <History size={16} />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Última</span>
+                    <div className="relative z-10 flex flex-col md:flex-row gap-6 w-full items-center">
+                        <div className="flex-1 space-y-1 w-full">
+                            <div className="flex items-center gap-2 text-stone-400 mb-2">
+                                <History size={12} />
+                                <span className="text-[9px] font-black uppercase tracking-widest leading-none">Última</span>
                             </div>
                             {lastSession ? (
-                                <div className="space-y-1">
-                                    <p className="text-lg font-bold text-stone-800 tracking-tight">
+                                <>
+                                    <p className="text-base font-bold text-stone-800 tracking-tight leading-none">
                                         {format(new Date(lastSession.startTime), "dd 'de' MMM", { locale: ptBR })}
                                     </p>
-                                    <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest">
+                                    <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest mt-0.5">
                                         {format(new Date(lastSession.startTime), "HH:mm")} • {lastSession.type}
                                     </p>
-                                </div>
+                                </>
                             ) : (
-                                <p className="text-xs text-stone-300 italic">Sem histórico.</p>
+                                <p className="text-[10px] text-stone-300 italic">Sem histórico.</p>
                             )}
                         </div>
 
-                        <div className="w-px bg-stone-100 hidden md:block" />
+                        <div className="w-px h-10 bg-stone-100 hidden md:block" />
 
-                        <div className="flex-1 space-y-3">
-                            <div className="flex items-center gap-3 text-amber-600">
-                                <Calendar size={16} />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Próxima</span>
+                        <div className="flex-1 space-y-1 w-full">
+                            <div className="flex items-center gap-2 text-amber-600 mb-2">
+                                <Calendar size={12} />
+                                <span className="text-[9px] font-black uppercase tracking-widest leading-none">Próxima</span>
                             </div>
                             {nextSession ? (
-                                <div className="space-y-1">
-                                    <p className="text-lg font-bold text-stone-900 tracking-tight">
+                                <>
+                                    <p className="text-base font-bold text-stone-900 tracking-tight leading-none">
                                         {format(new Date(nextSession.startTime), "dd 'de' MMM", { locale: ptBR })}
                                     </p>
-                                    <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest">
+                                    <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest mt-0.5">
                                         {format(new Date(nextSession.startTime), "HH:mm")} • {nextSession.type}
                                     </p>
                                     <div className="flex items-center gap-1 mt-1">
                                         <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                                         <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest">Agendado</span>
                                     </div>
-                                </div>
+                                </>
                             ) : (
-                                <div className="space-y-2">
-                                    <p className="text-xs text-stone-300 italic">Nenhuma marcada.</p>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[10px] text-stone-300 italic">Nenhuma marcada.</p>
                                     <Link href="/area-clinica/agenda">
-                                        <Button variant="outline" className="h-7 text-[8px] font-black uppercase tracking-widest rounded-lg px-3 border-stone-200">Agendar</Button>
+                                        <Button variant="outline" className="h-6 text-[8px] font-black uppercase tracking-widest rounded px-2 border-stone-200">Agendar</Button>
                                     </Link>
                                 </div>
                             )}
@@ -176,65 +176,9 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
                 </div>
             </div>
 
-            {/* Main Tabs Simulation / Content Sections */}
-            <div className="grid lg:grid-cols-3 gap-8">
-                {/* Evolution History with Filter */}
-                <div className="lg:col-span-2">
-                    <EvolutionHistory appointments={patient.appointments} patientId={patient.id} />
-                </div>
-
-                {/* Sidebar Info: Files, Finance, etc */}
-                <div className="space-y-8">
-                    {/* Finance Card */}
-                    <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-900">Financeiro</h3>
-                            <TrendingUp size={14} className="text-emerald-500" />
-                        </div>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs text-stone-500 font-medium">Valor/Sessão</span>
-                                <span className="text-sm font-bold text-stone-900">R$ 180,00</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs text-stone-500 font-medium">Situação</span>
-                                <span className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-widest border border-emerald-100/50">
-                                    <CheckCircle2 size={10} /> Em dia
-                                </span>
-                            </div>
-                        </div>
-                        <Button variant="outline" className="w-full rounded-xl h-10 border-stone-200 text-stone-600 font-bold text-[10px] uppercase tracking-widest hover:bg-stone-50">
-                            Gerar Recibo PIX
-                        </Button>
-                    </div>
-
-                    {/* Files/Attachments Card - Habilitado */}
-                    <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
-                        <AttachmentUpload patientId={patient.id} />
-
-                        {/* Listagem de arquivos se houver */}
-                        {patient.attachments.length > 0 && (
-                            <div className="mt-6 space-y-2">
-                                {patient.attachments.map(file => (
-                                    <div key={file.id} className="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100 hover:border-stone-200 transition-all group">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-stone-400 shadow-sm">
-                                                <FileText size={16} />
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold text-stone-800 tracking-tight line-clamp-1">{file.name}</p>
-                                                <p className="text-[8px] text-stone-400 font-black uppercase tracking-widest">{format(new Date(file.createdAt), 'dd MMM yyyy')}</p>
-                                            </div>
-                                        </div>
-                                        <a href={file.url} className="text-stone-300 hover:text-stone-900 transition-colors opacity-0 group-hover:opacity-100">
-                                            <Clock size={14} />
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
+            {/* Evolution History without sidebar */}
+            <div>
+                <EvolutionHistory appointments={patient.appointments} patientId={patient.id} />
             </div>
         </div>
     );
