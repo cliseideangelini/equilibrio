@@ -17,6 +17,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
     const [search, setSearch] = useState("");
     const [dateFilter, setDateFilter] = useState("");
     const [mounted, setMounted] = useState(false);
+    const [activeTab, setActiveTab] = useState<'all' | 'realizadas' | 'pendentes' | 'canceladas'>('all');
 
     useEffect(() => {
         setMounted(true);
@@ -33,14 +34,29 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                 matchesDate = appDate === dateFilter;
             }
 
-            return matchesSearch && matchesDate;
+            let matchesStatus = true;
+            if (activeTab === 'realizadas') matchesStatus = app.status === 'CONFIRMED';
+            else if (activeTab === 'pendentes') matchesStatus = app.status === 'PENDING';
+            else if (activeTab === 'canceladas') matchesStatus = app.status === 'CANCELLED';
+
+            return matchesSearch && matchesDate && matchesStatus;
         });
-    }, [appointments, search, dateFilter, mounted]);
+    }, [appointments, search, dateFilter, mounted, activeTab]);
+
+    const stats = useMemo(() => {
+        return {
+            realizadas: appointments.filter(a => a.status === 'CONFIRMED').length,
+            pendentes: appointments.filter(a => a.status === 'PENDING').length,
+            canceladas: appointments.filter(a => a.status === 'CANCELLED').length,
+        };
+    }, [appointments]);
 
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-1">
-                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-stone-900">Linha do Tempo / Evoluções</h3>
+                <div className="flex flex-col gap-1">
+                    <h3 className="text-sm font-black uppercase tracking-[0.2em] text-stone-900">Histórico de Atendimento</h3>
+                </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-48">
@@ -52,15 +68,36 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                             className="w-full h-9 pl-9 pr-4 text-[10px] bg-white border border-stone-200 rounded-lg outline-none focus:ring-2 focus:ring-stone-100 font-bold uppercase tracking-widest placeholder:text-stone-300"
                         />
                     </div>
-                    <div className="relative">
-                        <input
-                            type="date"
-                            value={dateFilter}
-                            onChange={(e) => setDateFilter(e.target.value)}
-                            className="h-9 px-3 text-[10px] bg-white border border-stone-200 rounded-lg outline-none focus:ring-2 focus:ring-stone-100 font-bold uppercase tracking-widest text-stone-600"
-                        />
-                    </div>
                 </div>
+            </div>
+
+            {/* Tabs de Status */}
+            <div className="flex gap-1 p-1 bg-stone-100 rounded-xl w-fit">
+                {[
+                    { id: 'all', label: 'Todos', count: appointments.length },
+                    { id: 'realizadas', label: 'Realizadas', count: stats.realizadas },
+                    { id: 'pendentes', label: 'Pendentes', count: stats.pendentes },
+                    { id: 'canceladas', label: 'Canceladas', count: stats.canceladas },
+                ].map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id as any)}
+                        className={cn(
+                            "px-4 py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all flex items-center gap-2",
+                            activeTab === tab.id
+                                ? "bg-white text-stone-900 shadow-sm"
+                                : "text-stone-400 hover:text-stone-600"
+                        )}
+                    >
+                        {tab.label}
+                        <span className={cn(
+                            "w-4 h-4 rounded-full flex items-center justify-center text-[8px]",
+                            activeTab === tab.id ? "bg-stone-900 text-white" : "bg-stone-200 text-stone-500"
+                        )}>
+                            {tab.count}
+                        </span>
+                    </button>
+                ))}
             </div>
 
             <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm">
@@ -85,10 +122,10 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                             <tr>
                                 <td colSpan={4} className="py-12 text-center bg-stone-50/30">
                                     <p className="text-stone-400 font-medium text-sm">Nenhum registro encontrado.</p>
-                                    {(search || dateFilter) && (
+                                    {(search || dateFilter || activeTab !== 'all') && (
                                         <Button
                                             variant="link"
-                                            onClick={() => { setSearch(""); setDateFilter(""); }}
+                                            onClick={() => { setSearch(""); setDateFilter(""); setActiveTab('all'); }}
                                             className="text-[10px] font-black uppercase tracking-widest text-stone-900 mt-2"
                                         >
                                             Limpar filtros
