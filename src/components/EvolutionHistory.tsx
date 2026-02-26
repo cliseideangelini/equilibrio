@@ -17,7 +17,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
     const [search, setSearch] = useState("");
     const [dateFilter, setDateFilter] = useState("");
     const [mounted, setMounted] = useState(false);
-    const [activeTab, setActiveTab] = useState<'all' | 'realizadas' | 'pendentes' | 'canceladas'>('all');
+    const [activeTab, setActiveTab] = useState<'all' | 'realizadas' | 'pendentes' | 'canceladas' | 'ausentes'>('all');
 
     useEffect(() => {
         setMounted(true);
@@ -38,6 +38,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
             if (activeTab === 'realizadas') matchesStatus = app.status === 'CONFIRMED';
             else if (activeTab === 'pendentes') matchesStatus = app.status === 'PENDING';
             else if (activeTab === 'canceladas') matchesStatus = app.status === 'CANCELLED';
+            else if (activeTab === 'ausentes') matchesStatus = app.status === 'ABSENT';
 
             return matchesSearch && matchesDate && matchesStatus;
         });
@@ -48,6 +49,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
             realizadas: appointments.filter(a => a.status === 'CONFIRMED').length,
             pendentes: appointments.filter(a => a.status === 'PENDING').length,
             canceladas: appointments.filter(a => a.status === 'CANCELLED').length,
+            ausentes: appointments.filter(a => a.status === 'ABSENT').length,
         };
     }, [appointments]);
 
@@ -78,6 +80,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                     { id: 'realizadas', label: 'Realizadas', count: stats.realizadas },
                     { id: 'pendentes', label: 'Pendentes', count: stats.pendentes },
                     { id: 'canceladas', label: 'Canceladas', count: stats.canceladas },
+                    { id: 'ausentes', label: 'Ausentes', count: stats.ausentes },
                 ].map((tab) => (
                     <button
                         key={tab.id}
@@ -160,9 +163,13 @@ function EvolutionItem({ app, appointments, patientId }: { app: any, appointment
                     </p>
                     <span className={cn(
                         "px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border inline-block mt-0.5",
-                        app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-stone-50 text-stone-400 border-stone-100"
+                        app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                            app.status === 'ABSENT' ? "bg-amber-50 text-amber-600 border-amber-100" :
+                                "bg-stone-50 text-stone-400 border-stone-100"
                     )}>
-                        {app.status === 'CONFIRMED' ? 'Realizada' : 'Pendente'}
+                        {app.status === 'CONFIRMED' ? 'Realizada' :
+                            app.status === 'ABSENT' ? 'Ausente' :
+                                'Pendente'}
                     </span>
                 </div>
             </td>

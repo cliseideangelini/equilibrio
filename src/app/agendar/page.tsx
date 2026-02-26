@@ -19,7 +19,6 @@ export default function BookingPage() {
                         <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center p-1.5 overflow-hidden">
                             <Image src="/logo.png" alt="Logo" width={24} height={24} className="opacity-80" />
                         </div>
-                        <h2 className="text-sm font-semibold tracking-tight text-stone-800">Equilíbrio</h2>
                     </div>
                     <div className="w-10" /> {/* Balance spacer */}
                 </div>

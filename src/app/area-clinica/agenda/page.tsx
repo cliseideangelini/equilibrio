@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CancellationButton } from "@/components/CancellationButton";
+import { AbsentButton } from "@/components/AbsentButton";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -146,15 +147,18 @@ export default async function ClinicianAgenda() {
                                             "inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm",
                                             app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100/50" :
                                                 app.status === 'CANCELLED' ? "bg-red-50 text-red-600 border-red-100/50" :
-                                                    "bg-amber-50 text-amber-600 border-amber-100/50"
+                                                    app.status === 'ABSENT' ? "bg-amber-50 text-amber-600 border-amber-100/50" :
+                                                        "bg-amber-50 text-amber-600 border-amber-100/50"
                                         )}>
                                             <span className={cn("w-1.5 h-1.5 rounded-full mr-2",
                                                 app.status === 'CONFIRMED' ? "bg-emerald-500 shadow-emerald-500/20 shadow-lg" :
                                                     app.status === 'CANCELLED' ? "bg-red-500 shadow-red-500/20 shadow-lg" :
-                                                        "bg-amber-500 shadow-amber-500/20 shadow-lg"
+                                                        app.status === 'ABSENT' ? "bg-amber-500 shadow-amber-500/20 shadow-lg" :
+                                                            "bg-amber-500 shadow-amber-500/20 shadow-lg"
                                             )} />
                                             {app.status === 'CONFIRMED' ? 'Confirmado' :
-                                                app.status === 'CANCELLED' ? 'Cancelado' : 'Aguardando'}
+                                                app.status === 'CANCELLED' ? 'Cancelado' :
+                                                    app.status === 'ABSENT' ? 'Ausente' : 'Aguardando'}
                                         </span>
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
@@ -176,6 +180,11 @@ export default async function ClinicianAgenda() {
                                                 </Button>
                                             )}
                                             <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
+                                            {app.status === 'CONFIRMED' && (
+                                                <div className="flex items-center gap-2">
+                                                    <AbsentButton appointmentId={app.id} />
+                                                </div>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
