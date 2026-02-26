@@ -25,18 +25,17 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
     const filteredAppointments = useMemo(() => {
         if (!mounted) return [];
         return appointments.filter(app => {
-            const matchesSearch = app.evolution?.content?.toLowerCase().includes(search.toLowerCase()) ||
-                format(app.startTime, "MMMM", { locale: ptBR }).toLowerCase().includes(search.toLowerCase());
+            const matchesSearch = !search || app.evolution?.content?.toLowerCase().includes(search.toLowerCase());
 
             let matchesDate = true;
             if (dateFilter) {
-                const appDate = format(app.startTime, "yyyy-MM-dd");
+                const appDate = format(new Date(app.startTime), "yyyy-MM-dd");
                 matchesDate = appDate === dateFilter;
             }
 
             return matchesSearch && matchesDate;
         });
-    }, [appointments, search, dateFilter]);
+    }, [appointments, search, dateFilter, mounted]);
 
     return (
         <div className="space-y-6">
