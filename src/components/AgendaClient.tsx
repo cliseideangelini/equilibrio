@@ -144,16 +144,30 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                         </div>
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stone-50 text-stone-500 rounded-[1rem] border border-stone-100 shadow-sm">
-                                            {app.type === 'ONLINE' ? (
-                                                <Video size={10} className="text-blue-500" />
-                                            ) : (
-                                                <MapPin size={10} className="text-stone-500" />
-                                            )}
-                                            <span className="text-[10px] font-black uppercase tracking-[0.15em]">
-                                                {app.type}
-                                            </span>
-                                        </div>
+                                        {app.type === 'ONLINE' && app.meetLink ? (
+                                            <a
+                                                href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-[1rem] border border-blue-100 shadow-sm hover:bg-blue-100 hover:border-blue-200 transition-all group/link"
+                                            >
+                                                <Video size={10} className="text-blue-500 group-hover/link:scale-110 transition-transform" />
+                                                <span className="text-[10px] font-black uppercase tracking-[0.15em]">
+                                                    {app.type}
+                                                </span>
+                                            </a>
+                                        ) : (
+                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stone-50 text-stone-500 rounded-[1rem] border border-stone-100 shadow-sm">
+                                                {app.type === 'ONLINE' ? (
+                                                    <Video size={10} className="text-blue-500" />
+                                                ) : (
+                                                    <MapPin size={10} className="text-stone-500" />
+                                                )}
+                                                <span className="text-[10px] font-black uppercase tracking-[0.15em]">
+                                                    {app.type}
+                                                </span>
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
                                         <span className={cn(
@@ -221,16 +235,6 @@ function ActionMenu({ appointment }: { appointment: Appointment }) {
                 <>
                     <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
                     <div className="absolute right-0 mt-2 w-48 bg-white border border-stone-100 rounded-2xl shadow-xl z-40 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                        {appointment.type === 'ONLINE' && appointment.meetLink && (
-                            <a
-                                href={appointment.meetLink.startsWith('http') ? appointment.meetLink : `https://${appointment.meetLink}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full px-4 py-2.5 flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 transition-colors"
-                            >
-                                <Video size={14} /> Abrir Meet
-                            </a>
-                        )}
 
                         <div className="px-2 py-1">
                             <CancellationButton
