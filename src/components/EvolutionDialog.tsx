@@ -24,13 +24,14 @@ interface EvolutionDialogProps {
 export function EvolutionDialog({ patientId, appointmentId, initialContent = "", trigger }: EvolutionDialogProps) {
     const [open, setOpen] = useState(false);
     const [content, setContent] = useState(initialContent);
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [isPending, setIsPending] = useState(false);
 
     const handleSave = async () => {
         if (!content.trim() && !initialContent) return;
         setIsPending(true);
         try {
-            await saveEvolution(patientId, appointmentId, content);
+            await saveEvolution(patientId, appointmentId, content, new Date(date));
             setOpen(false);
         } catch (error) {
             console.error("Error saving evolution:", error);
@@ -52,7 +53,16 @@ export function EvolutionDialog({ patientId, appointmentId, initialContent = "",
                 <DialogHeader>
                     <DialogTitle className="text-xl font-light text-stone-900">Evolução Clínica</DialogTitle>
                 </DialogHeader>
-                <div className="py-4">
+                <div className="py-4 space-y-4">
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-1">Data da Evolução</label>
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            className="w-full h-10 px-4 rounded-xl border border-stone-100 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-stone-100 transition-all"
+                        />
+                    </div>
                     <Textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}

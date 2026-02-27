@@ -285,7 +285,7 @@ export async function completeAppointment(id: string) {
     return { success: true };
 }
 
-export async function saveEvolution(patientId: string, appointmentId: string, content: string) {
+export async function saveEvolution(patientId: string, appointmentId: string, content: string, date?: Date) {
     if (!content.trim()) {
         try {
             await prisma.evolution.delete({
@@ -300,11 +300,15 @@ export async function saveEvolution(patientId: string, appointmentId: string, co
 
     const evolution = await prisma.evolution.upsert({
         where: { appointmentId },
-        update: { content },
+        update: {
+            content,
+            date: date || undefined
+        },
         create: {
             content,
             patientId,
-            appointmentId
+            appointmentId,
+            date: date || new Date()
         }
     });
 

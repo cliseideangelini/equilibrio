@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { ProntuariosClient } from "@/components/ProntuariosClient";
+import { PatientRegistrationDialog } from "@/components/PatientRegistrationDialog";
+import { ManualBookingDialog } from "@/components/ManualBookingDialog";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { AppointmentStatus } from "@prisma/client";
 
@@ -73,6 +75,11 @@ export default async function ProntuariosIndex() {
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
                         Repositório Permanente de Prontuários e Evoluções
                     </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <PatientRegistrationDialog />
+                    <ManualBookingDialog patients={patients.map(p => ({ id: p.id, name: p.name, phone: p.phone }))} />
                 </div>
             </header>
 

@@ -155,12 +155,17 @@ function EvolutionItem({ app, appointments, patientId }: { app: any, appointment
             </td>
             <td className="py-3 px-4 align-top">
                 <p className="text-xs font-bold text-stone-800" suppressHydrationWarning>
-                    {format(new Date(app.startTime), "dd/MM/yyyy")}
+                    {app.evolution?.date
+                        ? format(new Date(app.evolution.date), "dd/MM/yyyy")
+                        : format(new Date(app.startTime), "dd/MM/yyyy")}
                 </p>
                 <div className="flex flex-col items-start gap-1 mt-1" suppressHydrationWarning>
                     <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
                         {format(new Date(app.startTime), "HH:mm")} • {app.type.charAt(0)}
                     </p>
+                    {app.evolution?.date && format(new Date(app.evolution.date), "yyyy-MM-dd") !== format(new Date(app.startTime), "yyyy-MM-dd") && (
+                        <span className="text-[8px] text-amber-600 font-black uppercase tracking-widest">Data editada</span>
+                    )}
                     <span className={cn(
                         "px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border inline-block mt-0.5",
                         (app.status === 'CONFIRMED' || app.status === 'COMPLETED') ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
