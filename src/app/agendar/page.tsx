@@ -1,5 +1,6 @@
 import SimpleBookingForm from "@/components/SimpleBookingForm";
-import { ArrowLeft, Flower2 } from "lucide-react";
+import { WaitingListDialog } from "@/components/WaitingListDialog";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -24,8 +25,12 @@ export default function BookingPage() {
                 </div>
             </header>
 
-            <main className="pt-32 pb-24 px-6 flex justify-center">
+            <main className="pt-32 pb-24 px-6 flex flex-col items-center gap-12">
                 <SimpleBookingForm />
+
+                <div className="max-w-4xl w-full">
+                    <WaitingListDialog />
+                </div>
             </main>
         </div>
     );

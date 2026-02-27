@@ -248,7 +248,25 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         data: { status: "CANCELLED" }
     });
 
+    // Lógica de Lista de Espera: Notificar interessados
+    try {
+        const interested = await (prisma as any).waitingList.findMany({
+            where: { status: "PENDING" }
+        });
+
+        if (interested.length > 0) {
+            // Marcar como notificados
+            await (prisma as any).waitingList.updateMany({
+                where: { id: { in: interested.map((i: any) => i.id) } },
+                data: { status: "NOTIFIED" }
+            });
+        }
+    } catch (e) {
+        console.error("Erro ao processar lista de espera:", e);
+    }
+
     revalidatePath('/paciente/minha-agenda');
+    revalidatePath('/area-clinica/lista-espera');
     return { success: true };
 }
 
@@ -373,5 +391,48 @@ export async function updatePatientPassword(patientId: string, newPassword: stri
         }
     });
 
+    return { success: true };
+}
+
+// --- LISTA DE ESPERA ---
+
+export async function addToWaitingList(data: {
+    name: string;
+    phone: string;
+    email?: string;
+    preferredDays?: string;
+    preferredHours?: string;
+}) {
+    await prisma.waitingList.create({
+        data: {
+            ...data,
+            status: "PENDING"
+        }
+    });
+
+    revalidatePath('/area-clinica/lista-espera');
+    return { success: true };
+}
+
+export async function getWaitingList() {
+    return await prisma.waitingList.findMany({
+        orderBy: { createdAt: 'desc' }
+    });
+}
+
+export async function updateWaitingListStatus(id: string, status: string) {
+    await prisma.waitingList.update({
+        where: { id },
+        data: { status }
+    });
+    revalidatePath('/area-clinica/lista-espera');
+    return { success: true };
+}
+
+export async function deleteWaitingListEntry(id: string) {
+    await prisma.waitingList.delete({
+        where: { id }
+    });
+    revalidatePath('/area-clinica/lista-espera');
     return { success: true };
 }

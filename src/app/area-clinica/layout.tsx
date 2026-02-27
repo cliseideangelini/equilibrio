@@ -15,6 +15,7 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
         { label: "Agenda", href: "/area-clinica/agenda" },
         { label: "Pacientes", href: "/area-clinica/pacientes" },
         { label: "Prontuários", href: "/area-clinica/prontuarios" },
+        { label: "Lista de Espera", href: "/area-clinica/lista-espera" },
     ];
 
     return (
