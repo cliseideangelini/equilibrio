@@ -318,3 +318,35 @@ export async function addAttachment(patientId: string, name: string, url: string
     revalidatePath(`/area-clinica/prontuarios/${patientId}`);
     return { success: true, attachmentId: attachment.id };
 }
+
+export async function createManualAppointment(data: {
+    patientId: string;
+    date: Date;
+    type: "ONLINE" | "PRESENCIAL";
+    meetLink?: string;
+}) {
+    const psychologist = await prisma.psychologist.findFirst({
+        where: { email: 'Cliseideangelini@gmail.com' }
+    });
+
+    if (!psychologist) throw new Error("Psicóloga não encontrada");
+
+    const startTime = new Date(data.date);
+    const endTime = addMinutes(startTime, 30);
+
+    const appointment = await prisma.appointment.create({
+        data: {
+            startTime,
+            endTime,
+            psychologistId: psychologist.id,
+            patientId: data.patientId,
+            status: "CONFIRMED", // Agendamentos manuais já nascem confirmados
+            type: data.type,
+            meetLink: data.type === "ONLINE" ? (data.meetLink || "https://meet.google.com/wnx-geqg-wgs") : null,
+        }
+    });
+
+    revalidatePath('/area-clinica');
+    revalidatePath('/area-clinica/agenda');
+    return { success: true, appointmentId: appointment.id };
+}
