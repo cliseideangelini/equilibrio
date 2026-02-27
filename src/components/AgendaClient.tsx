@@ -17,6 +17,7 @@ import { CancellationButton } from "@/components/CancellationButton";
 import { AbsentButton } from "@/components/AbsentButton";
 import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface Appointment {
     id: string;
@@ -137,10 +138,10 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                             <div className="w-10 h-10 rounded-[1.2rem] bg-stone-100 flex items-center justify-center text-stone-400 transition-all shadow-sm border border-stone-200/50">
                                                 <span className="font-black text-[10px] uppercase tracking-widest">{app.patient.name.charAt(0)}</span>
                                             </div>
-                                            <div>
+                                            <Link href={`/area-clinica/prontuarios/${app.patient.id}`} className="hover:opacity-75 transition-opacity">
                                                 <h4 className="text-sm font-bold text-stone-800 tracking-tight">{app.patient.name}</h4>
-                                                <p className="text-[10px] text-stone-400 font-mono">{app.patient.phone}</p>
-                                            </div>
+                                                <p className="text-[10px] text-stone-400 font-mono italic">{app.patient.phone}</p>
+                                            </Link>
                                         </div>
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
