@@ -18,6 +18,7 @@ interface Patient {
     };
     hasAppointmentThisMonth: boolean;
     lastAppointmentDate: Date | string | null;
+    nextAppointmentDate: Date | string | null;
 }
 
 interface ProntuariosClientProps {
@@ -66,6 +67,7 @@ export function ProntuariosClient({ initialPatients }: ProntuariosClientProps) {
                             <tr>
                                 <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Paciente</th>
                                 <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Último Atendimento</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Próxima Consulta</th>
                                 <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400 text-center">Sessões</th>
                                 <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400 text-center">Cadastro</th>
                                 <th className="py-4 px-8 text-right font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Ações</th>
@@ -100,6 +102,20 @@ export function ProntuariosClient({ initialPatients }: ProntuariosClientProps) {
                                             </div>
                                         ) : (
                                             <span className="text-[10px] font-black uppercase tracking-widest text-stone-200 italic">Sem atendimentos</span>
+                                        )}
+                                    </td>
+                                    <td className="py-5 px-8 whitespace-nowrap">
+                                        {patient.nextAppointmentDate ? (
+                                            <div className="flex flex-col">
+                                                <span className="text-[11px] font-bold text-emerald-700">
+                                                    {format(new Date(patient.nextAppointmentDate), "dd 'de' MMMM", { locale: ptBR })}
+                                                </span>
+                                                <span className="text-[10px] text-emerald-500/60 font-mono">
+                                                    {format(new Date(patient.nextAppointmentDate), "EEEE', às ' HH:mm", { locale: ptBR })}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-stone-200 italic">Sem agendamento</span>
                                         )}
                                     </td>
                                     <td className="py-5 px-8 whitespace-nowrap text-center">

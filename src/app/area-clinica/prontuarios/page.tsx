@@ -10,7 +10,7 @@ export default async function ProntuariosIndex() {
     const monthStart = startOfMonth(now);
     const monthEnd = endOfMonth(now);
 
-    // Buscar todos os pacientes com contagem de consultas e último atendimento
+    // Buscar todos os pacientes com contagem de consultas
     const patientsRaw = await prisma.patient.findMany({
         include: {
             _count: {
@@ -18,7 +18,8 @@ export default async function ProntuariosIndex() {
             },
             appointments: {
                 orderBy: { startTime: 'desc' },
-                take: 1
+                // Buscaremos as últimas consultas para determinar qual é passada e qual é futura no mapeamento
+                take: 5
             }
         }
     });
@@ -39,7 +40,14 @@ export default async function ProntuariosIndex() {
 
     // Mapear dados para o formato do client
     const patients = patientsRaw.map(p => {
-        const lastApp = p.appointments[0];
+        const sortedApps = [...p.appointments].sort((a, b) =>
+            new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        );
+
+        const nextApp = sortedApps.find(a => new Date(a.startTime) >= now);
+        const pastApps = sortedApps.filter(a => new Date(a.startTime) < now);
+        const lastApp = pastApps.length > 0 ? pastApps[pastApps.length - 1] : null;
+
         return {
             id: p.id,
             name: p.name,
@@ -47,7 +55,8 @@ export default async function ProntuariosIndex() {
             createdAt: p.createdAt,
             _count: p._count,
             hasAppointmentThisMonth: monthlyPatientIds.has(p.id),
-            lastAppointmentDate: lastApp ? lastApp.startTime : null
+            lastAppointmentDate: lastApp ? lastApp.startTime : null,
+            nextAppointmentDate: nextApp ? nextApp.startTime : null
         };
     });
 
