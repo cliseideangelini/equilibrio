@@ -1,42 +1,70 @@
 import prisma from "@/lib/prisma";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { PatientsClient } from "@/components/PatientsClient";
-import { ManualBookingDialog } from "@/components/ManualBookingDialog";
+import { PatientRegistrationDialog } from "@/components/PatientRegistrationDialog";
 import { startOfWeek, endOfWeek } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
 export default async function PatientsList() {
-    // Definir o intervalo da semana atual (Domingo a Sábado)
     const now = new Date();
     const weekStart = startOfWeek(now);
     const weekEnd = endOfWeek(now);
 
-    // Buscar todos os pacientes com contagem de consultas e verificar se têm consulta na semana
-    const patients = await prisma.patient.findMany({
-        orderBy: { name: 'asc' },
+    // Buscar todos os pacientes com contagem de consultas e suas consultas
+    const patientsRaw = await prisma.patient.findMany({
         include: {
             _count: {
                 select: { appointments: true }
             },
             appointments: {
                 where: {
-                    startTime: {
-                        gte: weekStart,
-                        lte: weekEnd
-                    }
+                    status: { in: ['CONFIRMED', 'PENDING'] },
+                    startTime: { gte: now }
                 },
-                select: { id: true }
+                orderBy: { startTime: 'asc' },
+                take: 1
             }
         }
     });
 
-    // Mapear para o formato que o client precisa, adicionando flag de consulta na semana
-    const patientsWithWeeklyFlag = patients.map(p => ({
-        ...p,
-        hasAppointmentThisWeek: p.appointments.length > 0
-    }));
+    // Precisamos de uma query separada para a flag de semanal ou processar em JS
+    // Vamos processar em JS para economizar queries, buscando apenas as IDs de quem tem consulta essa semana
+    const semanalApps = await prisma.appointment.findMany({
+        where: {
+            startTime: {
+                gte: weekStart,
+                lte: weekEnd
+            },
+            status: { in: ['CONFIRMED', 'PENDING'] }
+        },
+        select: { patientId: true }
+    });
+
+    const weeklyPatientIds = new Set(semanalApps.map(a => a.patientId));
+
+    // Mapear e preparar para ordenação
+    const patients = patientsRaw.map(p => {
+        const nextApp = p.appointments[0];
+        return {
+            id: p.id,
+            name: p.name,
+            phone: p.phone,
+            createdAt: p.createdAt,
+            _count: p._count,
+            hasAppointmentThisWeek: weeklyPatientIds.has(p.id),
+            nextAppointmentDate: nextApp ? nextApp.startTime : null
+        };
+    });
+
+    // Ordenar: Próxima consulta (mais próxima para mais longe), depois sem consulta
+    patients.sort((a, b) => {
+        if (a.nextAppointmentDate && b.nextAppointmentDate) {
+            return a.nextAppointmentDate.getTime() - b.nextAppointmentDate.getTime();
+        }
+        if (a.nextAppointmentDate) return -1;
+        if (b.nextAppointmentDate) return 1;
+        return a.name.localeCompare(b.name);
+    });
 
     return (
         <div className="space-y-10">
@@ -50,11 +78,10 @@ export default async function PatientsList() {
                     </p>
                 </div>
 
-                {/* O ManualBookingDialog serve como o fluxo de 'Novo Paciente' no agendamento */}
-                <ManualBookingDialog patients={patients.map(p => ({ id: p.id, name: p.name, phone: p.phone }))} />
+                <PatientRegistrationDialog />
             </header>
 
-            <PatientsClient initialPatients={patientsWithWeeklyFlag} />
+            <PatientsClient initialPatients={patients} />
         </div>
     );
 }
