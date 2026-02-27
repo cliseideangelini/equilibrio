@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { createGoogleCalendarEvent } from "@/lib/google-calendar";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { AppointmentStatus } from "@prisma/client";
 import {
     startOfDay,
     endOfDay,
@@ -214,6 +215,7 @@ export async function registerPatient(formData: { name: string, phone: string, p
             data: { ...formData, password: hashedPassword }
         });
 
+    revalidatePath("/area-clinica/pacientes");
     return { success: true, patientId: (patient as any).id };
 }
 
@@ -259,7 +261,7 @@ export async function confirmAppointment(id: string) {
 export async function setAbsent(id: string) {
     await prisma.appointment.update({
         where: { id },
-        data: { status: "ABSENT" }
+        data: { status: AppointmentStatus.ABSENT }
     });
 
     revalidatePath('/area-clinica');
@@ -270,7 +272,7 @@ export async function setAbsent(id: string) {
 export async function completeAppointment(id: string) {
     await prisma.appointment.update({
         where: { id },
-        data: { status: "COMPLETED" }
+        data: { status: AppointmentStatus.COMPLETED }
     });
 
     revalidatePath('/area-clinica');

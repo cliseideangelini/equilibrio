@@ -12,12 +12,12 @@ interface Patient {
     id: string;
     name: string;
     phone: string;
-    createdAt: Date;
+    createdAt: Date | string;
     _count: {
         appointments: number;
     };
     hasAppointmentThisWeek: boolean;
-    nextAppointmentDate: Date | null;
+    nextAppointmentDate: Date | string | null;
 }
 
 interface PatientsClientProps {

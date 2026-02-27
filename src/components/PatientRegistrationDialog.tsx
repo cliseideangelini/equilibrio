@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { UserPlus, Loader2, Phone, User, Mail } from "lucide-react";
 import { registerPatient } from "@/lib/actions";
-import { revalidatePath } from "next/cache";
 
 export function PatientRegistrationDialog() {
     const [isOpen, setIsOpen] = useState(false);
