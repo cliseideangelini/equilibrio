@@ -50,6 +50,7 @@ model Patient {
   email        String?       @unique
   phone        String        @unique
   password     String?       // Opcional para pacientes antigos, obrigatório para novos
+  mustChangePassword Boolean @default(false)
   appointments Appointment[]
   evolutions   Evolution[]
   attachments  Attachment[]

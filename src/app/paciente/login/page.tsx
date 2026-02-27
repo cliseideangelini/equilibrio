@@ -8,12 +8,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { loginPatient } from "@/lib/actions";
+import { PasswordChangeDialog } from "@/components/PasswordChangeDialog";
 
 export default function PatientLoginPage() {
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isPending, setIsPending] = useState(false);
+    const [showPasswordChange, setShowPasswordChange] = useState(false);
+    const [tempPatientId, setTempPatientId] = useState("");
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -25,7 +28,13 @@ export default function PatientLoginPage() {
             const result = await loginPatient(phone, password);
             if (result.success) {
                 document.cookie = `patient_id=${result.patientId}; path=/; max-age=86400`;
-                router.push("/paciente/minha-agenda");
+
+                if (result.mustChangePassword) {
+                    setTempPatientId(result.patientId);
+                    setShowPasswordChange(true);
+                } else {
+                    router.push("/paciente/minha-agenda");
+                }
             } else {
                 setError(result.error || "Erro ao entrar.");
             }
@@ -100,6 +109,13 @@ export default function PatientLoginPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            <PasswordChangeDialog
+                isOpen={showPasswordChange}
+                onOpenChange={setShowPasswordChange}
+                patientId={tempPatientId}
+                onSuccess={() => router.push("/paciente/minha-agenda")}
+            />
         </div>
     );
 }

@@ -31,13 +31,11 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
         const query = search.toLowerCase().trim();
 
         if (!query) {
-            // Se não houver busca, mostrar todos (já que a ordenação do server prioriza quem tem consulta)
-            // Mas o usuário pediu "mostrar os pacientes da semana, os demais ao buscar"? 
-            // Na última requisição ele disse: "vamos mostrar os pacientes em grade e não em card, deve mostrar do proximo a ter consulta para o ultimo"
-            // Isso implica mostrar todos os pacientes, mas ordenados.
-            return initialPatients;
+            // Se não houver busca, mostrar APENAS os pacientes que têm consulta esta semana
+            return initialPatients.filter(p => p.hasAppointmentThisWeek);
         }
 
+        // Se houver busca, mostrar todos que batem com o termo
         return initialPatients.filter(p =>
             p.name.toLowerCase().includes(query) ||
             p.phone.includes(query)

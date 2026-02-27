@@ -197,7 +197,12 @@ export async function loginPatient(phone: string, password: string) {
     const isValid = await bcrypt.compare(password, patient.password);
     if (!isValid) return { success: false, error: "Senha incorreta." };
 
-    return { success: true, patientId: patient.id, name: patient.name };
+    return {
+        success: true,
+        patientId: patient.id,
+        name: patient.name,
+        mustChangePassword: patient.mustChangePassword
+    };
 }
 
 export async function registerPatient(formData: { name: string, phone: string, password: string, email?: string }) {
@@ -209,10 +214,10 @@ export async function registerPatient(formData: { name: string, phone: string, p
     const patient = existing
         ? await prisma.patient.update({
             where: { id: existing.id },
-            data: { password: hashedPassword, name: formData.name, email: formData.email }
+            data: { password: hashedPassword, name: formData.name, email: formData.email, mustChangePassword: true }
         })
         : await prisma.patient.create({
-            data: { ...formData, password: hashedPassword }
+            data: { ...formData, password: hashedPassword, mustChangePassword: true }
         });
 
     revalidatePath("/area-clinica/pacientes");
@@ -351,4 +356,18 @@ export async function createManualAppointment(data: {
     revalidatePath('/area-clinica');
     revalidatePath('/area-clinica/agenda');
     return { success: true, appointmentId: appointment.id };
+}
+
+export async function updatePatientPassword(patientId: string, newPassword: string) {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.patient.update({
+        where: { id: patientId },
+        data: {
+            password: hashedPassword,
+            mustChangePassword: false
+        }
+    });
+
+    return { success: true };
 }

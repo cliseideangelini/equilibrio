@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { PatientsClient } from "@/components/PatientsClient";
 import { PatientRegistrationDialog } from "@/components/PatientRegistrationDialog";
+import { ManualBookingDialog } from "@/components/ManualBookingDialog";
 import { startOfWeek, endOfWeek } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -78,7 +79,10 @@ export default async function PatientsList() {
                     </p>
                 </div>
 
-                <PatientRegistrationDialog />
+                <div className="flex items-center gap-3">
+                    <PatientRegistrationDialog />
+                    <ManualBookingDialog patients={patients.map(p => ({ id: p.id, name: p.name, phone: p.phone }))} />
+                </div>
             </header>
 
             <PatientsClient initialPatients={patients} />
