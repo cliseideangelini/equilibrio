@@ -14,6 +14,8 @@ interface WaitingEntry {
     phone: string;
     preferredDays: string | null;
     preferredHours: string | null;
+    specificDate: Date | string | null;
+    specificTime: string | null;
     status: string;
     createdAt: Date | string;
 }
@@ -99,14 +101,23 @@ export function WaitingListClient({ initialList }: WaitingListClientProps) {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="py-5 px-8 whitespace-nowrap">
+                                    <td className="p-4">
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1">
-                                                <Clock size={10} className="text-stone-300" /> {entry.preferredDays || "Qualquer dia"}
-                                            </span>
-                                            <span className="text-[9px] text-stone-400 font-medium">
-                                                {entry.preferredHours || "Qualquer horário"}
-                                            </span>
+                                            {entry.specificDate ? (
+                                                <div className="flex items-center gap-1.5 text-stone-900 font-bold group">
+                                                    <div className="w-2 h-2 rounded-full bg-amber-400 group-hover:animate-ping" />
+                                                    {format(new Date(entry.specificDate), "dd/MM")} às {entry.specificTime}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="text-stone-900 font-medium">
+                                                        {entry.preferredDays || "Qualquer dia"}
+                                                    </div>
+                                                    <div className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">
+                                                        {entry.preferredHours || "Qualquer turno"}
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="py-5 px-8 whitespace-nowrap text-center text-[10px] text-stone-400 font-mono">
@@ -128,7 +139,9 @@ export function WaitingListClient({ initialList }: WaitingListClientProps) {
                                     <td className="py-5 px-8 whitespace-nowrap text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <a
-                                                href={`https://wa.me/55${entry.phone.replace(/\D/g, '')}?text=Olá ${entry.name}, um horário acaba de ser liberado no Equilíbrio! Gostaria de agendar?`}
+                                                href={`https://wa.me/55${entry.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                                                    `Olá ${entry.name}, o horário que você aguardava (${entry.specificDate ? format(new Date(entry.specificDate), "dd/MM") + " às " + entry.specificTime : (entry.preferredDays || "um horário")}) acaba de ser liberado no Equilíbrio! Gostaria de agendar? \n\nLink: equilibrium.com/agendar`
+                                                )}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >

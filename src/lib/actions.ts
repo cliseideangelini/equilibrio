@@ -224,6 +224,51 @@ export async function registerPatient(formData: { name: string, phone: string, p
     return { success: true, patientId: (patient as any).id };
 }
 
+// --- LISTA DE ESPERA ---
+
+export async function addToWaitingList(data: {
+    name: string;
+    phone: string;
+    email?: string;
+    preferredDays?: string;
+    preferredHours?: string;
+    specificDate?: Date;
+    specificTime?: string;
+}) {
+    await prisma.waitingList.create({
+        data: {
+            ...data,
+            status: "PENDING"
+        }
+    });
+
+    revalidatePath('/area-clinica/lista-espera');
+    return { success: true };
+}
+
+export async function getWaitingList() {
+    return await prisma.waitingList.findMany({
+        orderBy: { createdAt: 'desc' }
+    });
+}
+
+export async function updateWaitingListStatus(id: string, status: string) {
+    await prisma.waitingList.update({
+        where: { id },
+        data: { status }
+    });
+    revalidatePath('/area-clinica/lista-espera');
+    return { success: true };
+}
+
+export async function deleteWaitingListEntry(id: string) {
+    await prisma.waitingList.delete({
+        where: { id }
+    });
+    revalidatePath('/area-clinica/lista-espera');
+    return { success: true };
+}
+
 export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false) {
     const appointment = await prisma.appointment.findUnique({
         where: { id: appointmentId },
@@ -233,6 +278,8 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
     if (!appointment) throw new Error("Agendamento não encontrado");
 
     const now = new Date();
+    const startTimeStr = format(appointment.startTime, 'yyyy-MM-dd');
+    const timeStr = format(appointment.startTime, 'HH:mm');
     const hoursUntilSession = (appointment.startTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
     if (hoursUntilSession <= 3 && !confirmLateCharge) {
@@ -250,16 +297,37 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     // Lógica de Lista de Espera: Notificar interessados
     try {
-        const interested = await (prisma as any).waitingList.findMany({
-            where: { status: "PENDING" }
+        // 1. Prioridade: Quem pediu ESSE horário específico
+        const specificInterested = await (prisma as any).waitingList.findMany({
+            where: {
+                status: "PENDING",
+                specificTime: timeStr,
+                specificDate: {
+                    gte: startOfDay(appointment.startTime),
+                    lte: endOfDay(appointment.startTime)
+                }
+            }
         });
 
-        if (interested.length > 0) {
+        // 2. Geral: Quem está na lista esperando qualquer vaga
+        const generalInterested = await (prisma as any).waitingList.findMany({
+            where: {
+                status: "PENDING",
+                specificDate: null
+            }
+        });
+
+        const allToNotify = [...specificInterested, ...generalInterested];
+
+        if (allToNotify.length > 0) {
             // Marcar como notificados
             await (prisma as any).waitingList.updateMany({
-                where: { id: { in: interested.map((i: any) => i.id) } },
+                where: { id: { in: allToNotify.map((i: any) => i.id) } },
                 data: { status: "NOTIFIED" }
             });
+
+            // Nota: Integrar com API de WhatsApp real aqui no futuro
+            // Ex: sendWhatsApp(i.phone, `Vaga aberta! Agende agora: equilibrium.com/agendar?date=${startTimeStr}&time=${timeStr}`)
         }
     } catch (e) {
         console.error("Erro ao processar lista de espera:", e);
@@ -267,6 +335,8 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     revalidatePath('/paciente/minha-agenda');
     revalidatePath('/area-clinica/lista-espera');
+    revalidatePath('/area-clinica');
+    revalidatePath('/area-clinica/agenda');
     return { success: true };
 }
 
@@ -394,45 +464,3 @@ export async function updatePatientPassword(patientId: string, newPassword: stri
     return { success: true };
 }
 
-// --- LISTA DE ESPERA ---
-
-export async function addToWaitingList(data: {
-    name: string;
-    phone: string;
-    email?: string;
-    preferredDays?: string;
-    preferredHours?: string;
-}) {
-    await prisma.waitingList.create({
-        data: {
-            ...data,
-            status: "PENDING"
-        }
-    });
-
-    revalidatePath('/area-clinica/lista-espera');
-    return { success: true };
-}
-
-export async function getWaitingList() {
-    return await prisma.waitingList.findMany({
-        orderBy: { createdAt: 'desc' }
-    });
-}
-
-export async function updateWaitingListStatus(id: string, status: string) {
-    await prisma.waitingList.update({
-        where: { id },
-        data: { status }
-    });
-    revalidatePath('/area-clinica/lista-espera');
-    return { success: true };
-}
-
-export async function deleteWaitingListEntry(id: string) {
-    await prisma.waitingList.delete({
-        where: { id }
-    });
-    revalidatePath('/area-clinica/lista-espera');
-    return { success: true };
-}

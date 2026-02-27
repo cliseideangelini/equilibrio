@@ -108,13 +108,15 @@ model Payment {
 }
 
 model WaitingList {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String
   phone          String
   email          String?
   preferredDays  String?
   preferredHours String?
-  status         String   @default("PENDING") // PENDING, NOTIFIED, BOOKED, CANCELLED
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  specificDate   DateTime?
+  specificTime   String?
+  status         String    @default("PENDING") // PENDING, NOTIFIED, BOOKED, CANCELLED
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

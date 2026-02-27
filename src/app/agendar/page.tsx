@@ -26,11 +26,20 @@ export default function BookingPage() {
             </header>
 
             <main className="pt-32 pb-24 px-6 flex flex-col items-center gap-12">
-                <SimpleBookingForm />
-
-                <div className="max-w-4xl w-full">
+                <div className="max-w-4xl w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-stone-500 text-[10px] font-black uppercase tracking-widest">
+                            <div className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-pulse" />
+                            Horários Diários
+                        </div>
+                        <h1 className="text-5xl font-light text-stone-900 tracking-tight leading-none">
+                            Escolha seu <span className="italic font-serif">Momento</span>
+                        </h1>
+                    </div>
                     <WaitingListDialog />
                 </div>
+
+                <SimpleBookingForm />
             </main>
         </div>
     );
