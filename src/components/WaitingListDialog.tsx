@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
     Dialog,
     DialogContent,
@@ -12,10 +12,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { addToWaitingList } from "@/lib/actions";
-import { Loader2, CalendarHeart, CheckCircle2, Clock, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils"; // Assuming cn utility is available
+import { Loader2, CalendarHeart, CheckCircle2, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { getDay } from "date-fns";
 
-export function WaitingListDialog() {
+interface AvailabilityRule {
+    dayOfWeek: number;
+    startTime: number;
+    endTime: number;
+}
+
+interface WaitingListDialogProps {
+    rules: AvailabilityRule[];
+}
+
+export function WaitingListDialog({ rules }: WaitingListDialogProps) {
     const [open, setOpen] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -31,15 +42,47 @@ export function WaitingListDialog() {
         specificTime: ""
     });
 
+    // Helper: Dias de atendimento (ex: [1, 2, 4])
+    const workingDays = useMemo(() => Array.from(new Set(rules.map(r => r.dayOfWeek))), [rules]);
+
+    // Helper: Horários para o dia selecionado
+    const availableSlotsForDate = useMemo(() => {
+        if (!formData.specificDate) return [];
+        const date = new Date(formData.specificDate + "T00:00:00");
+        const dayOfWeek = getDay(date);
+
+        const dayRules = rules.filter(r => r.dayOfWeek === dayOfWeek);
+        const slots: string[] = [];
+
+        dayRules.forEach(rule => {
+            let current = rule.startTime;
+            while (current + 30 <= rule.endTime) {
+                const h = Math.floor(current / 60);
+                const m = current % 60;
+                slots.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`);
+                current += 30;
+            }
+        });
+
+        return slots.sort();
+    }, [formData.specificDate, rules]);
+
+    const isDayValid = useMemo(() => {
+        if (!formData.specificDate) return true;
+        const date = new Date(formData.specificDate + "T00:00:00");
+        return workingDays.includes(getDay(date));
+    }, [formData.specificDate, workingDays]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name || !formData.phone) return;
+        if (mode === "specific" && !isDayValid) return;
 
         setIsPending(true);
         try {
             const dataToSubmit = {
                 ...formData,
-                specificDate: mode === "specific" && formData.specificDate ? new Date(formData.specificDate) : undefined,
+                specificDate: mode === "specific" && formData.specificDate ? new Date(formData.specificDate + "T00:00:00") : undefined,
                 specificTime: mode === "specific" ? formData.specificTime : undefined,
                 preferredDays: mode === "general" ? formData.preferredDays : undefined,
                 preferredHours: mode === "general" ? formData.preferredHours : undefined,
@@ -145,7 +188,7 @@ export function WaitingListDialog() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="grid gap-2">
                                                 <label className="text-[9px] font-black uppercase tracking-widest text-stone-400 px-1 flex items-center gap-1">
-                                                    <Calendar size={10} /> Dias Preferidos
+                                                    <CalendarIcon size={10} /> Dias Preferidos
                                                 </label>
                                                 <Input
                                                     value={formData.preferredDays}
@@ -170,27 +213,38 @@ export function WaitingListDialog() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="grid gap-2">
                                                 <label className="text-[9px] font-black uppercase tracking-widest text-stone-400 px-1 flex items-center gap-1">
-                                                    <Calendar size={10} /> Dia Desejado
+                                                    <CalendarIcon size={10} /> Dia Desejado
                                                 </label>
                                                 <Input
                                                     type="date"
                                                     required={mode === "specific"}
                                                     value={formData.specificDate}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, specificDate: e.target.value })}
-                                                    className="rounded-xl bg-stone-50 border-stone-100 focus:ring-stone-200 h-12"
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, specificDate: e.target.value, specificTime: "" })}
+                                                    className={cn(
+                                                        "rounded-xl bg-stone-50 border-stone-100 focus:ring-stone-200 h-12",
+                                                        !isDayValid && "border-red-200 bg-red-50"
+                                                    )}
                                                 />
+                                                {!isDayValid && (
+                                                    <p className="text-[8px] text-red-500 font-bold uppercase tracking-tight px-1">A Dra. não atende neste dia</p>
+                                                )}
                                             </div>
                                             <div className="grid gap-2">
                                                 <label className="text-[9px] font-black uppercase tracking-widest text-stone-400 px-1 flex items-center gap-1">
                                                     <Clock size={10} /> Hora Exata
                                                 </label>
-                                                <Input
-                                                    type="time"
+                                                <select
                                                     required={mode === "specific"}
+                                                    disabled={!formData.specificDate || !isDayValid}
                                                     value={formData.specificTime}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, specificTime: e.target.value })}
-                                                    className="rounded-xl bg-stone-50 border-stone-100 focus:ring-stone-200 h-12"
-                                                />
+                                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, specificTime: e.target.value })}
+                                                    className="rounded-xl bg-stone-50 border border-stone-100 focus:ring-2 focus:ring-stone-200 h-12 px-3 text-sm outline-none disabled:opacity-50"
+                                                >
+                                                    <option value="">Selecione...</option>
+                                                    {availableSlotsForDate.map(slot => (
+                                                        <option key={slot} value={slot}>{slot}</option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
                                     )}

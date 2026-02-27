@@ -19,6 +19,14 @@ import {
     subDays
 } from "date-fns";
 
+export async function getPsychologistAvailability() {
+    const psychologist = await prisma.psychologist.findFirst({
+        where: { email: 'Cliseideangelini@gmail.com' },
+        include: { availabilities: true }
+    });
+    return psychologist?.availabilities || [];
+}
+
 export async function getAvailableSlots(dateString: string) {
     const date = new Date(dateString);
     const dayOfWeek = getDay(date);

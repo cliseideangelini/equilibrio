@@ -3,10 +3,13 @@ import { WaitingListDialog } from "@/components/WaitingListDialog";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { getPsychologistAvailability } from "@/lib/actions";
 
 export const dynamic = "force-dynamic";
 
-export default function BookingPage() {
+export default async function BookingPage() {
+    const availability = await getPsychologistAvailability();
+
     return (
         <div className="min-h-screen bg-[#FDFCFB] text-[#2C3E50] selection:bg-primary/10">
             {/* Header - Glass Effect and Minimalist */}
@@ -36,7 +39,7 @@ export default function BookingPage() {
                             Escolha seu <span className="italic font-serif">Momento</span>
                         </h1>
                     </div>
-                    <WaitingListDialog />
+                    <WaitingListDialog rules={availability} />
                 </div>
 
                 <SimpleBookingForm />
