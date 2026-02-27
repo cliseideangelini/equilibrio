@@ -62,7 +62,7 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
     const nextSession = futureAppointments[0];
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-20">
+        <div className="space-y-8 pb-20">
             {/* Header / Breadcrumb */}
             <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-4">
