@@ -31,16 +31,19 @@ async function main() {
     await prisma.patient.deleteMany({})
     await prisma.availability.deleteMany({ where: { psychologistId: cliseide.id } })
 
-    // 1. Recriar disponibilidades
-    const weekDays = [1, 2, 3, 4, 5]
-    for (const day of weekDays) {
-        // Manhã
+    // 1. Recriar disponibilidades (agenda real da Dra.)
+    // Segunda (1): apenas tarde 14:30-17:30
+    await prisma.availability.create({
+        data: { dayOfWeek: 1, startTime: 870, endTime: 1050, psychologistId: cliseide.id } // 14:30 - 17:30
+    })
+
+    // Terça a Sexta (2-5): manhã 07:00-11:30 + tarde 14:30-17:30
+    for (const day of [2, 3, 4, 5]) {
         await prisma.availability.create({
-            data: { dayOfWeek: day, startTime: 480, endTime: 720, psychologistId: cliseide.id } // 08:00 - 12:00
+            data: { dayOfWeek: day, startTime: 420, endTime: 690, psychologistId: cliseide.id } // 07:00 - 11:30
         })
-        // Tarde
         await prisma.availability.create({
-            data: { dayOfWeek: day, startTime: 840, endTime: 1140, psychologistId: cliseide.id } // 14:00 - 19:00
+            data: { dayOfWeek: day, startTime: 870, endTime: 1050, psychologistId: cliseide.id } // 14:30 - 17:30
         })
     }
 
