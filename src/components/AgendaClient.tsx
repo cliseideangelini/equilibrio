@@ -177,30 +177,13 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                         </span>
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
-                                        <div className="flex items-center justify-end gap-3 min-w-[350px]">
-                                            {app.status !== 'CANCELLED' && app.status !== 'COMPLETED' && (
-                                                <>
-                                                    {app.type === 'ONLINE' && app.meetLink && (
-                                                        <Button asChild size="sm" className="h-9 px-5 rounded-[1.2rem] bg-blue-600 hover:bg-blue-700 text-white font-black text-[9px] uppercase tracking-wider shadow-lg shadow-blue-500/20 border-0 group/meet transition-all shrink-0">
-                                                            <a href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`} target="_blank" rel="noopener noreferrer">
-                                                                Abrir Meet <ExternalLink size={12} className="ml-1.5 group-hover/meet:translate-x-0.5 transition-transform" />
-                                                            </a>
-                                                        </Button>
-                                                    )}
-
-                                                    <div className="w-[110px] flex justify-center">
-                                                        <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
-                                                    </div>
-
-                                                    {app.status === 'CONFIRMED' && (
-                                                        <div className="w-[100px] flex justify-center">
-                                                            <AbsentButton appointmentId={app.id} />
-                                                        </div>
-                                                    )}
-                                                </>
-                                            )}
-                                            {app.status === 'COMPLETED' && (
+                                        <div className="flex items-center justify-end">
+                                            {app.status === 'COMPLETED' ? (
                                                 <span className="text-[10px] font-black uppercase text-stone-300 tracking-widest italic pr-4">Sessão Finalizada</span>
+                                            ) : app.status === 'CANCELLED' ? (
+                                                <span className="text-[10px] font-black uppercase text-stone-300 tracking-widest italic pr-4">Cancelada</span>
+                                            ) : (
+                                                <ActionMenu appointment={app} />
                                             )}
                                         </div>
                                     </td>
@@ -216,6 +199,60 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                     </table>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function ActionMenu({ appointment }: { appointment: Appointment }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="relative">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsOpen(!isOpen)}
+                className="h-9 px-4 rounded-xl border-stone-100 text-[9px] font-black uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-all gap-2"
+            >
+                Ações <ChevronRight size={12} className={cn("transition-transform", isOpen ? "rotate-90" : "")} />
+            </Button>
+
+            {isOpen && (
+                <>
+                    <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-stone-100 rounded-2xl shadow-xl z-40 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        {appointment.type === 'ONLINE' && appointment.meetLink && (
+                            <a
+                                href={appointment.meetLink.startsWith('http') ? appointment.meetLink : `https://${appointment.meetLink}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full px-4 py-2.5 flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 transition-colors"
+                            >
+                                <Video size={14} /> Abrir Meet
+                            </a>
+                        )}
+
+                        <div className="px-2 py-1">
+                            <CancellationButton
+                                appointmentId={appointment.id}
+                                startTime={appointment.startTime.toISOString()}
+                                variant="ghost"
+                                className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50"
+                            />
+                        </div>
+
+                        {appointment.status === 'CONFIRMED' && (
+                            <div className="px-2 py-1">
+                                <AbsentButton
+                                    appointmentId={appointment.id}
+                                    variant="ghost"
+                                    className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-amber-600 hover:bg-amber-50"
+                                />
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     );
 }

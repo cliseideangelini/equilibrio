@@ -14,13 +14,16 @@ import {
 import { AlertCircle, Loader2, XCircle } from "lucide-react";
 import { cancelAppointment } from "@/lib/actions";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface CancellationButtonProps {
     appointmentId: string;
     startTime: string;
+    variant?: "ghost" | "outline" | "default";
+    className?: string;
 }
 
-export function CancellationButton({ appointmentId, startTime }: CancellationButtonProps) {
+export function CancellationButton({ appointmentId, startTime, variant = "ghost", className }: CancellationButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [requiresLateConfirmation, setRequiresLateConfirmation] = useState(false);
@@ -48,7 +51,7 @@ export function CancellationButton({ appointmentId, startTime }: CancellationBut
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-xl px-4">
+                <Button variant={variant} size="sm" className={cn("text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-xl px-4", className)}>
                     <XCircle className="w-4 h-4 mr-2" /> Cancelar
                 </Button>
             </DialogTrigger>
