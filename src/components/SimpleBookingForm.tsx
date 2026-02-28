@@ -6,7 +6,7 @@ import { ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { Button } from "@/components/ui/button";
-import { getAvailableSlots, createAppointment } from "@/lib/actions";
+import { getAvailableSlots, createAppointment, registerPatient } from "@/lib/actions";
 import {
     Loader2,
     Monitor,
@@ -15,41 +15,71 @@ import {
     User,
     CheckCircle2,
     ChevronLeft,
+    ChevronRight,
     ShieldCheck,
     Calendar as CalendarIcon,
-    ArrowRight
+    ArrowRight,
+    LogIn,
+    UserPlus,
+    Lock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WaitingListDialog } from "./WaitingListDialog";
+import Link from "next/link";
 
-type Step = "date" | "slot" | "details";
+type Step = "auth" | "register" | "date" | "slot" | "details";
 
 export default function SimpleBookingForm({ availabilityRules }: { availabilityRules: any[] }) {
-    const [step, setStep] = useState<Step>("date");
+    const [step, setStep] = useState<Step>("auth");
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [slots, setSlots] = useState<string[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [appointmentType, setAppointmentType] = useState<"ONLINE" | "PRESENCIAL">("PRESENCIAL");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
     const [isPending, startTransition] = useTransition();
 
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
-    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [authChecked, setAuthChecked] = useState(false);
 
     useEffect(() => {
         const patientId = document.cookie.split('; ').find(row => row.startsWith('patient_id='))?.split('=')[1];
         const savedName = localStorage.getItem('patient_name');
         const savedPhone = localStorage.getItem('patient_phone');
+
         if (patientId && savedName) {
             setIsLoggedIn(true);
             setName(savedName);
             if (savedPhone) setPhone(savedPhone);
             setPassword("SESSION_ACTIVE");
+            setStep("date");
         }
+        setAuthChecked(true);
     }, []);
+
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!name || !phone || password.length < 4) return;
+
+        setIsRegistering(true);
+        try {
+            const result = await registerPatient({ name, phone, password });
+            if (result.success) {
+                document.cookie = `patient_id=${result.patientId}; path=/; max-age=86400`;
+                localStorage.setItem('patient_name', name);
+                localStorage.setItem('patient_phone', phone);
+                setIsLoggedIn(true);
+                setStep("date");
+            }
+        } catch (error: any) {
+            alert(error.message || "Erro ao realizar cadastro.");
+        } finally {
+            setIsRegistering(false);
+        }
+    };
 
     const fetchSlots = (date: Date) => {
         startTransition(async () => {
@@ -71,7 +101,7 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
         setSelectedSlot(slot);
     };
 
-    const canSubmit = selectedDate && selectedSlot && name.trim() && phone.trim() && (isLoggedIn || password.length >= 4);
+    const canSubmit = selectedDate && selectedSlot && isLoggedIn;
 
     const handleSubmit = async () => {
         if (!canSubmit) return;
@@ -79,9 +109,7 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
         try {
             const result = await createAppointment({
                 name,
-                email: email || undefined,
                 phone,
-                password: isLoggedIn ? undefined : password,
                 date: selectedDate!.toISOString(),
                 time: selectedSlot!,
                 type: appointmentType,
@@ -91,8 +119,6 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                 setIsSubmitting(false);
                 return;
             }
-            localStorage.setItem('patient_name', name);
-            localStorage.setItem('patient_phone', phone);
             window.location.href = '/paciente/minha-agenda';
         } catch (err: any) {
             console.error(err);
@@ -101,7 +127,13 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
         }
     };
 
-    const progress = step === "date" ? 33 : step === "slot" ? 66 : 100;
+    const progress = step === "auth" ? 0 : step === "register" ? 20 : step === "date" ? 40 : step === "slot" ? 70 : 100;
+
+    if (!authChecked) return (
+        <div className="flex justify-center items-center py-20">
+            <Loader2 className="animate-spin text-stone-200" size={40} />
+        </div>
+    );
 
     return (
         <div className="max-w-2xl w-full mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -114,14 +146,122 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                     />
                 </div>
                 <div className="flex justify-between mt-3 px-1">
-                    <span className={cn("text-[8px] font-black uppercase tracking-widest transition-colors", step === 'date' ? "text-stone-900" : "text-stone-300")}>Data</span>
-                    <span className={cn("text-[8px] font-black uppercase tracking-widest transition-colors", step === 'slot' ? "text-stone-900" : "text-stone-300")}>Horário</span>
-                    <span className={cn("text-[8px] font-black uppercase tracking-widest transition-colors", step === 'details' ? "text-stone-900" : "text-stone-300")}>Finalização</span>
+                    <span className={cn("text-[7px] font-black uppercase tracking-widest transition-colors", step === 'auth' || step === 'register' ? "text-stone-900" : "text-stone-300")}>Identificação</span>
+                    <span className={cn("text-[7px] font-black uppercase tracking-widest transition-colors", step === 'date' ? "text-stone-900" : "text-stone-300")}>Data</span>
+                    <span className={cn("text-[7px] font-black uppercase tracking-widest transition-colors", step === 'slot' ? "text-stone-900" : "text-stone-300")}>Horário</span>
+                    <span className={cn("text-[7px] font-black uppercase tracking-widest transition-colors", step === 'details' ? "text-stone-900" : "text-stone-300")}>Finalização</span>
                 </div>
             </div>
 
             <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-stone-200/40 p-8 md:p-12 border border-stone-100/50 min-h-[500px] flex flex-col">
                 <div className="flex-1">
+
+                    {step === "auth" && (
+                        <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500 py-4">
+                            <div className="text-center space-y-3">
+                                <h3 className="text-3xl font-light text-stone-900 tracking-tight leading-tight">
+                                    Bem-vindo! <br />
+                                    <span className="italic font-serif">Como podemos te identificar?</span>
+                                </h3>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Para facilitar seu agendamento, escolha uma opção</p>
+                            </div>
+
+                            <div className="grid gap-4">
+                                <button
+                                    onClick={() => setStep("register")}
+                                    className="group flex items-center justify-between p-8 rounded-[2rem] bg-stone-50 border border-stone-100 hover:border-stone-900/10 hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 text-left"
+                                >
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-14 h-14 rounded-2xl bg-white border border-stone-100 flex items-center justify-center text-stone-400 group-hover:text-stone-900 transition-colors shadow-sm">
+                                            <UserPlus size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-stone-900 mb-1">É minha primeira vez</p>
+                                            <p className="text-[10px] text-stone-400 font-medium uppercase tracking-widest">Criar meu cadastro rápido</p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight size={20} className="text-stone-200 group-hover:text-stone-900 group-hover:translate-x-1 transition-all" />
+                                </button>
+
+                                <Link
+                                    href="/paciente/login?redirect=/agendar"
+                                    className="group flex items-center justify-between p-8 rounded-[2rem] bg-stone-50 border border-stone-100 hover:border-stone-900/10 hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 text-left"
+                                >
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-14 h-14 rounded-2xl bg-white border border-stone-100 flex items-center justify-center text-stone-400 group-hover:text-stone-900 transition-colors shadow-sm">
+                                            <LogIn size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-stone-900 mb-1">Já sou paciente</p>
+                                            <p className="text-[10px] text-stone-400 font-medium uppercase tracking-widest">Acessar com meu telefone</p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight size={20} className="text-stone-200 group-hover:text-stone-900 group-hover:translate-x-1 transition-all" />
+                                </Link>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === "register" && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={() => setStep("auth")}
+                                    className="p-2 -ml-2 hover:bg-stone-50 rounded-full transition-colors text-stone-400 hover:text-stone-900"
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                                <div className="text-center space-y-1">
+                                    <h3 className="text-2xl font-light text-stone-900">Cadastro <span className="italic font-serif">Rápido</span></h3>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-stone-400">Só precisamos disso para começar</p>
+                                </div>
+                                <div className="w-8" />
+                            </div>
+
+                            <form onSubmit={handleRegister} className="grid gap-4">
+                                <div className="relative group">
+                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-stone-900 transition-colors" size={16} />
+                                    <input
+                                        required
+                                        className="w-full h-14 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-4 focus:ring-stone-100/50 focus:bg-white focus:border-stone-200 transition-all placeholder:text-stone-300"
+                                        placeholder="Nome completo"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="relative group">
+                                    <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-stone-900 transition-colors" size={16} />
+                                    <input
+                                        required
+                                        className="w-full h-14 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-4 focus:ring-stone-100/50 focus:bg-white focus:border-stone-200 transition-all placeholder:text-stone-300"
+                                        placeholder="WhatsApp (com DDD)"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                    />
+                                </div>
+                                <div className="relative group">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-stone-900 transition-colors" size={16} />
+                                    <input
+                                        required
+                                        type="password"
+                                        className="w-full h-14 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-4 focus:ring-stone-100/50 focus:bg-white focus:border-stone-200 transition-all placeholder:text-stone-300"
+                                        placeholder="Crie uma senha (mín 4 dígitos)"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    disabled={isRegistering || name.length < 3 || phone.length < 8 || password.length < 4}
+                                    className="w-full h-16 bg-stone-900 hover:bg-stone-800 text-white rounded-[1.8rem] font-black text-xs uppercase tracking-[0.25em] shadow-2xl shadow-stone-200 transition-all active:scale-95 disabled:opacity-50 mt-4"
+                                >
+                                    {isRegistering ? <Loader2 className="animate-spin" size={20} /> : "Continuar para Agenda"}
+                                </Button>
+                            </form>
+                        </div>
+                    )}
+
                     {step === "date" && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                             <div className="text-center space-y-2">
@@ -246,11 +386,11 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                                 <div className="w-8" />
                             </div>
 
-                            <div className="p-1 bg-stone-100 rounded-2xl flex gap-1">
+                            <div className="grid grid-cols-2 gap-2 p-1 bg-stone-100 rounded-2xl">
                                 <button
                                     onClick={() => setAppointmentType('PRESENCIAL')}
                                     className={cn(
-                                        "flex-1 py-4 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                        "py-4 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
                                         appointmentType === 'PRESENCIAL' ? "bg-white text-stone-900 shadow-sm" : "text-stone-400 hover:text-stone-500"
                                     )}
                                 >
@@ -259,7 +399,7 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                                 <button
                                     onClick={() => setAppointmentType('ONLINE')}
                                     className={cn(
-                                        "flex-1 py-4 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                        "py-4 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
                                         appointmentType === 'ONLINE' ? "bg-white text-stone-900 shadow-sm" : "text-stone-400 hover:text-stone-500"
                                     )}
                                 >
@@ -268,51 +408,27 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                             </div>
 
                             <div className="space-y-4">
-                                {isLoggedIn ? (
-                                    <div className="p-6 bg-stone-50 rounded-3xl border border-stone-100 flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-white border border-stone-100 flex items-center justify-center text-stone-800 font-bold">
-                                                {name.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <p className="text-base font-bold text-stone-900">{name}</p>
-                                                <p className="text-[10px] text-stone-400 font-mono italic">{phone}</p>
-                                            </div>
+                                <div className="p-6 bg-stone-50 rounded-3xl border border-stone-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-white border border-stone-100 flex items-center justify-center text-stone-800 font-bold">
+                                            {name.charAt(0)}
                                         </div>
-                                        <CheckCircle2 size={20} className="text-emerald-500" />
-                                    </div>
-                                ) : (
-                                    <div className="grid gap-3">
-                                        <div className="relative group">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-stone-900 transition-colors" size={16} />
-                                            <input
-                                                className="w-full h-14 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 focus:bg-white transition-all placeholder:text-stone-300"
-                                                placeholder="Nome completo"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="relative group">
-                                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-stone-900 transition-colors" size={16} />
-                                            <input
-                                                className="w-full h-14 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 focus:bg-white transition-all placeholder:text-stone-300"
-                                                placeholder="WhatsApp (com DDD)"
-                                                value={phone}
-                                                onChange={(e) => setPhone(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="relative group">
-                                            <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-stone-900 transition-colors" size={16} />
-                                            <input
-                                                type="password"
-                                                className="w-full h-14 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 focus:bg-white transition-all placeholder:text-stone-300"
-                                                placeholder="Crie uma senha (mín 4 dígitos)"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                            />
+                                        <div>
+                                            <p className="text-base font-bold text-stone-900">{name}</p>
+                                            <p className="text-[10px] text-stone-400 font-mono italic">{phone}</p>
                                         </div>
                                     </div>
-                                )}
+                                    <CheckCircle2 size={20} className="text-emerald-500" />
+                                </div>
+                                <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                                        <Clock size={14} />
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-emerald-800">Horário Reservado</p>
+                                        <p className="text-xs font-bold text-emerald-900">{format(selectedDate!, "dd/MM/yyyy")} às {selectedSlot}</p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="space-y-4 pt-4">

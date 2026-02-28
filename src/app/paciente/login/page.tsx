@@ -28,12 +28,16 @@ export default function PatientLoginPage() {
             const result = await loginPatient(phone, password);
             if (result.success) {
                 document.cookie = `patient_id=${result.patientId}; path=/; max-age=86400`;
+                localStorage.setItem('patient_name', result.name || "");
+                localStorage.setItem('patient_phone', phone);
 
                 if (result.mustChangePassword) {
                     setTempPatientId(result.patientId);
                     setShowPasswordChange(true);
                 } else {
-                    router.push("/paciente/minha-agenda");
+                    const searchParams = new URLSearchParams(window.location.search);
+                    const redirect = searchParams.get("redirect");
+                    router.push(redirect || "/paciente/minha-agenda");
                 }
             } else {
                 setError(result.error || "Erro ao entrar.");
