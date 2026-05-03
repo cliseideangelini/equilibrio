@@ -273,7 +273,7 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Quando você prefere seu atendimento?</p>
                             </div>
 
-                            <div className="flex justify-center py-4">
+                            <div className="flex justify-center py-4 w-full">
                                 <DayPicker
                                     mode="single"
                                     selected={selectedDate}
@@ -285,15 +285,16 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                                     ]}
                                     locale={ptBR}
                                     classNames={{
-                                        months: "w-full",
+                                        months: "w-full space-y-4",
+                                        month: "space-y-4 w-full",
                                         caption: "flex justify-between items-center px-4 mb-4",
                                         caption_label: "text-sm font-black uppercase tracking-widest text-stone-800",
                                         nav: "flex gap-2",
                                         nav_button: "h-10 w-10 flex items-center justify-center rounded-xl bg-stone-50 hover:bg-stone-100 text-stone-400 hover:text-stone-900 transition-all",
-                                        table: "w-full border-collapse",
-                                        head_row: "flex justify-between mb-4",
-                                        head_cell: "text-stone-300 w-10 font-black text-[9px] uppercase tracking-widest",
-                                        row: "flex justify-between mb-1",
+                                        table: "w-full border-collapse space-y-1",
+                                        head_row: "flex w-full justify-between mb-4",
+                                        head_cell: "text-stone-300 w-10 font-black text-[9px] uppercase tracking-widest text-center",
+                                        row: "flex w-full justify-between mb-1",
                                         cell: "relative p-0 text-center focus-within:relative focus-within:z-20",
                                         day: cn(
                                             "h-10 w-10 p-0 font-bold hover:bg-stone-50 rounded-xl transition-all text-sm text-stone-600 flex items-center justify-center cursor-pointer"

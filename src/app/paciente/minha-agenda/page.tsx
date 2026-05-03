@@ -221,11 +221,12 @@ export default async function PatientDashboard() {
                                                             <div className="flex items-center justify-end gap-3">
                                                                 {app.type === 'ONLINE' && (
                                                                     app.meetLink ? (
-                                                                        <Button asChild size="sm" className="rounded-xl h-10 font-black bg-blue-600 hover:bg-blue-700 shadow-sm uppercase tracking-widest text-[9px] px-4">
-                                                                            <a href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`} target="_blank" rel="noopener noreferrer">Entrar</a>
+                                                                        <Button asChild size="sm" className="rounded-xl h-11 font-black bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 uppercase tracking-widest text-[9px] px-6 flex items-center gap-2 group/btn">
+                                                                            <Video size={14} className="group-hover/btn:scale-110 transition-transform" />
+                                                                            <a href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`} target="_blank" rel="noopener noreferrer">Acessar Consulta</a>
                                                                         </Button>
                                                                     ) : (
-                                                                        <Button size="sm" disabled className="rounded-xl h-10 font-black bg-sage-100 text-sage-400 shadow-none uppercase tracking-widest text-[9px] px-4 cursor-not-allowed">
+                                                                        <Button size="sm" disabled className="rounded-xl h-11 font-black bg-stone-50 text-stone-300 shadow-none uppercase tracking-widest text-[9px] px-6 cursor-not-allowed border border-stone-100">
                                                                             Aguardando Link
                                                                         </Button>
                                                                     )

@@ -70,8 +70,13 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
         <div className="space-y-10">
             {/* Control Bar */}
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/60 p-2 rounded-[2rem] border border-stone-100 shadow-sm">
-                <div className="flex flex-1 items-center gap-2 px-4 w-full">
-                    <Search className="text-stone-300 pointer-events-none" size={16} />
+                <form 
+                    className="flex flex-1 items-center gap-2 px-4 w-full"
+                    onSubmit={(e) => { e.preventDefault(); setSearch(search); }}
+                >
+                    <button type="submit">
+                        <Search className="text-stone-300 hover:text-stone-900 transition-colors" size={16} />
+                    </button>
                     <input
                         type="text"
                         placeholder="Pesquisar por paciente ou telefone..."
@@ -79,7 +84,7 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                         onChange={(e) => setSearch(e.target.value)}
                         className="bg-transparent border-0 outline-none text-sm font-medium text-stone-600 placeholder:text-stone-300 w-full"
                     />
-                </div>
+                </form>
 
                 <div className="flex items-center gap-3 pr-2 w-full md:w-auto">
                     {/* Seletor de Data */}
@@ -173,22 +178,22 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                     <td className="py-6 px-8 whitespace-nowrap">
                                         <span className={cn(
                                             "inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm",
-                                            app.status === 'CONFIRMED' ? "bg-emerald-50 text-emerald-600 border-emerald-100/50" :
-                                                app.status === 'COMPLETED' ? "bg-stone-50 text-stone-600 border-stone-100/50" :
-                                                    app.status === 'CANCELLED' ? "bg-red-50 text-red-600 border-red-100/50" :
-                                                        app.status === 'ABSENT' ? "bg-amber-50 text-amber-600 border-amber-100/50" :
-                                                            "bg-amber-50 text-amber-600 border-amber-100/50"
+                                            app.status === 'CONFIRMED' ? "bg-blue-50 text-blue-600 border-blue-100/50" :
+                                                app.status === 'COMPLETED' ? "bg-emerald-50 text-emerald-600 border-emerald-100/50" :
+                                                    app.status === 'CANCELLED' ? "bg-amber-50 text-amber-600 border-amber-100/50" :
+                                                        app.status === 'ABSENT' ? "bg-red-50 text-red-600 border-red-100/50" :
+                                                            "bg-stone-50 text-stone-600 border-stone-100/50"
                                         )}>
                                             <span className={cn("w-1.5 h-1.5 rounded-full mr-2",
-                                                app.status === 'CONFIRMED' ? "bg-emerald-500 shadow-emerald-500/20 shadow-lg" :
-                                                    app.status === 'COMPLETED' ? "bg-stone-400" :
-                                                        app.status === 'CANCELLED' ? "bg-red-500" :
-                                                            "bg-amber-500"
+                                                app.status === 'CONFIRMED' ? "bg-blue-500 shadow-blue-500/20 shadow-lg" :
+                                                    app.status === 'COMPLETED' ? "bg-emerald-500 shadow-emerald-500/20 shadow-lg" :
+                                                        app.status === 'CANCELLED' ? "bg-amber-500" :
+                                                            "bg-red-500"
                                             )} />
                                             {app.status === 'CONFIRMED' ? 'Confirmado' :
                                                 app.status === 'COMPLETED' ? 'Realizado' :
                                                     app.status === 'CANCELLED' ? 'Cancelado' :
-                                                        app.status === 'ABSENT' ? 'Ausente' : 'Aguardando'}
+                                                        app.status === 'ABSENT' ? 'Falta' : 'Aguardando'}
                                         </span>
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">

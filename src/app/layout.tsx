@@ -35,7 +35,7 @@ export default function RootLayout({
         <Toaster position="top-center" richColors />
         <footer className="fixed bottom-4 right-6 pointer-events-none z-[100] hidden md:block">
           <span className="text-[10px] font-black uppercase tracking-widest text-stone-300 opacity-50">
-            v1.1.0
+            v1.2.0
           </span>
         </footer>
       </body>

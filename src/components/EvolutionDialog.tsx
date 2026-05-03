@@ -83,9 +83,9 @@ export function EvolutionDialog({ patientId, appointmentId, initialContent = "",
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] border-stone-200">
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <DialogTitle className="text-xl font-light text-stone-900">Evolução Clínica</DialogTitle>
+            <DialogContent className="sm:max-w-[700px] w-[95vw] h-[90vh] sm:h-auto border-stone-200 flex flex-col p-0 overflow-hidden rounded-[2rem]">
+                <DialogHeader className="p-6 pb-2 flex flex-row items-center justify-between space-y-0 border-b border-stone-50">
+                    <DialogTitle className="text-xl font-light text-stone-900">Evolução <span className="italic font-serif">Clínica</span></DialogTitle>
                     <div className="flex items-center gap-2 pr-6">
                         {isSavingDraft ? (
                             <span className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-stone-400">
@@ -98,32 +98,35 @@ export function EvolutionDialog({ patientId, appointmentId, initialContent = "",
                         )}
                     </div>
                 </DialogHeader>
-                <div className="py-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-1">Data da Evolução</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-1">Data da Atividade</label>
                         <input
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="w-full h-10 px-4 rounded-xl border border-stone-100 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-stone-100 transition-all"
+                            className="w-full h-12 px-4 rounded-xl bg-stone-50 border border-stone-100 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-stone-100 transition-all"
                         />
                     </div>
-                    <Textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder="Descreva o andamento da sessão, observações relevantes e condutas..."
-                        className="min-h-[300px] text-sm leading-relaxed border-stone-100 focus:ring-stone-200"
-                    />
+                    <div className="flex-1 flex flex-col min-h-[350px]">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-1 mb-1.5">Conteúdo da Evolução</label>
+                        <Textarea
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            placeholder="Descreva o andamento da sessão, observações relevantes e condutas..."
+                            className="flex-1 min-h-[300px] text-base leading-relaxed border-stone-100 focus:ring-stone-200 rounded-2xl p-4 bg-stone-50/50"
+                        />
+                    </div>
                 </div>
-                <DialogFooter>
-                    <Button variant="ghost" onClick={() => setOpen(false)} className="text-[10px] font-black uppercase tracking-widest text-stone-400">Cancelar</Button>
+                <DialogFooter className="p-6 bg-stone-50/30 border-t border-stone-50 flex flex-col sm:flex-row gap-2">
+                    <Button variant="ghost" onClick={() => setOpen(false)} className="text-[10px] font-black uppercase tracking-widest text-stone-400 h-12 px-6">Cancelar</Button>
                     <Button
                         onClick={handleSave}
                         disabled={isPending}
-                        className="bg-stone-900 text-white rounded-xl h-11 px-8 font-bold text-[10px] uppercase tracking-widest"
+                        className="bg-stone-900 text-white rounded-xl h-12 px-10 font-bold text-[10px] uppercase tracking-widest shadow-xl shadow-stone-200 flex-1 sm:flex-none"
                     >
                         {isPending && <Loader2 size={14} className="animate-spin mr-2" />}
-                        Salvar Evolução
+                        Finalizar e Salvar
                     </Button>
                 </DialogFooter>
             </DialogContent>
