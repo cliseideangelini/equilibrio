@@ -1,91 +1,113 @@
 "use client";
 
 import { useState } from "react";
+import { loginPsychologist } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ShieldCheck, Lock, User } from "lucide-react";
-import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Loader2, Lock, Mail, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function LoginPage() {
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+export default function AdminLoginPage() {
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Simplificado para esta versão (senha fixa da profissional)
-        if (password === "cliseide2025") {
-            document.cookie = "auth_token=cliseide_admin_session; path=/; max-age=86400";
-            router.push("/area-clinica");
-        } else {
-            setError("Senha incorreta. Tente novamente.");
+        setLoading(true);
+        try {
+            const result = await loginPsychologist(email, password);
+            if (result.success) {
+                toast.success("Login realizado com sucesso!");
+                router.push("/area-clinica");
+            } else {
+                toast.error(result.error);
+            }
+        } catch (error) {
+            toast.error("Erro ao realizar login.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-sage-50 px-6 py-12">
-            <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-20">
-                <div className="absolute top-[10%] left-[10%] w-72 h-72 bg-sage-300 rounded-full blur-3xl" />
-                <div className="absolute bottom-[10%] right-[10%] w-96 h-96 bg-sage-200 rounded-full blur-3xl" />
+        <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+            {/* Background Decorative */}
+            <div className="absolute top-0 left-0 w-full h-full -z-10">
+                <div className="absolute top-0 left-0 w-1/2 h-full bg-[#94A694]/5 blur-[120px]" />
+                <div className="absolute bottom-0 right-0 w-1/2 h-full bg-[#F2E8DF]/20 blur-[120px]" />
             </div>
 
-            <Card className="w-full max-w-md border-none shadow-2xl rounded-[2rem] overflow-hidden">
-                <div className="bg-primary p-8 text-center text-white relative">
-                    <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                            <Image src="/logo.png" alt="Logo" width={48} height={48} className="object-contain" />
+            <div className="max-w-md w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-stone-200/50 border border-stone-100">
+                    <div className="text-center mb-10">
+                        <div className="w-16 h-16 rounded-full bg-[#94A694]/10 flex items-center justify-center mx-auto mb-6">
+                            <Lock className="text-[#94A694]" size={28} />
                         </div>
+                        <h1 className="text-3xl font-serif italic text-stone-800 mb-2">Área Clínica</h1>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Portal Administrativo</p>
                     </div>
-                    <CardTitle className="text-2xl font-bold">Área Clínica</CardTitle>
-                    <CardDescription className="text-primary-foreground/80">Acesse sua agenda e gestão de pacientes</CardDescription>
-                </div>
 
-                <CardContent className="p-8 space-y-6">
-                    <form onSubmit={handleLogin} className="space-y-4">
+                    <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium ml-1">Usuário</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">E-mail Profissional</label>
                             <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                <input
-                                    type="text"
-                                    disabled
-                                    value="cliseide.angelini"
-                                    className="w-full h-12 rounded-xl border border-input bg-muted/50 px-12 text-muted-foreground outline-none"
+                                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
+                                <Input 
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="exemplo@email.com"
+                                    className="h-14 pl-12 rounded-2xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20"
+                                    required
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium ml-1">Senha de Acesso</label>
+                            <div className="flex justify-between items-center px-1">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-stone-400">Senha</label>
+                                <Link href="/recuperar-senha" size="sm" className="text-[9px] font-bold text-[#94A694] hover:underline">
+                                    Esqueceu a senha?
+                                </Link>
+                            </div>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                <input
+                                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
+                                <Input 
                                     type="password"
-                                    autoFocus
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full h-12 rounded-xl border border-input bg-background px-12 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                     placeholder="••••••••"
+                                    className="h-14 pl-12 rounded-2xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20"
+                                    required
                                 />
                             </div>
-                            {error && <p className="text-xs text-red-500 ml-1">{error}</p>}
                         </div>
 
-                        <Button type="submit" className="w-full h-12 rounded-xl font-bold shadow-lg shadow-primary/20 mt-4 group">
-                            Entrar no Sistema
-                            <ShieldCheck className="ml-2 w-4 h-4 group-hover:rotate-12 transition-transform" />
+                        <Button 
+                            type="submit" 
+                            disabled={loading}
+                            className="w-full h-14 rounded-2xl bg-[#94A694] hover:bg-[#839583] text-white font-bold text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#94A694]/20 transition-all flex items-center justify-center gap-2 group"
+                        >
+                            {loading ? <Loader2 className="animate-spin" /> : (
+                                <>
+                                    Entrar no Painel
+                                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </>
+                            )}
                         </Button>
                     </form>
 
-                    <div className="text-center">
-                        <p className="text-xs text-muted-foreground italic">
-                            Acesso exclusivo para Cliseide S. Angelini.
-                        </p>
+                    <div className="mt-8 text-center">
+                        <Link href="/" className="text-[10px] font-bold text-stone-400 hover:text-stone-800 transition-colors uppercase tracking-widest">
+                            Voltar para o site
+                        </Link>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 }

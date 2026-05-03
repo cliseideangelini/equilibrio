@@ -1,22 +1,28 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/request';
 
 export function middleware(request: NextRequest) {
-    const authCookie = request.cookies.get('auth_token');
-    const isLoginPage = request.nextUrl.pathname === '/login';
-    const isAdminPage = request.nextUrl.pathname.startsWith('/admin');
+  const { pathname } = request.nextUrl;
 
-    if (isAdminPage && !authCookie) {
-        return NextResponse.redirect(new URL('/login', request.url));
+  // Proteção da Área Clínica (Psicóloga)
+  if (pathname.startsWith('/area-clinica')) {
+    const adminId = request.cookies.get('admin_id')?.value;
+    if (!adminId) {
+      return NextResponse.redirect(new URL('/login', request.url));
     }
+  }
 
-    if (isLoginPage && authCookie) {
-        return NextResponse.redirect(new URL('/admin', request.url));
+  // Proteção do Painel do Paciente
+  if (pathname.startsWith('/paciente') && !pathname.includes('/login')) {
+    const patientId = request.cookies.get('patient_id')?.value;
+    if (!patientId) {
+      return NextResponse.redirect(new URL('/paciente/login', request.url));
     }
+  }
 
-    return NextResponse.next();
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/admin/:path*', '/login'],
+  matcher: ['/area-clinica/:path*', '/paciente/:path*'],
 };

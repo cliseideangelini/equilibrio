@@ -25,14 +25,19 @@ enum AppointmentStatus {
 }
 
 model Psychologist {
-  id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
-  crp           String
-  bio           String
-  phone         String?
-  availabilities Availability[]
-  appointments  Appointment[]
+  id                 String         @id @default(cuid())
+  name               String
+  email              String         @unique
+  password           String         // Senha criptografada
+  crp                String
+  bio                String
+  phone              String?
+  resetToken         String?        @unique
+  resetTokenExpiry   DateTime?
+  availabilities     Availability[]
+  appointments       Appointment[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 }
 
 model Availability {
@@ -45,20 +50,23 @@ model Availability {
 }
 
 model Patient {
-  id           String        @id @default(cuid())
-  name          String
-  email        String?       @unique
-  phone        String        @unique
-  password     String?       // Opcional para pacientes antigos, obrigatório para novos
-  mustChangePassword Boolean @default(false)
-  appointments Appointment[]
-  evolutions   Evolution[]
-  attachments  Attachment[]
-  isFixed      Boolean       @default(false)
-  fixedDayOfWeek Int?          // 0-6
-  fixedTime    String?       // HH:mm
-  deletedAt    DateTime?
-  createdAt    DateTime      @default(now())
+  id                 String        @id @default(cuid())
+  name               String
+  email              String?       @unique
+  phone              String        @unique
+  password           String?       // Senha criptografada
+  mustChangePassword Boolean       @default(false)
+  resetToken         String?       @unique
+  resetTokenExpiry   DateTime?
+  appointments       Appointment[]
+  evolutions         Evolution[]
+  attachments        Attachment[]
+  isFixed            Boolean       @default(false)
+  fixedDayOfWeek     Int?          // 0-6
+  fixedTime          String?       // HH:mm
+  deletedAt          DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 }
 
 model Appointment {

@@ -208,7 +208,7 @@ export async function createAppointment(formData: {
 
 export async function loginPatient(phone: string, password: string) {
     const patient: any = await prisma.patient.findUnique({
-        where: { phone }
+        where: { phone, deletedAt: null }
     });
 
     if (!patient || !patient.password) {
@@ -218,12 +218,95 @@ export async function loginPatient(phone: string, password: string) {
     const isValid = await bcrypt.compare(password, patient.password);
     if (!isValid) return { success: false, error: "Senha incorreta." };
 
+    const cookieStore = await cookies();
+    cookieStore.set("patient_id", patient.id, { httpOnly: true, secure: true, sameSite: "strict" });
+
     return {
         success: true,
         patientId: patient.id,
         name: patient.name,
         mustChangePassword: patient.mustChangePassword
     };
+}
+
+export async function loginPsychologist(email: string, password: string) {
+    const psychologist = await prisma.psychologist.findUnique({
+        where: { email }
+    });
+
+    if (!psychologist) {
+        return { success: false, error: "E-mail ou senha inválidos." };
+    }
+
+    const isValid = await bcrypt.compare(password, psychologist.password);
+    if (!isValid) return { success: false, error: "E-mail ou senha inválidos." };
+
+    const cookieStore = await cookies();
+    cookieStore.set("admin_id", psychologist.id, { httpOnly: true, secure: true, sameSite: "strict" });
+
+    return {
+        success: true,
+        adminId: psychologist.id,
+        name: psychologist.name
+    };
+}
+
+export async function forgotPassword(email: string, type: "PATIENT" | "PSYCHOLOGIST") {
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const expiry = new Date(Date.now() + 3600000); // 1 hora
+
+    if (type === "PSYCHOLOGIST") {
+        const user = await prisma.psychologist.findUnique({ where: { email } });
+        if (!user) return { success: false, error: "Usuário não encontrado." };
+        await prisma.psychologist.update({
+            where: { email },
+            data: { resetToken: token, resetTokenExpiry: expiry }
+        });
+    } else {
+        const user = await prisma.patient.findUnique({ where: { email } });
+        if (!user) return { success: false, error: "Usuário não encontrado." };
+        await prisma.patient.update({
+            where: { email },
+            data: { resetToken: token, resetTokenExpiry: expiry }
+        });
+    }
+
+    // Simulação de envio de e-mail
+    console.log(`[EMAIL] Link de recuperação para ${email}: https://equilibrio-psi.vercel.app/recuperar-senha?token=${token}`);
+    
+    return { success: true, message: "E-mail de recuperação enviado." };
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Tentar no Psicólogo
+    const psychologist = await prisma.psychologist.findFirst({
+        where: { resetToken: token, resetTokenExpiry: { gte: new Date() } }
+    });
+
+    if (psychologist) {
+        await prisma.psychologist.update({
+            where: { id: psychologist.id },
+            data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null }
+        });
+        return { success: true };
+    }
+
+    // Tentar no Paciente
+    const patient = await prisma.patient.findFirst({
+        where: { resetToken: token, resetTokenExpiry: { gte: new Date() } }
+    });
+
+    if (patient) {
+        await prisma.patient.update({
+            where: { id: patient.id },
+            data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null }
+        });
+        return { success: true };
+    }
+
+    return { success: false, error: "Token inválido ou expirado." };
 }
 
 export async function registerPatient(formData: { name: string, phone: string, password: string, email?: string }) {
@@ -497,4 +580,30 @@ export async function getPatientByPhone(phone: string) {
     return await prisma.patient.findFirst({
         where: { phone, deletedAt: null }
     });
+}
+
+export async function logout() {
+    const cookieStore = await cookies();
+    cookieStore.delete('admin_id');
+    cookieStore.delete('patient_id');
+    return { success: true };
+}
+
+export async function updatePatientProfile(data: { name: string, email: string, password?: string }) {
+    const cookieStore = await cookies();
+    const patientId = cookieStore.get('patient_id')?.value;
+    if (!patientId) return { success: false, error: 'N�o autorizado' };
+
+    const updateData: any = { name: data.name, email: data.email };
+    if (data.password) {
+        updateData.password = await bcrypt.hash(data.password, 10);
+    }
+
+    await prisma.patient.update({
+        where: { id: patientId },
+        data: updateData
+    });
+
+    revalidatePath('/paciente/minha-agenda');
+    return { success: true };
 }
