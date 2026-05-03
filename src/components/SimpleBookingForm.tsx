@@ -256,33 +256,33 @@ export default function SimpleBookingForm() {
                 </div>
 
                 {/* Coluna 2: Horários */}
-                <div className="bg-white rounded-[3rem] p-10 shadow-2xl shadow-stone-200/40 border border-stone-50 min-h-[500px] flex flex-col transition-transform hover:scale-[1.01] duration-500">
-                    <h3 className="text-lg font-light text-stone-800 mb-8 flex items-center gap-3">
-                        <Clock size={20} className="text-[#94A694]" />
+                <div className="bg-white rounded-[3rem] p-8 shadow-2xl shadow-stone-200/40 border border-stone-50 min-h-[480px] flex flex-col transition-transform hover:scale-[1.01] duration-500">
+                    <h3 className="text-base font-light text-stone-800 mb-6 flex items-center gap-3">
+                        <Clock size={18} className="text-[#94A694]" />
                         Horários <span className="font-serif italic text-stone-400">disponíveis</span>
                     </h3>
 
                     {!selectedDate ? (
-                        <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-                            <Calendar size={48} className="text-stone-100 mb-4" />
-                            <p className="text-stone-400 font-medium italic">Selecione uma data no calendário ao lado para ver os horários.</p>
+                        <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                            <Calendar size={40} className="text-stone-100 mb-4" />
+                            <p className="text-stone-400 text-sm font-medium italic">Selecione uma data no calendário ao lado para ver os horários.</p>
                         </div>
                     ) : slotsLoading ? (
                         <div className="flex-1 flex items-center justify-center">
-                            <Loader2 size={32} className="animate-spin text-[#94A694]" />
+                            <Loader2 size={24} className="animate-spin text-[#94A694]" />
                         </div>
                     ) : availableSlots.length > 0 ? (
                         <div className="flex-1 flex flex-col">
-                            <div className="grid grid-cols-2 gap-4 mb-10">
+                            <div className="grid grid-cols-2 gap-3 mb-8">
                                 {availableSlots.map((time) => (
                                     <button
                                         key={time}
                                         onClick={() => setSelectedTime(time)}
                                         className={cn(
-                                            "h-14 rounded-2xl font-bold text-sm tracking-widest transition-all border border-transparent shadow-sm",
+                                            "h-11 rounded-xl font-bold text-[13px] tracking-widest transition-all border border-transparent shadow-sm",
                                             selectedTime === time 
                                                 ? "bg-[#94A694] text-white shadow-lg shadow-[#94A694]/20" 
-                                                : "bg-[#F2E8DF]/60 text-[#8c786a] hover:bg-[#F2E8DF] hover:shadow-md"
+                                                : "bg-[#F2E8DF]/50 text-[#8c786a] hover:bg-[#F2E8DF] hover:shadow-md"
                                         )}
                                     >
                                         {time}
@@ -290,15 +290,15 @@ export default function SimpleBookingForm() {
                                 ))}
                             </div>
 
-                            <div className="mt-auto pt-10 border-t border-stone-50">
+                            <div className="mt-auto pt-6 border-t border-stone-50">
                                 <Button
                                     onClick={handleBooking}
                                     disabled={!selectedTime || loading}
-                                    className="w-full h-16 rounded-2xl bg-[#94A694] hover:bg-[#839583] text-white font-bold text-xs uppercase tracking-[0.2em] shadow-2xl shadow-[#94A694]/30 transition-all disabled:opacity-30"
+                                    className="w-full h-14 rounded-xl bg-[#94A694] hover:bg-[#839583] text-white font-bold text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#94A694]/20 transition-all disabled:opacity-30"
                                 >
                                     {loading ? <Loader2 className="animate-spin" /> : "Confirmar Agendamento"}
                                 </Button>
-                                <p className="text-[9px] text-stone-400 mt-4 text-center uppercase tracking-widest font-black opacity-50">Sessão Online via Google Meet</p>
+                                <p className="text-[8px] text-stone-400 mt-3 text-center uppercase tracking-widest font-black opacity-40">Sessão Online via Google Meet</p>
                             </div>
                         </div>
                     ) : (
