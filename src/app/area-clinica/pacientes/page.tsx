@@ -13,6 +13,7 @@ export default async function PatientsList() {
 
     // Buscar todos os pacientes com contagem de consultas e suas consultas
     const patientsRaw = await prisma.patient.findMany({
+        where: { deletedAt: null },
         include: {
             _count: {
                 select: { appointments: true }

@@ -46,9 +46,14 @@ export function ProntuariosClient({ initialPatients }: ProntuariosClientProps) {
     return (
         <div className="space-y-8">
             {/* Control Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/60 p-2 rounded-[2rem] border border-stone-100 shadow-sm">
+            <form 
+                onSubmit={(e) => e.preventDefault()}
+                className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/60 p-2 rounded-[2rem] border border-stone-100 shadow-sm w-full"
+            >
                 <div className="flex flex-1 items-center gap-2 px-4 w-full">
-                    <Search className="text-stone-300 pointer-events-none" size={16} />
+                    <button type="submit">
+                        <Search className="text-stone-300 hover:text-stone-900 transition-colors" size={16} />
+                    </button>
                     <input
                         type="text"
                         placeholder="Buscar prontuário por nome ou telefone..."
@@ -57,7 +62,7 @@ export function ProntuariosClient({ initialPatients }: ProntuariosClientProps) {
                         className="bg-transparent border-0 outline-none text-sm font-medium text-stone-600 placeholder:text-stone-300 w-full h-10"
                     />
                 </div>
-            </div>
+            </form>
 
             {/* Records Grid (Table Format) */}
             <div className="bg-white border border-stone-100 rounded-[2.5rem] shadow-xl shadow-stone-200/40 overflow-hidden">

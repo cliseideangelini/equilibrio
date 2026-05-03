@@ -25,8 +25,8 @@ export const dynamic = "force-dynamic";
 export default async function PatientRecordPage({ params }: { params: Promise<{ patientId: string }> }) {
     const { patientId } = await params;
 
-    const patient = await prisma.patient.findUnique({
-        where: { id: patientId },
+    const patient = await prisma.patient.findFirst({
+        where: { id: patientId, deletedAt: null },
         include: {
             appointments: {
                 include: {

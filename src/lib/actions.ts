@@ -32,6 +32,12 @@ export async function getAvailableSlots(dateString: string) {
     const dayOfWeek = getDay(date);
     const now = new Date();
 
+    // 1. Regra de Janela de 15 Dias
+    const today = startOfDay(new Date());
+    const maxDate = endOfDay(addMinutes(addMinutes(today, 15 * 24 * 60), -1)); // 15 dias
+    if (isBefore(date, today) || isAfter(date, maxDate)) return [];
+    if (dayOfWeek === 0 || dayOfWeek === 6) return []; // Ocultar finais de semana
+
     const availabilities = await prisma.availability.findMany({
         where: {
             dayOfWeek,
@@ -41,13 +47,20 @@ export async function getAvailableSlots(dateString: string) {
 
     if (availabilities.length === 0) return [];
 
+    // 2. Buscar pacientes fixos para este dia da semana
+    const fixedPatients = await prisma.patient.findMany({
+        where: { isFixed: true, fixedDayOfWeek: dayOfWeek, deletedAt: null }
+    });
+    const fixedTimes = fixedPatients.map(p => p.fixedTime);
+
     const appointments = await prisma.appointment.findMany({
         where: {
             startTime: {
                 gte: startOfDay(date),
                 lte: endOfDay(date),
             },
-            status: { not: 'CANCELLED' }
+            status: { not: 'CANCELLED' },
+            deletedAt: null
         }
     });
 
@@ -88,7 +101,7 @@ export async function getAvailableSlots(dateString: string) {
                     );
                 });
 
-                if (!isOccupied) {
+                if (!isOccupied && !fixedTimes.includes(format(slotStart, 'HH:mm'))) {
                     slots.push(format(slotStart, 'HH:mm'));
                 }
             }
@@ -113,7 +126,7 @@ export async function createAppointment(formData: {
 
     // Encontrar paciente pelo TELEFONE
     let patient: any = await prisma.patient.findFirst({
-        where: { phone }
+        where: { phone, deletedAt: null }
     });
 
     const cookieStore = await cookies();
@@ -239,7 +252,7 @@ export async function addToWaitingList(data: {
     phone: string;
     email?: string;
     preferredDays?: string;
-    preferredHours?: string;
+    preferredShift?: "MANHA" | "TARDE";
     specificDate?: Date;
     specificTime?: string;
 }) {
@@ -277,20 +290,19 @@ export async function deleteWaitingListEntry(id: string) {
     return { success: true };
 }
 
-export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false) {
+export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false, isProfessional: boolean = false) {
     const appointment = await prisma.appointment.findUnique({
         where: { id: appointmentId },
-        include: { psychologist: true }
+        include: { psychologist: true, patient: true }
     });
 
     if (!appointment) throw new Error("Agendamento não encontrado");
 
     const now = new Date();
-    const startTimeStr = format(appointment.startTime, 'yyyy-MM-dd');
-    const timeStr = format(appointment.startTime, 'HH:mm');
     const hoursUntilSession = (appointment.startTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-    if (hoursUntilSession <= 3 && !confirmLateCharge) {
+    // Se for o profissional cancelando, não tem regra de 3h, mas dispara notificação pro paciente
+    if (!isProfessional && hoursUntilSession <= 3 && !confirmLateCharge) {
         return {
             success: false,
             requiresConfirmation: true,
@@ -302,6 +314,12 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         where: { id: appointmentId },
         data: { status: "CANCELLED" }
     });
+
+    if (isProfessional) {
+        // Gatilho de notificação para o paciente (Simulado aqui, integrar com API de WhatsApp)
+        console.log(`NOTIFICAÇÃO: Enviando aviso para o paciente ${appointment.patient.name} (${appointment.patient.phone}) sobre cancelamento pela profissional.`);
+        // Ex: sendWhatsApp(appointment.patient.phone, `Olá ${appointment.patient.name}, infelizmente a Dra. Cliseide precisou desmarcar seu horário de ${format(appointment.startTime, "dd/MM 'às' HH:mm")}. Entre em contato para reagendarmos.`);
+    }
 
     // Lógica de Lista de Espera: Notificar interessados
     try {
@@ -381,7 +399,7 @@ export async function completeAppointment(id: string) {
     return { success: true };
 }
 
-export async function saveEvolution(patientId: string, appointmentId: string, content: string, date?: Date) {
+export async function saveEvolution(patientId: string, appointmentId: string, content: string, date?: Date, isDraft: boolean = false) {
     if (!content.trim()) {
         try {
             await prisma.evolution.delete({
@@ -398,12 +416,14 @@ export async function saveEvolution(patientId: string, appointmentId: string, co
         where: { appointmentId },
         update: {
             content,
+            isDraft,
             date: date || undefined
         },
         create: {
             content,
             patientId,
             appointmentId,
+            isDraft,
             date: date || new Date()
         }
     });

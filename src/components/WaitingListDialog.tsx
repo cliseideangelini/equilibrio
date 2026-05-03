@@ -37,9 +37,9 @@ export function WaitingListDialog({ rules }: WaitingListDialogProps) {
         phone: "",
         email: "",
         preferredDays: "",
-        preferredHours: "",
         specificDate: "",
-        specificTime: ""
+        specificTime: "",
+        preferredShift: "MANHA" as "MANHA" | "TARDE"
     });
 
     // Helper: Dias de atendimento (ex: [1, 2, 4])
@@ -85,7 +85,7 @@ export function WaitingListDialog({ rules }: WaitingListDialogProps) {
                 specificDate: mode === "specific" && formData.specificDate ? new Date(formData.specificDate + "T00:00:00") : undefined,
                 specificTime: mode === "specific" ? formData.specificTime : undefined,
                 preferredDays: mode === "general" ? formData.preferredDays : undefined,
-                preferredHours: mode === "general" ? formData.preferredHours : undefined,
+                preferredShift: mode === "general" ? formData.preferredShift : undefined,
             };
 
             await addToWaitingList(dataToSubmit);
@@ -199,14 +199,16 @@ export function WaitingListDialog({ rules }: WaitingListDialogProps) {
                                             </div>
                                             <div className="grid gap-2">
                                                 <label className="text-[9px] font-black uppercase tracking-widest text-stone-400 px-1 flex items-center gap-1">
-                                                    <Clock size={10} /> Período
+                                                    <Clock size={10} /> Turno de Preferência
                                                 </label>
-                                                <Input
-                                                    value={formData.preferredHours}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, preferredHours: e.target.value })}
-                                                    placeholder="Ex: Manhã"
-                                                    className="rounded-xl bg-stone-50 border-stone-100 focus:ring-stone-200 h-12"
-                                                />
+                                                <select
+                                                    value={formData.preferredShift}
+                                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, preferredShift: e.target.value as any })}
+                                                    className="rounded-xl bg-stone-50 border border-stone-100 focus:ring-2 focus:ring-stone-200 h-12 px-3 text-sm outline-none"
+                                                >
+                                                    <option value="MANHA">Manhã (07:00 - 11:30)</option>
+                                                    <option value="TARDE">Tarde (14:30 - 17:30)</option>
+                                                </select>
                                             </div>
                                         </div>
                                     ) : (

@@ -36,6 +36,7 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
 
     // Buscar todos os pacientes para o diálogo de agendamento manual
     const patients = await prisma.patient.findMany({
+        where: { deletedAt: null },
         select: { id: true, name: true, phone: true },
         orderBy: { name: 'asc' }
     });

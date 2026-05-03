@@ -12,7 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { saveEvolution } from "@/lib/actions";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, CloudCheck, Cloud } from "lucide-react";
+import { toast } from "sonner";
+import { useEffect, useCallback, useRef } from "react";
 
 interface EvolutionDialogProps {
     patientId: string;
@@ -26,15 +28,47 @@ export function EvolutionDialog({ patientId, appointmentId, initialContent = "",
     const [content, setContent] = useState(initialContent);
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [isPending, setIsPending] = useState(false);
+    const [isSavingDraft, setIsSavingDraft] = useState(false);
+    const lastSavedContent = useRef(initialContent);
+
+    // Simple debounce implementation
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const debouncedSaveDraft = useCallback((newContent: string) => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        
+        timeoutRef.current = setTimeout(async () => {
+            if (!newContent.trim() || newContent === lastSavedContent.current) return;
+            setIsSavingDraft(true);
+            try {
+                await saveEvolution(patientId, appointmentId, newContent, new Date(date), true);
+                lastSavedContent.current = newContent;
+            } catch (error) {
+                console.error("Erro ao salvar rascunho:", error);
+            } finally {
+                setIsSavingDraft(false);
+            }
+        }, 2000);
+    }, [patientId, appointmentId, date]);
+
+    useEffect(() => {
+        if (open && content !== initialContent) {
+            debouncedSaveDraft(content);
+        }
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+    }, [content, open, debouncedSaveDraft, initialContent]);
 
     const handleSave = async () => {
         if (!content.trim() && !initialContent) return;
         setIsPending(true);
         try {
-            await saveEvolution(patientId, appointmentId, content, new Date(date));
+            await saveEvolution(patientId, appointmentId, content, new Date(date), false);
+            toast.success("Evolução salva com sucesso!");
             setOpen(false);
         } catch (error) {
             console.error("Error saving evolution:", error);
+            toast.error("Erro ao salvar evolução.");
         } finally {
             setIsPending(false);
         }
@@ -50,8 +84,19 @@ export function EvolutionDialog({ patientId, appointmentId, initialContent = "",
                 )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] border-stone-200">
-                <DialogHeader>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <DialogTitle className="text-xl font-light text-stone-900">Evolução Clínica</DialogTitle>
+                    <div className="flex items-center gap-2 pr-6">
+                        {isSavingDraft ? (
+                            <span className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-stone-400">
+                                <Cloud size={10} className="animate-pulse" /> Salvando...
+                            </span>
+                        ) : (
+                            <span className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-emerald-500">
+                                <CloudCheck size={10} /> Sincronizado
+                            </span>
+                        )}
+                    </div>
                 </DialogHeader>
                 <div className="py-4 space-y-4">
                     <div className="space-y-1.5">

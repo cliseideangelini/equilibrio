@@ -21,6 +21,7 @@ interface CancellationButtonProps {
     startTime: string;
     variant?: "ghost" | "outline" | "default";
     className?: string;
+    isProfessional?: boolean;
 }
 
 export function CancellationButton({ appointmentId, startTime, variant = "ghost", className }: CancellationButtonProps) {
@@ -32,7 +33,7 @@ export function CancellationButton({ appointmentId, startTime, variant = "ghost"
     const handleCancel = async (confirmLate: boolean = false) => {
         setIsPending(true);
         try {
-            const result = await cancelAppointment(appointmentId, confirmLate);
+            const result = await cancelAppointment(appointmentId, confirmLate, isProfessional);
 
             if (result.requiresConfirmation) {
                 setRequiresLateConfirmation(true);

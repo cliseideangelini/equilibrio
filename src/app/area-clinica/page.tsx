@@ -107,7 +107,7 @@ export default async function AreaClinicaDashboard() {
                                         <div className="flex items-center justify-end gap-2">
                                             <CompleteAppointmentButton appointmentId={app.id} />
                                             <AbsentButton appointmentId={app.id} />
-                                            <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
+                                            <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} isProfessional={true} />
                                         </div>
                                     </td>
                                 </tr>

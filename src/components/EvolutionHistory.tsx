@@ -103,113 +103,114 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
                 ))}
             </div>
 
-            <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-stone-50/50 border-b border-stone-100">
-                        <tr>
-                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest w-12 text-center">#</th>
-                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest w-40">Data/Hora</th>
-                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest">Evolução</th>
-                            <th className="py-3 px-4 font-black uppercase text-[10px] text-stone-400 tracking-widest w-24 text-right">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-100">
-                        {filteredAppointments.length > 0 ? filteredAppointments.map((app, i) => (
-                            <EvolutionItem
-                                key={app.id}
-                                app={app}
-                                appointments={appointments}
-                                patientId={patientId}
-                            />
-                        )) : (
-                            <tr>
-                                <td colSpan={4} className="py-12 text-center bg-stone-50/30">
-                                    <p className="text-stone-400 font-medium text-sm">Nenhum registro encontrado.</p>
-                                    {(search || dateFilter || activeTab !== 'all') && (
-                                        <Button
-                                            variant="link"
-                                            onClick={() => { setSearch(""); setDateFilter(""); setActiveTab('all'); }}
-                                            className="text-[10px] font-black uppercase tracking-widest text-stone-900 mt-2"
-                                        >
-                                            Limpar filtros
-                                        </Button>
-                                    )}
-                                </td>
-                            </tr>
+            <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-stone-200 before:to-transparent">
+                {filteredAppointments.length > 0 ? filteredAppointments.map((app, i) => (
+                    <TimelineItem
+                        key={app.id}
+                        app={app}
+                        appointments={appointments}
+                        patientId={patientId}
+                    />
+                )) : (
+                    <div className="py-20 text-center bg-stone-50/30 rounded-3xl border border-dashed border-stone-200">
+                        <p className="text-stone-400 font-medium text-sm">Nenhum registro encontrado.</p>
+                        {(search || dateFilter || activeTab !== 'all') && (
+                            <Button
+                                variant="link"
+                                onClick={() => { setSearch(""); setDateFilter(""); setActiveTab('all'); }}
+                                className="text-[10px] font-black uppercase tracking-widest text-stone-900 mt-2"
+                            >
+                                Limpar filtros
+                            </Button>
                         )}
-                    </tbody>
-                </table>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
-function EvolutionItem({ app, appointments, patientId }: { app: any, appointments: any[], patientId: string }) {
+function TimelineItem({ app, appointments, patientId }: { app: any, appointments: any[], patientId: string }) {
     const [expanded, setExpanded] = useState(false);
+    const isCompleted = app.status === 'CONFIRMED' || app.status === 'COMPLETED';
+    
     return (
-        <tr className="hover:bg-stone-50/50 transition-colors group">
-            <td className="py-3 px-4 text-center align-top">
-                <div className="w-6 h-6 mx-auto rounded bg-stone-100 flex items-center justify-center text-stone-500 font-black text-[10px]">
-                    {appointments.length - appointments.indexOf(app)}
+        <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Icon/Dot */}
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-stone-50 text-stone-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 group-hover:bg-stone-900 group-hover:text-white transition-all duration-500 z-10">
+                <span className="text-[10px] font-black">{appointments.length - appointments.indexOf(app)}</span>
+            </div>
+
+            {/* Content Card */}
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-6 rounded-[2rem] border border-stone-100 shadow-sm hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500">
+                <div className="flex items-center justify-between mb-3">
+                    <time className="text-[10px] font-black uppercase tracking-widest text-stone-400" suppressHydrationWarning>
+                        {app.evolution?.date
+                            ? format(new Date(app.evolution.date), "dd 'de' MMMM, yyyy", { locale: ptBR })
+                            : format(new Date(app.startTime), "dd 'de' MMMM, yyyy", { locale: ptBR })}
+                    </time>
+                    <div className="flex items-center gap-2">
+                        {app.evolution?.isDraft && (
+                            <span className="bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded">Rascunho</span>
+                        )}
+                        <span className={cn(
+                            "px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border",
+                            isCompleted ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                app.status === 'ABSENT' ? "bg-amber-50 text-amber-600 border-amber-100" :
+                                    app.status === 'CANCELLED' ? "bg-red-50 text-red-600 border-red-100" :
+                                        "bg-stone-50 text-stone-400 border-stone-100"
+                        )}>
+                            {isCompleted ? 'Realizada' :
+                                app.status === 'ABSENT' ? 'Ausente' :
+                                    app.status === 'CANCELLED' ? 'Cancelada' :
+                                        'Pendente'}
+                        </span>
+                    </div>
                 </div>
-            </td>
-            <td className="py-3 px-4 align-top">
-                <p className="text-xs font-bold text-stone-800" suppressHydrationWarning>
-                    {app.evolution?.date
-                        ? format(new Date(app.evolution.date), "dd/MM/yyyy")
-                        : format(new Date(app.startTime), "dd/MM/yyyy")}
-                </p>
-                <div className="flex flex-col items-start gap-1 mt-1" suppressHydrationWarning>
-                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
-                        {format(new Date(app.startTime), "HH:mm")} • {app.type.charAt(0)}
-                    </p>
-                    {app.evolution?.date && format(new Date(app.evolution.date), "yyyy-MM-dd") !== format(new Date(app.startTime), "yyyy-MM-dd") && (
-                        <span className="text-[8px] text-amber-600 font-black uppercase tracking-widest">Data editada</span>
-                    )}
-                    <span className={cn(
-                        "px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border inline-block mt-0.5",
-                        (app.status === 'CONFIRMED' || app.status === 'COMPLETED') ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                            app.status === 'ABSENT' ? "bg-amber-50 text-amber-600 border-amber-100" :
-                                app.status === 'CANCELLED' ? "bg-red-50 text-red-600 border-red-100" :
-                                    "bg-stone-50 text-stone-400 border-stone-100"
-                    )}>
-                        {(app.status === 'CONFIRMED' || app.status === 'COMPLETED') ? 'Realizada' :
-                            app.status === 'ABSENT' ? 'Ausente' :
-                                app.status === 'CANCELLED' ? 'Cancelada' :
-                                    'Pendente'}
-                    </span>
+
+                <div className="space-y-4">
+                    <div 
+                        className={cn(
+                            "relative transition-all duration-500",
+                            !expanded && app.evolution?.content?.length > 200 && "cursor-pointer"
+                        )}
+                        onClick={() => { if (app.evolution?.content?.length > 200) setExpanded(!expanded) }}
+                    >
+                        {app.evolution ? (
+                            <p className={cn(
+                                "text-sm text-stone-600 leading-relaxed whitespace-pre-wrap",
+                                !expanded && "line-clamp-3"
+                            )}>
+                                {app.evolution.content}
+                            </p>
+                        ) : (
+                            <p className="text-xs text-stone-300 italic">Nenhuma observação registrada para esta sessão.</p>
+                        )}
+                        
+                        {!expanded && app.evolution?.content?.length > 200 && (
+                            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                        )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-stone-50">
+                        <div className="flex items-center gap-3 text-stone-400">
+                            <span className="text-[9px] font-black uppercase tracking-widest">
+                                {format(new Date(app.startTime), "HH:mm")} • {app.type}
+                            </span>
+                        </div>
+                        <EvolutionDialog
+                            patientId={patientId}
+                            appointmentId={app.id}
+                            initialContent={app.evolution?.content}
+                            trigger={
+                                <button className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-stone-900 transition-colors flex items-center gap-1">
+                                    {app.evolution ? "Editar Evolução" : "+ Adicionar Nota"}
+                                </button>
+                            }
+                        />
+                    </div>
                 </div>
-            </td>
-            <td className={cn(
-                "py-3 px-4 align-top",
-                app.evolution ? "cursor-pointer" : ""
-            )}
-                onClick={() => { if (app.evolution) setExpanded(!expanded) }}>
-                {app.evolution ? (
-                    <p className={cn(
-                        "text-xs text-stone-600 leading-relaxed whitespace-pre-wrap transition-all",
-                        !expanded && "line-clamp-2"
-                    )}>
-                        {app.evolution.content}
-                    </p>
-                ) : (
-                    <p className="text-[10px] text-stone-300 font-bold uppercase tracking-widest italic pt-0.5">
-                        Sem nota
-                    </p>
-                )}
-            </td>
-            <td className="py-3 px-4 align-top text-right">
-                <EvolutionDialog
-                    patientId={patientId}
-                    appointmentId={app.id}
-                    initialContent={app.evolution?.content}
-                    trigger={
-                        <button className="text-[9px] font-black uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors bg-white border border-stone-200 px-3 py-1.5 rounded shadow-sm hover:border-stone-400 whitespace-nowrap">
-                            {app.evolution ? "Editar" : "+ Nota"}
-                        </button>
-                    }
-                />
-            </td>
-        </tr>
+            </div>
+        </div>
     );
 }

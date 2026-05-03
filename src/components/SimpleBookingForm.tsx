@@ -26,6 +26,9 @@ import {
 import { cn } from "@/lib/utils";
 import { WaitingListDialog } from "./WaitingListDialog";
 import Link from "next/link";
+import { toast } from "sonner";
+import { addDays, isWeekend } from "date-fns";
+import { SCHEDULE_CONFIG } from "@/lib/schedule-utils";
 
 type Step = "auth" | "register" | "date" | "slot" | "details";
 
@@ -75,7 +78,7 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                 setStep("date");
             }
         } catch (error: any) {
-            alert(error.message || "Erro ao realizar cadastro.");
+            toast.error(error.message || "Erro ao realizar cadastro.");
         } finally {
             setIsRegistering(false);
         }
@@ -115,14 +118,15 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                 type: appointmentType,
             });
             if (!result.success) {
-                alert(result.error || "Erro ao agendar. Tente novamente.");
+                toast.error(result.error || "Erro ao agendar. Tente novamente.");
                 setIsSubmitting(false);
                 return;
             }
+            toast.success("Agendamento realizado com sucesso!");
             window.location.href = '/paciente/minha-agenda';
         } catch (err: any) {
             console.error(err);
-            alert("Erro de comunicação com o servidor. Tente novamente.");
+            toast.error("Erro de comunicação com o servidor. Tente novamente.");
             setIsSubmitting(false);
         }
     };
@@ -274,7 +278,11 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                                     mode="single"
                                     selected={selectedDate}
                                     onSelect={handleDateSelect}
-                                    disabled={[{ before: startOfToday() }, { dayOfWeek: [0, 6] }]}
+                                    disabled={[
+                                        { before: startOfToday() },
+                                        { after: addDays(startOfToday(), SCHEDULE_CONFIG.WINDOW_DAYS) },
+                                        { dayOfWeek: [0, 6] }
+                                    ]}
                                     locale={ptBR}
                                     classNames={{
                                         months: "w-full",

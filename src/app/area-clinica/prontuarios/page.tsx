@@ -14,6 +14,7 @@ export default async function ProntuariosIndex() {
 
     // Buscar todos os pacientes com contagem de consultas
     const patientsRaw = await prisma.patient.findMany({
+        where: { deletedAt: null },
         include: {
             _count: {
                 select: { appointments: true }

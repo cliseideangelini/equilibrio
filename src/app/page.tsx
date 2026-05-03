@@ -17,6 +17,14 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="flex flex-col gap-20 pb-20">
+      {/* 15-day Window Banner */}
+      <div className="w-full bg-emerald-50 border-b border-emerald-100 py-3 text-center animate-in slide-in-from-top duration-500">
+        <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-emerald-700 flex items-center justify-center gap-2">
+          <Clock size={14} className="animate-pulse" />
+          Nossa agenda é liberada quinzenalmente — agende para os próximos 15 dias.
+        </p>
+      </div>
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30">
@@ -220,7 +228,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">WhatsApp</p>
-                    <p className="font-bold text-lg">(19) 98827-5290</p>
+                    <a href="https://wa.me/5519988275290" className="font-bold text-lg hover:text-primary transition-colors">(19) 98827-5290</a>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border w-fit shadow-sm">
