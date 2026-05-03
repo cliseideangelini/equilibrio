@@ -251,19 +251,6 @@ export default function SimpleBookingForm() {
                                 { dayOfWeek: [0, 6] }
                             ]}
                             locale={ptBR}
-                            classNames={{
-                                months: "w-full",
-                                month: "w-full",
-                                caption: "flex justify-between items-center px-4 mb-8",
-                                caption_label: "text-lg font-light text-stone-800 tracking-tight lowercase first-letter:uppercase",
-                                nav: "flex gap-4",
-                                nav_button: "h-10 w-10 flex items-center justify-center rounded-full hover:bg-[#F2E8DF] text-stone-400 transition-all",
-                                table: "w-full border-collapse",
-                                head_row: "flex justify-between mb-4 px-2",
-                                head_cell: "text-stone-300 font-black text-[9px] uppercase tracking-[0.2em] w-[44px] text-center",
-                                row: "flex justify-between mb-2",
-                                cell: "p-0",
-                            }}
                         />
                     </div>
                 </div>

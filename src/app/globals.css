@@ -50,49 +50,114 @@
 }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
-/* Estilos do Calendário Premium (Sálvia & Bege) */
+/* React Day Picker v9 Grid Fix */
+.rdp-root {
+  --rdp-accent-color: #94A694;
+  --rdp-accent-background-color: #F2E8DF;
+  --rdp-day-button-width: 44px;
+  --rdp-day-button-height: 44px;
+  --rdp-selected-color: white;
+}
+
+.rdp-month_grid {
+  display: table !important;
+  width: 100% !important;
+  border-spacing: 0 8px !important;
+  border-collapse: separate !important;
+}
+
+.rdp-weekdays {
+  display: table-header-group !important;
+}
+
+.rdp-weekday {
+  display: table-cell !important;
+  text-align: center !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2em !important;
+  color: #d1d5db !important;
+  padding-bottom: 1rem !important;
+}
+
+.rdp-weeks {
+  display: table-row-group !important;
+}
+
+.rdp-week {
+  display: table-row !important;
+}
+
 .rdp-day {
+  display: table-cell !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.rdp-day_button {
   width: 44px !important;
   height: 44px !important;
-  display: flex !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  border-radius: 9999px !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
 }
 
-.rdp-day_selected {
-  background-color: #94A694 !important;
-  color: white !important;
-  border-radius: 9999px !important;
-  font-weight: 800 !important;
-  box-shadow: 0 10px 15px -3px rgba(148, 166, 148, 0.3);
-}
-
-.rdp-day_today {
-  color: #94A694 !important;
-  font-weight: 800 !important;
-}
-
-.rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_disabled) {
+.rdp-day_button:hover:not(.rdp-day_selected_button):not(.rdp-day_disabled_button) {
   background-color: #F2E8DF !important;
-  border-radius: 9999px !important;
   color: #8c786a !important;
 }
 
-.rdp-table {
-  width: 100% !important;
-  border-collapse: separate !important;
-  border-spacing: 0 8px !important;
+.rdp-day_selected .rdp-day_button {
+  background-color: #94A694 !important;
+  color: white !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 15px -3px rgba(148, 166, 148, 0.3) !important;
 }
 
-.rdp-tr {
+.rdp-day_today .rdp-day_button {
+  color: #94A694 !important;
+  font-weight: 800 !important;
+  border: 1px solid #94A694 !important;
+}
+
+.rdp-caption_label {
+  font-family: serif !important;
+  font-style: italic !important;
+  font-size: 1.25rem !important;
+  color: #1f2937 !important;
+  text-transform: lowercase !important;
+}
+
+.rdp-caption_label::first-letter {
+  text-transform: uppercase !important;
+}
+
+.rdp-nav {
   display: flex !important;
-  justify-content: space-between !important;
-  width: 100% !important;
+  gap: 1rem !important;
 }
 
-.rdp-head_cell {
-  @apply text-stone-300 font-black text-[9px] uppercase tracking-widest text-center w-[44px];
+.rdp-nav_button {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+}
+
+.rdp-nav_button:hover {
+  background-color: #F2E8DF !important;
+  color: #1f2937 !important;
 }
