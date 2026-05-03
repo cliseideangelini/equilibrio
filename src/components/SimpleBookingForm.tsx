@@ -112,10 +112,11 @@ export default function SimpleBookingForm() {
             const startTime = setMinutes(setHours(selectedDate, hours), minutes);
             
             await createAppointment({
-                patientName: name,
-                patientPhone: phone,
-                patientPassword: password,
-                startTime,
+                name: name,
+                phone: phone,
+                password: password,
+                date: selectedDate.toISOString(),
+                time: selectedTime,
                 type: "ONLINE"
             });
             

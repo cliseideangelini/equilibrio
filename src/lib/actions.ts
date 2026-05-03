@@ -492,3 +492,9 @@ export async function updatePatientPassword(patientId: string, newPassword: stri
     return { success: true };
 }
 
+
+export async function getPatientByPhone(phone: string) {
+    return await prisma.patient.findFirst({
+        where: { phone, deletedAt: null }
+    });
+}
