@@ -173,3 +173,8 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+.rdp-month { width: 100% !important; }
+.rdp-table { width: 100% !important; border-collapse: collapse !important; }
+.rdp-tbody { width: 100% !important; }
+.rdp-tr { display: flex !important; justify-content: space-between !important; width: 100% !important; }
+.rdp-day { width: 40px !important; height: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important; }

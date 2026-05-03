@@ -285,19 +285,19 @@ export default function SimpleBookingForm({ availabilityRules }: { availabilityR
                                     ]}
                                     locale={ptBR}
                                     classNames={{
-                                        months: "w-full space-y-4",
-                                        month: "space-y-4 w-full",
+                                        months: "w-full",
+                                        month: "w-full space-y-4",
                                         caption: "flex justify-between items-center px-4 mb-4",
                                         caption_label: "text-sm font-black uppercase tracking-widest text-stone-800",
                                         nav: "flex gap-2",
                                         nav_button: "h-10 w-10 flex items-center justify-center rounded-xl bg-stone-50 hover:bg-stone-100 text-stone-400 hover:text-stone-900 transition-all",
-                                        table: "w-full border-collapse space-y-1",
-                                        head_row: "flex w-full justify-between mb-4",
+                                        table: "w-full border-collapse",
+                                        head_row: "flex justify-between mb-4",
                                         head_cell: "text-stone-300 w-10 font-black text-[9px] uppercase tracking-widest text-center",
-                                        row: "flex w-full justify-between mb-1",
-                                        cell: "relative p-0 text-center focus-within:relative focus-within:z-20",
+                                        row: "flex justify-between mb-1",
+                                        cell: "relative p-0 text-center",
                                         day: cn(
-                                            "h-10 w-10 p-0 font-bold hover:bg-stone-50 rounded-xl transition-all text-sm text-stone-600 flex items-center justify-center cursor-pointer"
+                                            "h-10 w-10 p-0 font-bold hover:bg-stone-50 rounded-xl transition-all text-sm text-stone-600 flex items-center justify-center cursor-pointer mx-auto"
                                         ),
                                         day_selected: "bg-stone-900 text-white hover:bg-stone-900 hover:text-white shadow-xl shadow-stone-200",
                                         day_today: "text-stone-900 border-b-2 border-stone-900 rounded-none",
