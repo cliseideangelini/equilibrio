@@ -313,24 +313,7 @@ export async function resetPassword(token: string, newPassword: string) {
     return { success: false, error: "Token inválido ou expirado." };
 }
 
-export async function registerPatient(formData: { name: string, phone: string, password: string, email?: string }) {
-    const existing: any = await prisma.patient.findUnique({ where: { phone: formData.phone } });
-    if (existing && existing.password) throw new Error("Este telefone já possui cadastro.");
 
-    const hashedPassword = await bcrypt.hash(formData.password, 10);
-
-    const patient = existing
-        ? await prisma.patient.update({
-            where: { id: existing.id },
-            data: { password: hashedPassword, name: formData.name, email: formData.email, mustChangePassword: true }
-        })
-        : await prisma.patient.create({
-            data: { ...formData, password: hashedPassword, mustChangePassword: true }
-        });
-
-    revalidatePath("/area-clinica/pacientes");
-    return { success: true, patientId: (patient as any).id };
-}
 
 // --- LISTA DE ESPERA ---
 
