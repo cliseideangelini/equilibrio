@@ -57,11 +57,17 @@ export default async function PatientDashboard() {
     const lastPastAppointment = pastOrCancelled[0];
     const remainingHistory = pastOrCancelled.slice(1);
 
-    const nowHora = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
-    const currentHour = new Date(nowHora).getHours();
-    let saudacao = "Bom dia";
-    if (currentHour >= 12 && currentHour < 18) saudacao = "Boa tarde";
-    else if (currentHour >= 18 || currentHour < 5) saudacao = "Boa noite";
+    const saoPauloTime = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        hour: 'numeric',
+        hour12: false,
+    }).format(new Date());
+    const currentHour = parseInt(saoPauloTime);
+    
+    let saudacao = "Olá";
+    if (currentHour >= 5 && currentHour < 12) saudacao = "Bom dia";
+    else if (currentHour >= 12 && currentHour < 18) saudacao = "Boa tarde";
+    else saudacao = "Boa noite";
 
     return (
         <div className="fixed inset-0 bg-white z-40 flex flex-col md:flex-row overflow-hidden font-sans">
@@ -229,8 +235,10 @@ export default async function PatientDashboard() {
                                                                 {app.type === 'ONLINE' && (
                                                                     app.meetLink ? (
                                                                         <Button asChild size="sm" className="rounded-xl h-11 font-black bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 uppercase tracking-widest text-[9px] px-6 flex items-center gap-2 group/btn">
-                                                                            <Video size={14} className="group-hover/btn:scale-110 transition-transform" />
-                                                                            <a href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`} target="_blank" rel="noopener noreferrer">Acessar Consulta</a>
+                                                                            <a href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`} target="_blank" rel="noopener noreferrer">
+                                                                                <Video size={14} className="group-hover/btn:scale-110 transition-transform mr-2 inline" />
+                                                                                Acessar Consulta
+                                                                            </a>
                                                                         </Button>
                                                                     ) : (
                                                                         <Button size="sm" disabled className="rounded-xl h-11 font-black bg-stone-50 text-stone-300 shadow-none uppercase tracking-widest text-[9px] px-6 cursor-not-allowed border border-stone-100">
@@ -239,7 +247,7 @@ export default async function PatientDashboard() {
                                                                     )
                                                                 )}
                                                                 <div className="scale-75 origin-right">
-                                                                    <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} />
+                                                                    <CancellationButton appointmentId={app.id} startTime={new Date(app.startTime).toISOString()} />
                                                                 </div>
                                                             </div>
                                                         </td>
