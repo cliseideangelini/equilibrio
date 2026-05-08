@@ -14,7 +14,8 @@ import {
     LayoutDashboard,
     LogOut,
     MessageCircle,
-    BellRing
+    BellRing,
+    User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
