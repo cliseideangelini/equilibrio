@@ -15,7 +15,8 @@ import {
     getAvailableSlots, 
     createAppointment, 
     getPatientByPhone,
-    loginPatient
+    loginPatient,
+    registerPatient
 } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,8 @@ export default function SimpleBookingForm() {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+    const [dateOfBirth, setDateOfBirth] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isExistingPatient, setIsExistingPatient] = useState(false);
@@ -72,9 +75,9 @@ export default function SimpleBookingForm() {
         }
     };
 
-    const handleRegisterStep = (e: React.FormEvent) => {
+    const handleRegisterStep = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name || !email || !password || !confirmPassword) {
+        if (!name || !email || !password || !confirmPassword || !username || !dateOfBirth) {
             toast.error("Preencha todos os campos.");
             return;
         }
@@ -86,7 +89,29 @@ export default function SimpleBookingForm() {
             toast.error("A senha deve ter pelo menos 4 dígitos.");
             return;
         }
-        setStep(2); // Valid registration data, move to calendar
+        
+        setLoading(true);
+        try {
+            const result = await registerPatient({
+                name,
+                email,
+                phone,
+                username,
+                dateOfBirth,
+                password
+            });
+
+            if (result.success) {
+                toast.success("Cadastro realizado com sucesso!");
+                setStep(2);
+            } else {
+                toast.error(result.error || "Erro ao realizar cadastro.");
+            }
+        } catch (error) {
+            toast.error("Erro ao realizar cadastro.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleLoginStep = async (e: React.FormEvent) => {
@@ -127,7 +152,7 @@ export default function SimpleBookingForm() {
                 name,
                 phone,
                 email: email || undefined,
-                password: isExistingPatient ? "SESSION_ACTIVE" : password,
+                password: "SESSION_ACTIVE",
                 date: selectedDate.toISOString(),
                 time: selectedTime,
                 type: "ONLINE"
@@ -207,6 +232,35 @@ export default function SimpleBookingForm() {
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">Data de Nascimento</label>
+                                <div className="relative">
+                                    <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
+                                    <Input 
+                                        type="date"
+                                        value={dateOfBirth}
+                                        onChange={(e) => setDateOfBirth(e.target.value)}
+                                        className="h-12 pl-12 rounded-xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20 text-stone-500"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">Usuário</label>
+                                <div className="relative">
+                                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
+                                    <Input 
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        placeholder="Ex: joaosilva"
+                                        className="h-12 pl-12 rounded-xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">E-mail</label>
                             <div className="relative">
@@ -217,7 +271,6 @@ export default function SimpleBookingForm() {
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="seu@email.com"
                                     className="h-12 pl-12 rounded-xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20"
-                                    required
                                 />
                             </div>
                         </div>

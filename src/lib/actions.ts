@@ -117,12 +117,14 @@ export async function createAppointment(formData: {
     name: string;
     email?: string;
     phone: string;
+    username?: string;
+    dateOfBirth?: string;
     password?: string;
     date: string;
     time: string;
     type: "ONLINE" | "PRESENCIAL";
 }) {
-    const { name, email, phone, password, date, time, type } = formData;
+    const { name, email, phone, username, dateOfBirth, password, date, time, type } = formData;
 
     // Encontrar paciente pelo TELEFONE
     let patient: any = await prisma.patient.findFirst({
@@ -147,6 +149,8 @@ export async function createAppointment(formData: {
                 name,
                 email: email || null,
                 phone,
+                username: username || null,
+                dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
                 password: hashedPassword
             }
         });
@@ -592,7 +596,7 @@ export async function logout() {
 export async function updatePatientProfile(data: { name: string, email: string, password?: string }) {
     const cookieStore = await cookies();
     const patientId = cookieStore.get('patient_id')?.value;
-    if (!patientId) return { success: false, error: 'N�o autorizado' };
+    if (!patientId) return { success: false, error: 'N�o autorizado' };
 
     const updateData: any = { name: data.name, email: data.email };
     if (data.password) {
@@ -606,4 +610,44 @@ export async function updatePatientProfile(data: { name: string, email: string, 
 
     revalidatePath('/paciente/minha-agenda');
     return { success: true };
+}
+
+
+export async function registerPatient(formData: {
+    name: string;
+    email?: string;
+    phone: string;
+    username: string;
+    dateOfBirth: string;
+    password?: string;
+}) {
+    const { name, email, phone, username, dateOfBirth, password } = formData;
+    
+    const existingPhone = await prisma.patient.findFirst({ where: { phone, deletedAt: null } });
+    if (existingPhone) return { success: false, error: "Este WhatsApp já está cadastrado." };
+    
+    const existingUsername = await prisma.patient.findFirst({ where: { username, deletedAt: null } });
+    if (existingUsername) return { success: false, error: "Este Nome de Usuário já está em uso." };
+
+    let hashedPassword = undefined;
+    if (password) {
+        hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    const patient = await prisma.patient.create({
+        data: {
+            name,
+            email: email || null,
+            phone,
+            username,
+            dateOfBirth: new Date(dateOfBirth),
+            password: hashedPassword
+        }
+    });
+
+    // Auto-login setting cookie
+    const cookieStore = await cookies();
+    cookieStore.set("patient_id", patient.id, { httpOnly: true, secure: true, maxAge: 60 * 60 * 24 * 7 });
+
+    return { success: true, patient };
 }
