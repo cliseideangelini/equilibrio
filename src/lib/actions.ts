@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { createGoogleCalendarEvent } from "@/lib/google-calendar";
+
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { AppointmentStatus } from "@prisma/client";
@@ -176,23 +176,7 @@ export async function createAppointment(formData: {
     startTime.setHours(hours, mins, 0, 0);
     const endTime = addMinutes(startTime, 30);
 
-    // Google Calendar — Tentativa de criação dinâmica (opcional)
-    let meetLink: string | null = "https://meet.google.com/wnx-geqg-wgs";
-
-    try {
-        const result = await createGoogleCalendarEvent({
-            patientName: name,
-            startTime,
-            durationMinutes: 30,
-            type: type as "ONLINE" | "PRESENCIAL"
-        });
-        if (result.meetLink) meetLink = result.meetLink;
-    } catch (err: any) {
-        // Falha silenciosa, usaremos o link fixo padrão definido acima
-    }
-
-    // Se for presencial, não salva link
-    if (type !== "ONLINE") meetLink = null;
+    const meetLink = type === "ONLINE" ? "https://meet.google.com/wnx-geqg-wgs" : null;
 
     const appointment = await prisma.appointment.create({
         data: {
