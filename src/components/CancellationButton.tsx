@@ -24,7 +24,7 @@ interface CancellationButtonProps {
     isProfessional?: boolean;
 }
 
-export function CancellationButton({ appointmentId, startTime, variant = "ghost", className }: CancellationButtonProps) {
+export function CancellationButton({ appointmentId, startTime, variant = "ghost", className, isProfessional }: CancellationButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [requiresLateConfirmation, setRequiresLateConfirmation] = useState(false);
