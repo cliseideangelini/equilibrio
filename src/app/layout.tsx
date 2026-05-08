@@ -34,7 +34,7 @@ export default function RootLayout({
         <ConditionalShell />
         <Toaster position="top-center" richColors />
         <footer className="fixed bottom-4 right-6 pointer-events-none z-[100] hidden md:block">
-          <span className="text-[10px] font-black uppercase tracking-widest text-stone-300 opacity-50">
+          <span className="text-[10px] font-black uppercase tracking-widest text-stone-800 opacity-100 bg-stone-100 px-2 py-1 rounded-md shadow-sm border border-stone-200">
             v1.4.1
           </span>
         </footer>
