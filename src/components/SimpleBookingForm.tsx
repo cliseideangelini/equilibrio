@@ -24,6 +24,7 @@ import { Loader2, Calendar, Clock, ChevronLeft, User, Phone, Lock, Mail, ArrowRi
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const SCHEDULE_CONFIG = {
     WINDOW_DAYS: 15,
