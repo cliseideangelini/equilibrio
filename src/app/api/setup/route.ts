@@ -6,7 +6,14 @@ export async function GET() {
     try {
         const hashedPassword = await bcrypt.hash("cliseide2025", 10);
         
-        // Find existing psychologist
+        // 1. Try to add the column directly via SQL if it doesn't exist
+        try {
+            await prisma.$executeRawUnsafe(`ALTER TABLE "Psychologist" ADD COLUMN "username" TEXT UNIQUE;`);
+        } catch (e: any) {
+            console.log("Column might already exist or error: ", e.message);
+        }
+
+        // 2. Find existing psychologist
         const admin = await prisma.psychologist.findFirst();
 
         if (admin) {
@@ -15,7 +22,7 @@ export async function GET() {
                 data: {
                     username: "cliseide.angelini",
                     password: hashedPassword,
-                    email: "cliseide.angelini@equilibrio.local" // We keep a dummy email since it's required by the database structure
+                    email: "cliseide.angelini@equilibrio.local"
                 }
             });
         } else {
@@ -27,15 +34,14 @@ export async function GET() {
                     password: hashedPassword,
                     email: "cliseide.angelini@equilibrio.local",
                     crp: "06/000000",
-                    bio: "Psicóloga Clínica",
-                    phone: "(00) 00000-0000"
+                    bio: "Psicóloga Clínica"
                 }
             });
         }
         
         return NextResponse.json({ 
             success: true, 
-            message: "Usuário atualizado com sucesso para cliseide.angelini" 
+            message: "Usuário atualizado com sucesso para cliseide.angelini e senha atualizada." 
         });
     } catch (e: any) {
         return NextResponse.json({ success: false, error: e.message });
