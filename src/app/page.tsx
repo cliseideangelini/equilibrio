@@ -68,7 +68,6 @@ const CREDENTIALS = [
   "Especialização em TCC",
   "Pós-graduação em Psicopedagogia",
   "Formação em Terapia de Casal",
-  "Cursos complementares e Qualificações (Em breve)",
 ];
 
 const STATS = [
@@ -779,9 +778,12 @@ export default function HomePage() {
 
         {/* Bottom bar */}
         <div className="border-t border-border/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-center">
-            <p className="text-xs text-muted-foreground/50 font-medium text-center">
-              © {new Date().getFullYear()} Equilíbrio Psicologia Clínica · Cliseide S. Angelini · Todos os direitos reservados.
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col items-center justify-center gap-1.5">
+            <p className="text-xs text-muted-foreground/60 font-medium text-center">
+              © {new Date().getFullYear()} Equilíbrio Psicologia Clínica
+            </p>
+            <p className="text-xs text-muted-foreground/40 font-medium text-center">
+              Desenvolvido com carinho para o bem-estar. (By Pedro Gabriel)
             </p>
           </div>
         </div>
