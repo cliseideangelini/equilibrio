@@ -89,17 +89,14 @@ export function HistoryTimelineWidget({ appointments }: { appointments: any[] })
         );
     }
 
-    // Limit to last 5
-    const recentHistory = appointments.slice(0, 5);
-
     return (
         <div className="glass-card rounded-[2.5rem] p-8 border border-white/10">
             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-8">
                 Linha do Tempo
             </h3>
             
-            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
-                {recentHistory.map((app: any, idx: number) => {
+            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
+                {appointments.map((app: any, idx: number) => {
                     const isCancelled = app.status === 'CANCELLED';
                     
                     return (
