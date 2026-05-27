@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import HomeBookingForm from "@/components/HomeBookingForm";
 import {
   ArrowRight,
   Brain,
@@ -555,59 +556,10 @@ export default function HomePage() {
           {/* WhatsApp-first contact block */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="contato">
 
-            {/* Main WhatsApp CTA — hero card */}
+            {/* Main Booking Form */}
             <div className="reveal lg:col-span-2">
-              <div className="relative glass-card rounded-3xl p-10 sm:p-14 overflow-hidden border border-[#25D366]/20 hover:border-[#25D366]/50 transition-colors duration-500 group">
-                {/* Ambient glow */}
-                <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#25D366]/8 blur-3xl pointer-events-none group-hover:bg-[#25D366]/15 transition-all duration-700" />
-
-                <div className="relative z-10 flex flex-col gap-7">
-                  <div className="w-14 h-14 rounded-2xl bg-[#25D366]/15 border border-[#25D366]/25 flex items-center justify-center">
-                    <MessageCircle className="w-7 h-7 text-[#25D366]" />
-                  </div>
-
-                  <div>
-                    <h3 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-3 leading-tight">
-                      Fale diretamente<br />pelo WhatsApp.
-                    </h3>
-                    <p className="text-muted-foreground text-base leading-relaxed max-w-md">
-                      A forma mais rápida de tirar dúvidas, conhecer meu trabalho e marcar
-                      sua primeira consulta. Respondemos com atenção e agilidade.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <a
-                      href="https://wa.me/5519988275290"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 sm:flex-none"
-                    >
-                      <Button
-                        size="lg"
-                        className="w-full sm:w-auto gap-3 h-14 px-8 text-sm font-bold bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl transition-all duration-300 hover:shadow-[0_0_40px_-8px_rgba(37,211,102,0.6)] hover:-translate-y-0.5 group/btn"
-                      >
-                        <Phone className="w-4 h-4" />
-                        Iniciar conversa
-                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                      </Button>
-                    </a>
-                    <Link href="/agendar">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="w-full sm:w-auto gap-2 h-14 px-8 text-sm font-semibold border-border/70 text-muted-foreground hover:text-foreground hover:bg-surface hover:border-primary/40 rounded-xl transition-all duration-300"
-                      >
-                        <Calendar className="w-4 h-4" />
-                        Agendar online
-                      </Button>
-                    </Link>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground/60">
-                    Atendimento seg–sex, 8h às 20h · Presencial em Limeira–SP e Online
-                  </p>
-                </div>
+              <div className="relative glass-card rounded-3xl overflow-hidden border border-border/40 shadow-dim-lg">
+                <HomeBookingForm />
               </div>
             </div>
 
