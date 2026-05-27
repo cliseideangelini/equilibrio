@@ -58,8 +58,8 @@ const SERVICES = [
     border: "border-blue-400/20",
     hoverBorder: "hover:border-blue-400/50",
     description:
-      "Diagnóstico preciso com instrumentos psicométricos validados. Avaliações para fins clínicos, neuropsicológicos, psicopedagógicos e institucionais.",
-    items: ["TDAH e TEA", "Dificuldades de aprendizagem", "Laudos e relatórios", "Avaliação neuropsicológica"],
+      "Foco estratégico corporativo (B2B), trânsito e transportadoras, além de diagnósticos clínicos com instrumentos psicométricos validados.",
+    items: ["Empresas e corporativo", "Trânsito e transportadoras", "Psicossocial", "Laudos e relatórios"],
   },
 ];
 
@@ -70,8 +70,13 @@ const CREDENTIALS = [
   "Formação em Terapia de Casal",
 ];
 
+const COURSES = [
+  "Resumo de Qualificações / Cursos Complementares (Em breve)",
+  // Adicione outros cursos aqui
+];
+
 const STATS = [
-  { value: "+9",   label: "Anos de experiência", icon: Clock },
+  { value: "12",   label: "Anos de experiência", icon: Clock },
   { value: "+500", label: "Pacientes atendidos",  icon: Users },
   { value: "4",    label: "Especialidades",       icon: Award },
   { value: "100%", label: "Dedicação clínica",    icon: Star },
@@ -169,7 +174,7 @@ export default function HomePage() {
 
               {/* Sub */}
               <p className="animate-fade-up delay-200 text-base sm:text-lg text-muted-foreground leading-relaxed max-w-lg">
-                Mais de <strong className="text-foreground/90 font-semibold">9 anos</strong> de experiência
+                <strong className="text-foreground/90 font-semibold">12 anos</strong> de experiência
                 clínica com base na{" "}
                 <strong className="text-foreground/90 font-semibold">
                   Terapia Cognitivo-Comportamental (TCC)
@@ -244,7 +249,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground/90">Cliseide S. Angelini</p>
-                      <p className="text-xs text-muted-foreground">Psicóloga Clínica · +9 anos de experiência</p>
+                      <p className="text-xs text-muted-foreground">Psicóloga Clínica · 12 anos de experiência</p>
                     </div>
                   </div>
                 </div>
@@ -303,7 +308,7 @@ export default function HomePage() {
             </h2>
             <div className="section-divider" />
             <p className="text-muted-foreground text-base leading-relaxed">
-              Psicóloga clínica com sólida formação acadêmica e mais de 9 anos dedicados
+              Psicóloga clínica com sólida formação acadêmica e 12 anos dedicados
               ao cuidado da saúde mental.
             </p>
           </div>
@@ -327,7 +332,7 @@ export default function HomePage() {
                   , além de acolhimento humano genuíno e respeito à subjetividade de cada paciente.
                 </p>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  Tenho atuado na área clínica desde 2015, atendendo crianças, adolescentes,
+                  Tenho atuado na área clínica desde 2014, atendendo crianças, adolescentes,
                   adultos, idosos, terapia de casal e realizando avaliações psicológicas.
                   Venha conhecer o meu trabalho e{" "}
                   <strong className="text-foreground/90 font-semibold">
@@ -342,6 +347,21 @@ export default function HomePage() {
                   </p>
                   <ul className="flex flex-col gap-2.5">
                     {CREDENTIALS.map((c) => (
+                      <li key={c} className="flex items-center gap-2.5 text-sm text-foreground/80 font-medium">
+                        <CheckCircle className="w-4 h-4 text-primary shrink-0" />
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Courses pills (Placeholder) */}
+                <div className="pt-4 border-t border-border/50">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">
+                    Qualificações e Cursos
+                  </p>
+                  <ul className="flex flex-col gap-2.5">
+                    {COURSES.map((c) => (
                       <li key={c} className="flex items-center gap-2.5 text-sm text-foreground/80 font-medium">
                         <CheckCircle className="w-4 h-4 text-primary shrink-0" />
                         {c}
