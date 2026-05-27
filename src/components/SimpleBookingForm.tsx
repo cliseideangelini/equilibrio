@@ -90,29 +90,34 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
     return (
         <div className="max-w-6xl w-full mx-auto animate-in fade-in slide-in-from-bottom-12 duration-1000">
             {/* Header Estilo Imagem */}
-            <header className="flex items-center justify-between mb-12 bg-[#94A694]/10 p-6 rounded-[2rem] border border-[#94A694]/20">
+            <header className="flex items-center justify-between mb-12 glass-card p-6 rounded-[2rem] border border-white/10 bg-white/5">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#94A694] flex items-center justify-center text-white font-serif italic text-xl">C</div>
-                    <h1 className="text-xl font-light text-[#5A635A] tracking-tight">Cliseide <span className="opacity-40 mx-2">|</span> <span className="font-serif italic">Psicologia</span></h1>
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white border border-white/10 group-hover:bg-primary/20 transition-colors shadow-dim">
+                        <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain shrink-0 invert opacity-90" />
+                    </div>
+                    <div>
+                        <h1 className="text-xl font-serif text-white tracking-tight">Equilíbrio <span className="opacity-40 mx-2 font-sans">|</span> <span className="font-sans text-sm uppercase tracking-widest text-primary font-bold">Agendamento</span></h1>
+                    </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[#94A694]">{patientName}</p>
-                        <p className="text-[8px] font-bold text-stone-400 italic">Sessão Autenticada e Segura</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white">{patientName}</p>
+                        <p className="text-[8px] font-bold text-muted-foreground italic">Sessão Autenticada e Segura</p>
                     </div>
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm bg-[#94A694]/10 flex items-center justify-center text-[#94A694]">
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white shadow-sm">
                          <User size={20} />
                     </div>
                 </div>
             </header>
 
-            <h2 className="text-3xl md:text-5xl font-light text-stone-800 tracking-tight mb-12 text-center">Agendamento <span className="font-serif italic text-stone-500">de Consulta</span></h2>
+            <h2 className="text-3xl md:text-5xl font-serif text-white tracking-tight mb-12 text-center">Agendamento <span className="italic text-primary">de Consulta</span></h2>
 
-            <div className="grid lg:grid-cols-2 gap-10 items-start">
+            <div className="grid lg:grid-cols-2 gap-8 items-start">
                 
                 {/* Coluna 1: Calendário */}
-                <div className="bg-white rounded-[3rem] p-8 shadow-2xl shadow-stone-200/40 border border-stone-50 transition-transform hover:scale-[1.01] duration-500">
-                    <div className="flex items-center justify-center mb-6">
+                <div className="glass-card rounded-[3rem] p-8 border border-white/10 transition-transform hover:border-primary/30 duration-500 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/20 transition-all pointer-events-none" />
+                    <div className="flex items-center justify-center mb-6 relative z-10 dark-calendar-wrapper">
                          <DayPicker
                             mode="single"
                             selected={selectedDate}
@@ -123,104 +128,110 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
                                 { dayOfWeek: [0, 6] }
                             ]}
                             locale={ptBR}
+                            className="text-white"
                         />
                     </div>
                 </div>
 
                 {/* Coluna 2: Modalidade e Horários */}
-                <div className="bg-white rounded-[3rem] p-8 shadow-2xl shadow-stone-200/40 border border-stone-50 min-h-[480px] flex flex-col transition-transform hover:scale-[1.01] duration-500">
+                <div className="glass-card rounded-[3rem] p-8 border border-white/10 min-h-[480px] flex flex-col transition-transform hover:border-primary/30 duration-500 relative overflow-hidden group">
+                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-champagne-500/10 rounded-full -ml-20 -mb-20 blur-3xl group-hover:bg-champagne-500/20 transition-all pointer-events-none" />
                     
-                    {/* Modalidade Selector */}
-                    <div className="mb-8">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 block mb-3 ml-1">Como deseja o atendimento?</label>
-                        <div className="grid grid-cols-2 gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setModality("ONLINE")}
-                                className={cn(
-                                    "flex items-center justify-center gap-2 h-14 rounded-xl font-bold text-xs uppercase tracking-wider transition-all border",
-                                    modality === "ONLINE"
-                                        ? "bg-[#94A694]/10 text-[#5A635A] border-[#94A694]"
-                                        : "bg-stone-50 border-stone-100 text-stone-400 hover:bg-stone-100"
-                                )}
-                            >
-                                <Video size={16} />
-                                Online (Meet)
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setModality("PRESENCIAL")}
-                                className={cn(
-                                    "flex items-center justify-center gap-2 h-14 rounded-xl font-bold text-xs uppercase tracking-wider transition-all border",
-                                    modality === "PRESENCIAL"
-                                        ? "bg-[#94A694]/10 text-[#5A635A] border-[#94A694]"
-                                        : "bg-stone-50 border-stone-100 text-stone-400 hover:bg-stone-100"
-                                )}
-                            >
-                                <MapPin size={16} />
-                                Presencial
-                            </button>
-                        </div>
-                    </div>
-
-                    <h3 className="text-base font-light text-stone-800 mb-6 flex items-center gap-3 border-t border-stone-50 pt-6">
-                        <Clock size={18} className="text-[#94A694]" />
-                        Horários <span className="font-serif italic text-stone-400">disponíveis</span>
-                    </h3>
-
-                    {!selectedDate ? (
-                        <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
-                            <Calendar size={40} className="text-stone-100 mb-4" />
-                            <p className="text-stone-400 text-sm font-medium italic">Selecione uma data no calendário ao lado para ver os horários.</p>
-                        </div>
-                    ) : slotsLoading ? (
-                        <div className="flex-1 flex items-center justify-center">
-                            <Loader2 size={24} className="animate-spin text-[#94A694]" />
-                        </div>
-                    ) : availableSlots.length > 0 ? (
-                        <div className="flex-1 flex flex-col">
-                            <div className="grid grid-cols-2 gap-3 mb-8">
-                                {availableSlots.map((time) => (
-                                    <button
-                                        key={time}
-                                        onClick={() => setSelectedTime(time)}
-                                        className={cn(
-                                            "h-11 rounded-xl font-bold text-[13px] tracking-widest transition-all border border-transparent shadow-sm",
-                                            selectedTime === time 
-                                                ? "bg-[#94A694] text-white shadow-lg shadow-[#94A694]/20" 
-                                                : "bg-[#F2E8DF]/50 text-[#8c786a] hover:bg-[#F2E8DF] hover:shadow-md"
-                                        )}
-                                    >
-                                        {time}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="mt-auto pt-6 border-t border-stone-50">
-                                <Button
-                                    onClick={handleBooking}
-                                    disabled={!selectedTime || loading}
-                                    className="w-full h-14 rounded-xl bg-[#94A694] hover:bg-[#839583] text-white font-bold text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#94A694]/20 transition-all disabled:opacity-30"
+                    <div className="relative z-10">
+                        {/* Modalidade Selector */}
+                        <div className="mb-8">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-3 ml-1">Como deseja o atendimento?</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setModality("ONLINE")}
+                                    className={cn(
+                                        "flex items-center justify-center gap-2 h-14 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border",
+                                        modality === "ONLINE"
+                                            ? "bg-primary/20 text-white border-primary shadow-[0_0_15px_rgba(45,212,191,0.2)]"
+                                            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-white"
+                                    )}
                                 >
-                                    {loading ? <Loader2 className="animate-spin" /> : "Confirmar Agendamento"}
-                                </Button>
-                                <p className="text-[8px] text-stone-400 mt-3 text-center uppercase tracking-widest font-black opacity-40">
-                                    {modality === "ONLINE" ? "Sessão Online via Google Meet" : "Sessão Presencial no Consultório"}
-                                </p>
+                                    <Video size={16} className={modality === "ONLINE" ? "text-primary" : ""} />
+                                    Online (Meet)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setModality("PRESENCIAL")}
+                                    className={cn(
+                                        "flex items-center justify-center gap-2 h-14 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border",
+                                        modality === "PRESENCIAL"
+                                            ? "bg-champagne-500/20 text-white border-champagne-500 shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+                                            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-white"
+                                    )}
+                                >
+                                    <MapPin size={16} className={modality === "PRESENCIAL" ? "text-champagne-500" : ""} />
+                                    Presencial
+                                </button>
                             </div>
                         </div>
-                    ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-                            <Clock size={48} className="text-stone-100 mb-4" />
-                            <p className="text-stone-400 font-medium italic">Infelizmente não há horários disponíveis para este dia.</p>
-                        </div>
-                    )}
+
+                        <h3 className="text-base font-serif text-white mb-6 flex items-center gap-3 border-t border-white/10 pt-6">
+                            <Clock size={18} className="text-primary" />
+                            Horários <span className="italic text-muted-foreground">disponíveis</span>
+                        </h3>
+
+                        {!selectedDate ? (
+                            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 mt-8">
+                                <Calendar size={40} className="text-white/10 mb-4" />
+                                <p className="text-muted-foreground text-sm font-medium">Selecione uma data no calendário ao lado para ver os horários.</p>
+                            </div>
+                        ) : slotsLoading ? (
+                            <div className="flex-1 flex items-center justify-center mt-16">
+                                <Loader2 size={32} className="animate-spin text-primary" />
+                            </div>
+                        ) : availableSlots.length > 0 ? (
+                            <div className="flex-1 flex flex-col">
+                                <div className="grid grid-cols-2 gap-3 mb-8">
+                                    {availableSlots.map((time) => (
+                                        <button
+                                            key={time}
+                                            onClick={() => setSelectedTime(time)}
+                                            className={cn(
+                                                "h-12 rounded-xl font-bold text-sm tracking-widest transition-all border",
+                                                selectedTime === time 
+                                                    ? "bg-primary text-white border-primary shadow-glow" 
+                                                    : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-white"
+                                            )}
+                                        >
+                                            {time}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="mt-auto pt-6 border-t border-white/10">
+                                    <Button
+                                        onClick={handleBooking}
+                                        disabled={!selectedTime || loading}
+                                        className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-xs uppercase tracking-widest shadow-glow hover:shadow-glow-lg hover:-translate-y-1 transition-all disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-glow"
+                                    >
+                                        {loading ? <Loader2 className="animate-spin" /> : "Confirmar Agendamento"}
+                                    </Button>
+                                    <p className="text-[9px] text-muted-foreground mt-4 text-center uppercase tracking-widest font-bold">
+                                        {modality === "ONLINE" ? "Sessão Online via Google Meet" : "Sessão Presencial no Consultório"}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center text-center p-10 mt-8">
+                                <Clock size={48} className="text-white/10 mb-4" />
+                                <p className="text-muted-foreground font-medium">Infelizmente não há horários disponíveis para este dia.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
             
             {/* Footer de Ajuda */}
-            <div className="mt-12 text-center">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-300">Dificuldades para agendar? <a href="https://wa.me/5519988275290" className="text-[#94A694] underline">Fale conosco no WhatsApp</a></p>
+            <div className="mt-12 text-center pb-12 relative z-20">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
+                    Dificuldades para agendar? <a href="https://wa.me/5519988275290" className="text-primary hover:text-white transition-colors">Fale conosco no WhatsApp</a>
+                </p>
             </div>
         </div>
     );

@@ -28,22 +28,26 @@ export default async function BookingPage() {
     const availability = await getPsychologistAvailability();
 
     return (
-        <div className="min-h-screen bg-[#FDFCFB] relative overflow-hidden flex flex-col pt-12">
-            {/* Background Decorative Elements */}
-            <div className="absolute top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-0 w-1/2 h-full bg-[#94A694]/5 blur-[120px]" />
-                <div className="absolute bottom-0 right-0 w-1/2 h-full bg-[#F2E8DF]/20 blur-[120px]" />
+            <div className="min-h-screen bg-[#0A0A0A] text-foreground font-sans relative overflow-x-hidden pt-12">
+            
+            {/* Cinematic Aurora Background - Deep 2026 Style */}
+            <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+                <div className="absolute top-[-20%] left-[10%] w-[60vw] h-[60vw] rounded-full bg-primary/10 blur-[150px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-emeraldGlow-500/10 blur-[130px] animate-pulse delay-1000" />
+                <div className="absolute top-[40%] left-[40%] w-[30vw] h-[30vw] rounded-full bg-champagne-500/5 blur-[100px] animate-pulse delay-700" />
             </div>
 
             {/* Início Link */}
-            <div className="container mx-auto px-10 pt-10">
-                <Link href="/paciente/minha-agenda" className="group inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors">
-                    <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            <div className="container mx-auto px-6 md:px-10 pt-10 relative z-20">
+                <Link href="/paciente/minha-agenda" className="group inline-flex items-center gap-2 text-muted-foreground hover:text-white transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:border-primary/30 transition-all">
+                        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                    </div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Painel do Paciente</span>
                 </Link>
             </div>
 
-            <main className="flex-1 py-12 px-6 flex flex-col items-center">
+            <main className="flex-1 py-12 px-6 flex flex-col items-center relative z-20">
                 <SimpleBookingForm 
                     availabilityRules={availability} 
                     patientName={patient.name} 
