@@ -62,46 +62,7 @@ export function FixedTimeWidget({ patient }: { patient: any }) {
     );
 }
 
-export function FinancialWidget({ appointments }: { appointments: any[] }) {
-    // Only check past appointments or today's appointments
-    const now = new Date();
-    const relevantAppointments = appointments.filter((app: any) => 
-        new Date(app.startTime) <= now && app.status !== 'CANCELLED'
-    );
 
-    const hasPendingPayment = relevantAppointments.some((app: any) => 
-        !app.payment || app.payment.status === 'PENDING'
-    );
-
-    return (
-        <div className="glass-card rounded-3xl p-6 border border-white/10 flex items-center gap-5">
-            <div className={cn(
-                "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border",
-                hasPendingPayment 
-                    ? "bg-red-500/10 text-red-400 border-red-500/20" 
-                    : "bg-emeraldGlow-500/10 text-emeraldGlow-400 border-emeraldGlow-500/20"
-            )}>
-                <CreditCard size={20} />
-            </div>
-            <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Status Financeiro</p>
-                <div className="flex items-center gap-2">
-                    {hasPendingPayment ? (
-                        <>
-                            <AlertCircle size={14} className="text-red-400" />
-                            <span className="font-bold text-sm text-white">Pagamento Pendente</span>
-                        </>
-                    ) : (
-                        <>
-                            <CheckCircle2 size={14} className="text-emeraldGlow-400" />
-                            <span className="font-bold text-sm text-white">Tudo em dia</span>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
 
 export function PolicyWidget() {
     return (

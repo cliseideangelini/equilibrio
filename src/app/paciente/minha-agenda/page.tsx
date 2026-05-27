@@ -9,7 +9,6 @@ import { NextAppointmentWidget } from "./NextAppointmentWidget";
 import { 
     QuickActionsWidget, 
     FixedTimeWidget, 
-    FinancialWidget, 
     PolicyWidget, 
     HistoryTimelineWidget 
 } from "./ActionWidgets";
@@ -95,14 +94,19 @@ export default async function PatientDashboardBento() {
             {/* Main Bento Grid Content */}
             <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20">
                 
-                {/* Greeting Section */}
-                <div className="mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <h1 className="text-5xl md:text-7xl font-serif text-white tracking-tight leading-tight mb-4">
-                        {saudacao}, <span className="text-primary italic">{patient.name.split(' ')[0]}</span>.
-                    </h1>
-                    <p className="text-muted-foreground font-medium text-lg max-w-xl">
-                        Acompanhe suas sessões, gerencie seu agendamento e tenha controle total sobre seu bem-estar, tudo em um só lugar.
-                    </p>
+                {/* Greeting Section with Policy Widget */}
+                <div className="mb-12 flex flex-col lg:flex-row lg:items-center justify-between gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                    <div>
+                        <h1 className="text-5xl md:text-7xl font-serif text-white tracking-tight leading-tight mb-4">
+                            {saudacao}, <span className="text-primary italic">{patient.name.split(' ')[0]}</span>.
+                        </h1>
+                        <p className="text-muted-foreground font-medium text-lg max-w-xl">
+                            Acompanhe suas sessões, gerencie seu agendamento e tenha controle total sobre seu bem-estar, tudo em um só lugar.
+                        </p>
+                    </div>
+                    <div className="w-full lg:w-96 shrink-0">
+                        <PolicyWidget />
+                    </div>
                 </div>
 
                 {/* The Grid */}
@@ -123,25 +127,15 @@ export default async function PatientDashboardBento() {
 
                         {/* Fixed Time / Notice Widget */}
                         <div className="h-auto">
-                            {patient.isFixed ? (
-                                <FixedTimeWidget patient={patient} />
-                            ) : (
-                                <FinancialWidget appointments={pastOrCancelled} />
-                            )}
+                            {patient.isFixed && <FixedTimeWidget patient={patient} />}
                         </div>
 
                     </div>
 
                     {/* Bottom Row */}
                     
-                    {/* Policy / Info Widget (Span 4) */}
-                    <div className="md:col-span-4 lg:col-span-5 flex flex-col gap-6">
-                        {patient.isFixed && <FinancialWidget appointments={pastOrCancelled} />}
-                        <PolicyWidget />
-                    </div>
-
-                    {/* Timeline History Widget (Span 8) */}
-                    <div className="md:col-span-8 lg:col-span-7">
+                    {/* Timeline History Widget (Span 12) */}
+                    <div className="md:col-span-12 lg:col-span-12">
                         <HistoryTimelineWidget appointments={pastOrCancelled} />
                     </div>
 
