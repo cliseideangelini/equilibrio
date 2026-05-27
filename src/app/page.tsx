@@ -84,26 +84,34 @@ export default function Home() {
             <p className="text-primary font-medium mb-4">CRP 123230 | Psicóloga Clínica Especialista em TCC</p>
             <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
               <p>
-                Acredito que a terapia é um processo colaborativo, onde trabalhamos juntos para compreender seus padrões de pensamento e comportamento.
+                A terapia é um processo colaborativo, no qual trabalhamos juntos para compreender e reestruturar seus padrões de pensamento e comportamento.
               </p>
               <p>
-                Com especialização em Terapia Cognitivo-Comportamental (TCC), meu foco é oferecer ferramentas práticas e acolhimento humano para pacientes de todas as idades, incluindo atendimentos infantis, adultos, idosos e acompanhamento para pacientes oncológicos.
+                Por meio de técnicas da Terapia Cognitivo-Comportamental (TCC), apresento e ofereço ferramentas práticas, seguras e eficazes, com embasamento científico que comprova seus resultados, além de acolhimento humano e respeito à subjetividade de cada paciente.
+              </p>
+              <p>
+                Tenho atuado na área clínica desde 2015, atendendo crianças, adolescentes, adultos e idosos, além de realizar terapia de casal e avaliação psicológica.
+              </p>
+              <p>
+                Venha conhecer o meu trabalho e desenvolver o melhor de si.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 mt-10">
+            <div className="grid sm:grid-cols-2 gap-6 mt-10">
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="text-primary w-6 h-6 shrink-0 mt-1" />
                 <div>
                   <h4 className="font-semibold">Abordagem TCC</h4>
-                  <p className="text-sm">Especialista em Terapia Cognitivo-Comportamental.</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Especialista em Terapia Cognitivo-Comportamental.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="text-primary w-6 h-6 shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-semibold">Avaliação Psicológica</h4>
-                  <p className="text-sm">Processos minuciosos de avaliação clínica.</p>
+                  <h4 className="font-semibold">Principais Formações</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Bacharel em Psicologia; Especialização em Terapia Cognitivo-Comportamental; Pós-graduada em Psicopedagogia; Formação em Psico-Oncologia; Capacitação Nacional em Psicologia do Trânsito; Pós-graduanda em Neuropsicologia e outros cursos de menor extensão.
+                  </p>
                 </div>
               </div>
             </div>
