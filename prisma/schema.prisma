@@ -28,6 +28,7 @@ model Psychologist {
   id                 String         @id @default(cuid())
   name               String
   email              String         @unique
+  username           String?        @unique
   password           String         // Senha criptografada
   crp                String
   bio                String

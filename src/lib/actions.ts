@@ -217,17 +217,22 @@ export async function loginPatient(phone: string, password: string) {
     };
 }
 
-export async function loginPsychologist(email: string, password: string) {
-    const psychologist = await prisma.psychologist.findUnique({
-        where: { email }
+export async function loginPsychologist(identifier: string, password: string) {
+    const psychologist = await prisma.psychologist.findFirst({
+        where: {
+            OR: [
+                { email: identifier },
+                { username: identifier }
+            ]
+        }
     });
 
     if (!psychologist) {
-        return { success: false, error: "E-mail ou senha inválidos." };
+        return { success: false, error: "Usuário ou senha inválidos." };
     }
 
     const isValid = await bcrypt.compare(password, psychologist.password);
-    if (!isValid) return { success: false, error: "E-mail ou senha inválidos." };
+    if (!isValid) return { success: false, error: "Usuário ou senha inválidos." };
 
     const cookieStore = await cookies();
     cookieStore.set("admin_id", psychologist.id, { httpOnly: true, secure: true, sameSite: "strict" });

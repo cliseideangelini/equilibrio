@@ -135,14 +135,14 @@ export default function UnifiedLoginForm() {
                         ) : (
                             // Campos do Profissional
                             <div className="space-y-2">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">E-mail Profissional</label>
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Usuário Profissional</label>
                                 <div className="relative">
-                                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
                                     <Input 
-                                        type="email"
+                                        type="text"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="exemplo@email.com"
+                                        placeholder="Seu usuário ou e-mail"
                                         className="h-14 pl-12 rounded-2xl border-white/10 bg-white/5 focus:bg-white/10 focus:ring-primary/20 text-white placeholder-white/20 transition-all"
                                         required
                                     />
