@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import Image from "next/image";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -19,6 +20,7 @@ import {
   Calendar,
   Users,
   Award,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -221,41 +223,30 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* ── Right column: Visual card ── */}
+            {/* ── Right column: Clinic photo ── */}
             <div className="order-1 lg:order-2 animate-fade-up delay-200">
-              <div className="relative">
-                {/* Main card */}
-                <div className="glass-card rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] max-h-[520px] relative group">
-                  {/* Ambient gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-warm/10" />
-                  {/* Center quote */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center gap-6">
-                    <span className="text-7xl font-serif text-primary/40 leading-none select-none">"</span>
-                    <p className="font-serif text-xl sm:text-2xl text-foreground/80 leading-relaxed italic">
-                      A terapia é um processo colaborativo, onde trabalhamos juntos para compreender e transformar seus padrões.
-                    </p>
-                    <div className="section-divider mx-auto" />
-                    <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
-                      Cliseide S. Angelini
-                    </p>
-                    <p className="text-xs text-muted-foreground/70 font-medium">
-                      Psicóloga Clínica · CRP 06/XXXXX
-                    </p>
+              <div className="relative rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] max-h-[560px] group shadow-dim-lg">
+                {/* Photo */}
+                <Image
+                  src="/clinic-office.png"
+                  alt="Consultório da Cliseide S. Angelini — ambiente acolhedor e profissional"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  priority
+                />
+                {/* Gradient overlay bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                {/* Caption pill */}
+                <div className="absolute bottom-5 left-5 right-5">
+                  <div className="glass rounded-2xl px-5 py-4 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
+                      <span className="font-serif text-sm font-bold text-primary">Ψ</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground/90">Cliseide S. Angelini</p>
+                      <p className="text-xs text-muted-foreground">Psicóloga Clínica · +9 anos de experiência</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Floating stat chips */}
-                <div className="absolute -left-4 top-8 glass rounded-2xl px-4 py-3 shadow-dim animate-fade-in delay-600">
-                  <p className="text-2xl font-serif font-bold text-primary">+9</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-0.5">
-                    Anos de experiência
-                  </p>
-                </div>
-                <div className="absolute -right-4 bottom-12 glass rounded-2xl px-4 py-3 shadow-dim animate-fade-in delay-700">
-                  <p className="text-2xl font-serif font-bold text-warm">TCC</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-0.5">
-                    Abordagem científica
-                  </p>
                 </div>
               </div>
             </div>
@@ -512,151 +503,77 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* WhatsApp-first contact block */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="contato">
 
-            {/* Form */}
-            <div className="lg:col-span-3 reveal">
-              <div className="glass-card rounded-3xl p-8 sm:p-10">
-                <h3 className="font-serif text-2xl font-bold text-foreground mb-6">
-                  Envie uma mensagem
-                </h3>
-                <form
-                  className="flex flex-col gap-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    /* Integração futura com Supabase / API */
-                    alert("Mensagem enviada! Entraremos em contato em breve.");
-                  }}
-                >
-                  {/* Nome */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Nome completo *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Seu nome"
-                      className={cn(
-                        "w-full h-12 px-4 rounded-xl text-sm font-medium",
-                        "bg-surface border border-border/60",
-                        "text-foreground placeholder:text-muted-foreground/50",
-                        "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/60",
-                        "transition-all duration-200"
-                      )}
-                    />
+            {/* Main WhatsApp CTA — hero card */}
+            <div className="reveal lg:col-span-2">
+              <div className="relative glass-card rounded-3xl p-10 sm:p-14 overflow-hidden border border-[#25D366]/20 hover:border-[#25D366]/50 transition-colors duration-500 group">
+                {/* Ambient glow */}
+                <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#25D366]/8 blur-3xl pointer-events-none group-hover:bg-[#25D366]/15 transition-all duration-700" />
+
+                <div className="relative z-10 flex flex-col gap-7">
+                  <div className="w-14 h-14 rounded-2xl bg-[#25D366]/15 border border-[#25D366]/25 flex items-center justify-center">
+                    <MessageCircle className="w-7 h-7 text-[#25D366]" />
                   </div>
 
-                  {/* Telefone + Email */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                        WhatsApp *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="(99) 99999-9999"
-                        className={cn(
-                          "w-full h-12 px-4 rounded-xl text-sm font-medium",
-                          "bg-surface border border-border/60",
-                          "text-foreground placeholder:text-muted-foreground/50",
-                          "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/60",
-                          "transition-all duration-200"
-                        )}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                        E-mail
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="seu@email.com"
-                        className={cn(
-                          "w-full h-12 px-4 rounded-xl text-sm font-medium",
-                          "bg-surface border border-border/60",
-                          "text-foreground placeholder:text-muted-foreground/50",
-                          "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/60",
-                          "transition-all duration-200"
-                        )}
-                      />
-                    </div>
+                  <div>
+                    <h3 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-3 leading-tight">
+                      Fale diretamente<br />pelo WhatsApp.
+                    </h3>
+                    <p className="text-muted-foreground text-base leading-relaxed max-w-md">
+                      A forma mais rápida de tirar dúvidas, conhecer meu trabalho e marcar
+                      sua primeira consulta. Respondemos com atenção e agilidade.
+                    </p>
                   </div>
 
-                  {/* Interesse */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Área de interesse *
-                    </label>
-                    <select
-                      required
-                      className={cn(
-                        "w-full h-12 px-4 rounded-xl text-sm font-medium",
-                        "bg-surface border border-border/60",
-                        "text-foreground",
-                        "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/60",
-                        "transition-all duration-200",
-                        "appearance-none cursor-pointer"
-                      )}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <a
+                      href="https://wa.me/5519988275290"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 sm:flex-none"
                     >
-                      <option value="" disabled selected>Selecione uma opção</option>
-                      <option>Terapia Individual</option>
-                      <option>Terapia de Casal</option>
-                      <option>Avaliação Psicológica</option>
-                      <option>Outro / Dúvida</option>
-                    </select>
+                      <Button
+                        size="lg"
+                        className="w-full sm:w-auto gap-3 h-14 px-8 text-sm font-bold bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl transition-all duration-300 hover:shadow-[0_0_40px_-8px_rgba(37,211,102,0.6)] hover:-translate-y-0.5 group/btn"
+                      >
+                        <Phone className="w-4 h-4" />
+                        Iniciar conversa
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </Button>
+                    </a>
+                    <Link href="/agendar">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full sm:w-auto gap-2 h-14 px-8 text-sm font-semibold border-border/70 text-muted-foreground hover:text-foreground hover:bg-surface hover:border-primary/40 rounded-xl transition-all duration-300"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        Agendar online
+                      </Button>
+                    </Link>
                   </div>
 
-                  {/* Mensagem */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Mensagem (opcional)
-                    </label>
-                    <textarea
-                      rows={4}
-                      placeholder="Conte um pouco sobre o que está buscando..."
-                      className={cn(
-                        "w-full px-4 py-3 rounded-xl text-sm font-medium resize-none",
-                        "bg-surface border border-border/60",
-                        "text-foreground placeholder:text-muted-foreground/50",
-                        "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/60",
-                        "transition-all duration-200"
-                      )}
-                    />
-                  </div>
-
-                  {/* Submit */}
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full h-13 gap-2 text-sm font-bold uppercase tracking-wider bg-primary text-white hover:bg-primary/90 hover:shadow-glow rounded-xl transition-all duration-300 group mt-2"
-                  >
-                    Enviar Mensagem
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-
-                  <p className="text-[11px] text-muted-foreground/70 text-center mt-1">
-                    Seus dados são tratados com total sigilo e confidencialidade.
+                  <p className="text-xs text-muted-foreground/60">
+                    Atendimento seg–sex, 8h às 20h · Presencial em Campinas–SP e Online
                   </p>
-                </form>
+                </div>
               </div>
             </div>
 
-            {/* Contact info */}
-            <div className="lg:col-span-2 flex flex-col gap-5" id="contato">
-
-              {/* Quick contact cards */}
+            {/* Contact info sidebar */}
+            <div className="flex flex-col gap-4">
               {CONTACT_INFO.map(({ icon: Icon, label, value, href }) => (
                 <a
                   key={label}
                   href={href}
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="reveal glass-card rounded-2xl p-6 flex items-center gap-4 group"
+                  className="reveal glass-card rounded-2xl p-5 flex items-center gap-4 group"
                 >
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:border-primary transition-colors duration-300">
-                    <Icon className="w-4.5 h-4.5 text-primary group-hover:text-white transition-colors duration-300" />
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:border-primary transition-colors duration-300">
+                    <Icon className="w-4 h-4 text-primary group-hover:text-white transition-colors duration-300" />
                   </div>
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">{label}</p>
@@ -665,31 +582,20 @@ export default function HomePage() {
                 </a>
               ))}
 
-              {/* WhatsApp CTA */}
-              <div className="reveal glass-card rounded-2xl p-8 flex flex-col gap-4 border border-primary/20 hover:border-primary/50 bg-primary/5">
-                <h3 className="font-serif text-xl font-bold text-foreground">
-                  Prefere o WhatsApp?
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Clique abaixo e inicie uma conversa direta. Respondemos com agilidade e
-                  clareza todas as suas dúvidas.
+              {/* Trust badge */}
+              <div className="reveal glass-card rounded-2xl p-5 border border-primary/15 bg-primary/5">
+                <div className="flex items-center gap-2 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-warm text-warm" />
+                  ))}
+                </div>
+                <p className="text-sm font-semibold text-foreground/80 leading-snug">
+                  "Atendimento cuidadoso e resultados reais."
                 </p>
-                <a
-                  href="https://wa.me/5519988275290"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    size="lg"
-                    className="w-full h-12 gap-2 text-sm font-bold bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_-6px_rgba(37,211,102,0.5)]"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Falar no WhatsApp
-                  </Button>
-                </a>
+                <p className="text-xs text-muted-foreground mt-1">— Paciente, 2024</p>
               </div>
-
             </div>
+
           </div>
         </div>
       </section>
@@ -823,12 +729,9 @@ export default function HomePage() {
 
         {/* Bottom bar */}
         <div className="border-t border-border/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-muted-foreground/60 font-medium">
-              © {new Date().getFullYear()} Equilíbrio Psicologia Clínica — Cliseide S. Angelini. Todos os direitos reservados.
-            </p>
-            <p className="text-xs text-muted-foreground/40 font-medium">
-              Feito com cuidado · Campinas, SP
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-center">
+            <p className="text-xs text-muted-foreground/50 font-medium text-center">
+              © {new Date().getFullYear()} Equilíbrio Psicologia Clínica · Cliseide S. Angelini · Todos os direitos reservados.
             </p>
           </div>
         </div>
