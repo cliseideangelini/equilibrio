@@ -43,70 +43,64 @@ export function Navbar() {
 
 
     return (
-        <div className="fixed top-4 left-0 w-full z-50 px-4 sm:px-6 pointer-events-none flex justify-center transition-all duration-500">
+        <div className="fixed top-6 left-0 w-full z-50 px-4 sm:px-8 pointer-events-none flex justify-center transition-all duration-700">
             <header
                 className={cn(
-                    "pointer-events-auto flex items-center justify-between transition-all duration-500 border",
+                    "pointer-events-auto flex items-center justify-between transition-all duration-700",
                     scrolled 
-                        ? "glass-panel py-3 px-6 w-full max-w-5xl rounded-full shadow-glass-lg border-white/40 bg-white/70 backdrop-blur-xl" 
-                        : "py-4 px-2 w-full max-w-7xl rounded-full border-transparent bg-transparent"
+                        ? "glass-panel py-3 px-8 w-full max-w-5xl shadow-dark-glass-lg border-white/10 bg-black/60 backdrop-blur-2xl" 
+                        : "py-4 px-4 w-full max-w-7xl rounded-full border-transparent bg-transparent"
                 )}
             >
-                <Link href="/" className="flex items-center gap-3 group">
-                    <Image
-                        src="/logo.png"
-                        alt="Equilíbrio Logo"
-                        width={32}
-                        height={32}
-                        className="group-hover:scale-110 transition-transform duration-500 object-contain drop-shadow-sm"
-                    />
-                    <span className="text-xl font-bold tracking-tight text-foreground/90 group-hover:text-primary transition-colors">
+                <Link href="/" className="flex items-center gap-4 group">
+                    <div className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 group-hover:bg-primary/20 transition-colors duration-500">
+                        <Image
+                            src="/logo.png"
+                            alt="Equilíbrio Logo"
+                            width={24}
+                            height={24}
+                            className="group-hover:scale-110 transition-transform duration-500 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] invert"
+                        />
+                    </div>
+                    <span className="text-xl font-bold tracking-widest uppercase text-foreground/90 group-hover:text-primary transition-colors font-serif">
                         Equilíbrio
                     </span>
                 </Link>
 
-                <nav className="hidden md:flex items-center gap-8">
-                    <Link href="/#sobre" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
-                        Sobre
-                    </Link>
-                    <Link href="/#servicos" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
-                        Serviços
-                    </Link>
-                    <Link href="/#faq" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
-                        Dúvidas
-                    </Link>
-                    <Link href="/#contato" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
-                        Contato
-                    </Link>
+                <nav className="hidden md:flex items-center gap-10">
+                    {['Sobre', 'Serviços', 'Dúvidas', 'Contato'].map((item) => (
+                        <Link 
+                            key={item}
+                            href={`/#${item.toLowerCase().replace('ú', 'u')}`} 
+                            className="text-[11px] uppercase tracking-[0.2em] font-bold text-muted-foreground hover:text-white hover:-translate-y-0.5 transition-all duration-300 relative group"
+                        >
+                            {item}
+                            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
+                        </Link>
+                    ))}
                 </nav>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                     {isPatient ? (
                         <Link href="/paciente/minha-agenda">
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold hover:bg-primary/10 rounded-full h-10 px-4 transition-all">
+                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary hover:text-white hover:bg-primary/20 rounded-full h-11 px-5 font-bold tracking-wider text-xs transition-all uppercase">
                                 <User className="w-4 h-4" />
                                 Minha Agenda
                             </Button>
                         </Link>
                     ) : (
                         <Link href="/paciente/login">
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full h-10 px-4 transition-all">
+                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-muted-foreground hover:text-white hover:bg-white/10 rounded-full h-11 px-5 font-bold tracking-wider text-xs transition-all uppercase">
                                 <User className="w-4 h-4" />
-                                Portal do Paciente
+                                Paciente
                             </Button>
                         </Link>
                     )}
 
-                    <Link href="/login">
-                        <Button variant="ghost" size="sm" className="hidden lg:flex text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full h-10 px-4 transition-all font-medium">
-                            Área Clínica
-                        </Button>
-                    </Link>
-
                     <Link href="/agendar">
-                        <Button className="shadow-glass gap-2 rounded-full h-10 px-6 font-bold hover:scale-105 hover:shadow-glass-lg transition-all duration-300">
-                            <Calendar className="w-4 h-4" />
+                        <Button className="glass-glow gap-3 rounded-full h-12 px-8 font-bold text-white hover:bg-primary/20 hover:scale-[1.02] transition-all duration-500 uppercase tracking-widest text-xs">
                             Agendar
+                            <Calendar className="w-4 h-4 text-emeraldGlow-400" />
                         </Button>
                     </Link>
                 </div>

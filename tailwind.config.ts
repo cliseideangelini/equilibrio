@@ -43,29 +43,29 @@ export default {
     			border: 'hsl(var(--border))',
     			input: 'hsl(var(--input))',
     			ring: 'hsl(var(--ring))',
-    			chart: {
-    				'1': 'hsl(var(--chart-1))',
-    				'2': 'hsl(var(--chart-2))',
-    				'3': 'hsl(var(--chart-3))',
-    				'4': 'hsl(var(--chart-4))',
-    				'5': 'hsl(var(--chart-5))'
-    			},
-    			sage: {
-    				'50': '#f7f9f8',
-    				'100': '#ebf1ef',
-    				'200': '#d5e2dd',
-    				'300': '#b4cac3',
-    				'400': '#8ebaa8',
-    				'500': '#6b9282',
-    				'600': '#527265',
-    				'700': '#435c52',
-    				'800': '#374b43',
-    				'900': '#2f3f39',
-    				'950': '#192420'
-    			},
-    			teal: {
-    				'950': '#091c1b'
-    			}
+                // Luxury Palette
+                obsidian: {
+                    DEFAULT: '#060A09', // Extremely dark teal/black
+                    500: '#141E1C',
+                    600: '#101816',
+                    700: '#0B1210',
+                    800: '#080D0C',
+                    900: '#060A09',
+                    950: '#030504',
+                },
+                emeraldGlow: {
+                    DEFAULT: '#059669', // Strong emerald
+                    400: '#34D399',
+                    500: '#10B981',
+                    600: '#059669',
+                    800: '#065F46',
+                },
+                champagne: {
+                    DEFAULT: '#F3EAC0', // Soft gold/champagne
+                    300: '#FDE68A',
+                    400: '#FCD34D',
+                    500: '#FBBF24',
+                }
     		},
     		borderRadius: {
     			lg: 'var(--radius)',
@@ -77,15 +77,32 @@ export default {
     		},
             fontFamily: {
                 sans: ['var(--font-jakarta)', 'sans-serif'],
+                serif: ['var(--font-playfair)', 'serif'],
             },
             boxShadow: {
-                'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
-                'glass-sm': '0 4px 16px 0 rgba(31, 38, 135, 0.03)',
-                'glass-lg': '0 12px 48px 0 rgba(31, 38, 135, 0.07)',
-                'floating': '0 20px 40px -15px rgba(0,0,0,0.05)',
+                'dark-glass': '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
+                'dark-glass-sm': '0 4px 16px 0 rgba(0, 0, 0, 0.3)',
+                'dark-glass-lg': '0 16px 48px 0 rgba(0, 0, 0, 0.6)',
+                'glow': '0 0 40px -10px rgba(16, 185, 129, 0.3)',
+                'glow-strong': '0 0 60px -15px rgba(16, 185, 129, 0.5)',
             },
             backgroundImage: {
-                'mesh-gradient': 'radial-gradient(at 40% 20%, hsla(158, 20%, 90%, 1) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(20, 20%, 95%, 1) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(158, 15%, 95%, 1) 0px, transparent 50%)',
+                'aurora': 'radial-gradient(ellipse at 50% -20%, rgba(16, 185, 129, 0.15), transparent 60%), radial-gradient(ellipse at bottom right, rgba(251, 191, 36, 0.05), transparent 40%)',
+            },
+            animation: {
+                'spin-slow': 'spin 15s linear infinite',
+                'fade-in': 'fadeIn 1s ease-out forwards',
+                'float': 'float 6s ease-in-out infinite',
+            },
+            keyframes: {
+                fadeIn: {
+                    '0%': { opacity: '0', transform: 'translateY(10px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                }
             }
     	}
     },
