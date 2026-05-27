@@ -68,11 +68,7 @@ const CREDENTIALS = [
   "Especialização em TCC",
   "Pós-graduação em Psicopedagogia",
   "Formação em Terapia de Casal",
-];
-
-const COURSES = [
-  "Resumo de Qualificações / Cursos Complementares (Em breve)",
-  // Adicione outros cursos aqui
+  "Cursos complementares e Qualificações (Em breve)",
 ];
 
 const STATS = [
@@ -343,25 +339,10 @@ export default function HomePage() {
                 {/* Formation pills */}
                 <div className="mt-auto pt-4 border-t border-border/50">
                   <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">
-                    Formação Acadêmica
+                    Formações e Qualificações
                   </p>
                   <ul className="flex flex-col gap-2.5">
                     {CREDENTIALS.map((c) => (
-                      <li key={c} className="flex items-center gap-2.5 text-sm text-foreground/80 font-medium">
-                        <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                        {c}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Courses pills (Placeholder) */}
-                <div className="pt-4 border-t border-border/50">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">
-                    Qualificações e Cursos
-                  </p>
-                  <ul className="flex flex-col gap-2.5">
-                    {COURSES.map((c) => (
                       <li key={c} className="flex items-center gap-2.5 text-sm text-foreground/80 font-medium">
                         <CheckCircle className="w-4 h-4 text-primary shrink-0" />
                         {c}
