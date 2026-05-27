@@ -6,40 +6,65 @@ import { cn } from "@/lib/utils";
 import { ConditionalShell } from "@/components/ConditionalShell";
 import { Toaster } from "sonner";
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Equilíbrio | Psicologia Clínica - Cliseide S. Angelini",
-  description: "Atendimento psicológico humanizado com base na Terapia Cognitivo-Comportamental. Agende sua consulta com Cliseide S. Angelini.",
-  icons: {
-    icon: "/icon.svg",
-  }
+  title: "Equilíbrio | Psicologia Clínica — Cliseide S. Angelini",
+  description:
+    "Psicologia clínica com base na Terapia Cognitivo-Comportamental (TCC). Atendimento individual, de casal e avaliação psicológica. +9 anos de experiência. Agende sua consulta.",
+  keywords: [
+    "psicologia",
+    "TCC",
+    "terapia cognitivo comportamental",
+    "Cliseide Angelini",
+    "equilíbrio",
+    "psicóloga",
+    "avaliação psicológica",
+    "terapia de casal",
+  ],
+  openGraph: {
+    title: "Equilíbrio | Psicologia Clínica",
+    description:
+      "Cuidado psicológico humanizado com embasamento científico. Agende sua consulta.",
+    type: "website",
+    locale: "pt_BR",
+  },
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className="scroll-smooth dark">
+    <html lang="pt-BR" className="scroll-smooth">
       <body
         className={cn(
           jakarta.variable,
           playfair.variable,
-          "min-h-screen bg-background font-sans antialiased text-foreground selection:bg-primary/30"
+          "min-h-screen bg-background text-foreground font-sans antialiased overflow-x-hidden"
         )}
       >
         <Navbar />
         <main>{children}</main>
         <ConditionalShell />
         <Toaster position="top-center" richColors />
-        <footer className="fixed bottom-4 right-6 pointer-events-none z-[100] hidden md:block">
-          <span className="text-[10px] font-black uppercase tracking-widest text-stone-800 opacity-100 bg-stone-100 px-2 py-1 rounded-md shadow-sm border border-stone-200">
-            v1.4.1
+
+        {/* Version badge — desktop only */}
+        <div className="fixed bottom-4 right-5 pointer-events-none z-[100] hidden md:block">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 bg-surface/60 backdrop-blur px-2 py-1 rounded-md border border-border/30">
+            v2.0
           </span>
-        </footer>
+        </div>
       </body>
     </html>
   );

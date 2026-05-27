@@ -1,110 +1,196 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Calendar, User } from "lucide-react";
+import { Calendar, User, ShieldCheck, AlignJustify, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+/* ── Navigation items ─────────────────────────────────────── */
+const NAV_LINKS = [
+  { label: "Sobre",        href: "/#sobre" },
+  { label: "Serviços",     href: "/#servicos" },
+  { label: "Agendamento",  href: "/#agendamento" },
+  { label: "Contato",      href: "/#contato" },
+];
+
 export function Navbar() {
-    const pathname = usePathname();
-    const [scrolled, setScrolled] = useState(false);
-    const [isPatient, setIsPatient] = useState(false);
-    const router = useRouter();
+  const pathname   = usePathname();
+  const router     = useRouter();
+  const [scrolled,  setScrolled]  = useState(false);
+  const [isPatient, setIsPatient] = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
 
-    useEffect(() => {
-        const checkAuth = () => {
-            setIsPatient(document.cookie.includes("patient_id="));
-        };
-        checkAuth();
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
-        };
-        window.addEventListener("scroll", handleScroll);
-        const interval = setInterval(checkAuth, 2000);
+  /* ── Scroll + auth detection ── */
+  useEffect(() => {
+    const checkAuth   = () => setIsPatient(document.cookie.includes("patient_id="));
+    const handleScroll = () => setScrolled(window.scrollY > 32);
 
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            clearInterval(interval);
-        };
-    }, []);
-
-    const handleLogout = () => {
-        document.cookie = "patient_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        setIsPatient(false);
-        router.push("/");
+    checkAuth();
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    const interval = setInterval(checkAuth, 3000);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearInterval(interval);
     };
+  }, []);
 
-    if (pathname === '/paciente/minha-agenda') return null;
-    if (pathname.startsWith('/area-clinica')) return null;
-    if (pathname === '/login') return null;
+  /* ── Close mobile menu on route change ── */
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
+  /* ── Hidden on internal app pages ── */
+  const hiddenRoutes = [
+    "/paciente/minha-agenda",
+    "/login",
+    "/area-clinica",
+    "/admin",
+  ];
+  if (hiddenRoutes.some((r) => pathname.startsWith(r))) return null;
 
-    return (
-        <div className="fixed top-6 left-0 w-full z-50 px-4 sm:px-8 pointer-events-none flex justify-center transition-all duration-700">
-            <header
-                className={cn(
-                    "pointer-events-auto flex items-center justify-between transition-all duration-700",
-                    scrolled 
-                        ? "glass-panel py-3 px-8 w-full max-w-5xl shadow-dark-glass-lg border-white/10 bg-black/60 backdrop-blur-2xl" 
-                        : "py-4 px-4 w-full max-w-7xl rounded-full border-transparent bg-transparent"
-                )}
+  return (
+    <>
+      {/* ── Fixed header wrapper ─────────────────────── */}
+      <div className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 sm:px-6 pt-4 pointer-events-none">
+        <header
+          className={cn(
+            "pointer-events-auto w-full transition-all duration-500",
+            scrolled
+              ? "max-w-5xl nav-pill rounded-2xl px-5 py-3"
+              : "max-w-7xl px-2 py-4"
+          )}
+        >
+          <div className="flex items-center justify-between gap-4">
+
+            {/* ── Logo ── */}
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 group shrink-0"
+              aria-label="Equilíbrio — Página inicial"
             >
-                <Link href="/" className="flex items-center gap-4 group">
-                    <div className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 group-hover:bg-primary/20 transition-colors duration-500">
-                        <Image
-                            src="/logo.png"
-                            alt="Equilíbrio Logo"
-                            width={24}
-                            height={24}
-                            className="group-hover:scale-110 transition-transform duration-500 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] invert"
-                        />
-                    </div>
-                    <span className="text-xl font-bold tracking-widest uppercase text-foreground/90 group-hover:text-primary transition-colors font-serif">
-                        Equilíbrio
-                    </span>
+              <span
+                className={cn(
+                  "w-8 h-8 rounded-xl flex items-center justify-center border text-sm font-serif font-bold transition-all duration-300",
+                  "bg-primary/10 border-primary/30 text-primary group-hover:bg-primary group-hover:text-white"
+                )}
+              >
+                Ψ
+              </span>
+              <span className="font-serif text-lg font-bold tracking-wide text-foreground/90 group-hover:text-primary transition-colors duration-300">
+                Equilíbrio
+              </span>
+            </Link>
+
+            {/* ── Desktop nav ── */}
+            <nav className="hidden md:flex items-center gap-7" role="navigation">
+              {NAV_LINKS.map(({ label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className="link-underline text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors duration-300"
+                >
+                  {label}
                 </Link>
+              ))}
+            </nav>
 
-                <nav className="hidden md:flex items-center gap-10">
-                    {['Sobre', 'Serviços', 'Dúvidas', 'Contato'].map((item) => (
-                        <Link 
-                            key={item}
-                            href={`/#${item.toLowerCase().replace('ú', 'u')}`} 
-                            className="text-[11px] uppercase tracking-[0.2em] font-bold text-muted-foreground hover:text-white hover:-translate-y-0.5 transition-all duration-300 relative group"
-                        >
-                            {item}
-                            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
-                        </Link>
-                    ))}
-                </nav>
+            {/* ── Desktop CTA group ── */}
+            <div className="hidden md:flex items-center gap-2">
+              {/* Área do Paciente */}
+              <Link href={isPatient ? "/paciente/minha-agenda" : "/paciente/login"}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-surface rounded-xl h-9 px-4 transition-all"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  {isPatient ? "Minha Agenda" : "Área do Paciente"}
+                </Button>
+              </Link>
 
-                <div className="flex items-center gap-4">
-                    {isPatient ? (
-                        <Link href="/paciente/minha-agenda">
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary hover:text-white hover:bg-primary/20 rounded-full h-11 px-5 font-bold tracking-wider text-xs transition-all uppercase">
-                                <User className="w-4 h-4" />
-                                Minha Agenda
-                            </Button>
-                        </Link>
-                    ) : (
-                        <Link href="/paciente/login">
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-muted-foreground hover:text-white hover:bg-white/10 rounded-full h-11 px-5 font-bold tracking-wider text-xs transition-all uppercase">
-                                <User className="w-4 h-4" />
-                                Paciente
-                            </Button>
-                        </Link>
-                    )}
+              {/* Acesso Profissional */}
+              <Link href="/admin">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-surface rounded-xl h-9 px-4 transition-all"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Acesso Profissional
+                </Button>
+              </Link>
 
-                    <Link href="/agendar">
-                        <Button className="glass-glow gap-3 rounded-full h-12 px-8 font-bold text-white hover:bg-primary/20 hover:scale-[1.02] transition-all duration-500 uppercase tracking-widest text-xs">
-                            Agendar
-                            <Calendar className="w-4 h-4 text-emeraldGlow-400" />
-                        </Button>
-                    </Link>
-                </div>
-            </header>
+              {/* Primary CTA */}
+              <Link href="/#agendamento">
+                <Button
+                  size="sm"
+                  className={cn(
+                    "gap-2 rounded-xl h-9 px-5 text-[11px] font-bold uppercase tracking-wider",
+                    "bg-primary text-white hover:bg-primary/90 hover:shadow-glow",
+                    "transition-all duration-300"
+                  )}
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  Agendar Consulta
+                </Button>
+              </Link>
+            </div>
+
+            {/* ── Mobile hamburger ── */}
+            <button
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl border border-border/60 text-muted-foreground hover:text-foreground hover:bg-surface transition-all"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+            >
+              {menuOpen ? <X className="w-4 h-4" /> : <AlignJustify className="w-4 h-4" />}
+            </button>
+          </div>
+        </header>
+      </div>
+
+      {/* ── Mobile menu drawer ───────────────────────── */}
+      <div
+        className={cn(
+          "fixed inset-0 z-40 flex flex-col pt-24 px-5 pb-8 transition-all duration-400 md:hidden",
+          "bg-background/95 backdrop-blur-2xl",
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        )}
+      >
+        <nav className="flex flex-col gap-1 mb-8">
+          {NAV_LINKS.map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
+              className="py-3.5 px-4 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-surface transition-all"
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="mt-auto flex flex-col gap-3">
+          <Link href={isPatient ? "/paciente/minha-agenda" : "/paciente/login"} onClick={() => setMenuOpen(false)}>
+            <Button variant="outline" className="w-full gap-2 rounded-xl h-12 text-xs font-bold uppercase tracking-wider border-border/70 text-muted-foreground hover:text-foreground hover:bg-surface">
+              <User className="w-4 h-4" />
+              {isPatient ? "Minha Agenda" : "Área do Paciente"}
+            </Button>
+          </Link>
+          <Link href="/admin" onClick={() => setMenuOpen(false)}>
+            <Button variant="outline" className="w-full gap-2 rounded-xl h-12 text-xs font-bold uppercase tracking-wider border-border/70 text-muted-foreground hover:text-foreground hover:bg-surface">
+              <ShieldCheck className="w-4 h-4" />
+              Acesso Profissional
+            </Button>
+          </Link>
+          <Link href="/#agendamento" onClick={() => setMenuOpen(false)}>
+            <Button className="w-full gap-2 rounded-xl h-12 text-xs font-bold uppercase tracking-wider bg-primary text-white hover:bg-primary/90 hover:shadow-glow transition-all">
+              <Calendar className="w-4 h-4" />
+              Agendar Consulta
+            </Button>
+          </Link>
         </div>
-    );
+      </div>
+    </>
+  );
 }

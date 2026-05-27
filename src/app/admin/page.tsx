@@ -37,13 +37,13 @@ export default async function AdminDashboard() {
     const adminName = "Administrador";
 
     return (
-        <div className="min-h-screen bg-obsidian text-foreground font-sans relative overflow-hidden pb-20">
+        <div className="min-h-screen bg-background text-foreground font-sans relative overflow-hidden pb-20">
             <AdminNavBar adminName={adminName} />
             
-            {/* Cinematic Aurora Background for Admin */}
-            <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
-                <div className="absolute top-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-emeraldGlow-500/20 blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-20%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-champagne-500/10 blur-[100px] animate-pulse delay-1000" />
+            {/* Ambient orbs */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-30">
+                <div className="absolute top-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-primary/15 blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-20%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-warm/10 blur-[100px] animate-pulse delay-1000" />
             </div>
 
             <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -54,30 +54,30 @@ export default async function AdminDashboard() {
 
                 {/* Stats Grid - Bento Box Style */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div className="glass-panel p-8 bg-emeraldGlow-500/10 border-emeraldGlow-500/30 shadow-glow hover:-translate-y-1 transition-transform duration-500 rounded-[2rem]">
+                    <div className="glass-card p-8 border-primary/30 shadow-glow hover:-translate-y-1 transition-transform duration-500 rounded-[2rem]">
                         <div className="flex flex-row items-center justify-between pb-2">
-                            <h3 className="text-xs font-bold text-emeraldGlow-400 uppercase tracking-widest">Sessões hoje</h3>
-                            <Clock className="w-5 h-5 text-emeraldGlow-400" />
+                            <h3 className="text-xs font-bold text-primary uppercase tracking-widest">Sessões hoje</h3>
+                            <Clock className="w-5 h-5 text-primary" />
                         </div>
                         <div className="mt-4">
                             <div className="text-6xl font-serif text-white">{todayAppointments.length}</div>
                         </div>
                     </div>
 
-                    <div className="glass-panel p-8 border-white/10 shadow-dark-glass hover:-translate-y-1 transition-transform duration-500 rounded-[2rem]">
+                    <div className="glass-card p-8 hover:-translate-y-1 transition-transform duration-500 rounded-[2rem]">
                         <div className="flex flex-row items-center justify-between pb-2">
                             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Aguardando Confirmação</h3>
-                            <AlertCircle className="w-5 h-5 text-champagne-400" />
+                            <AlertCircle className="w-5 h-5 text-warm" />
                         </div>
                         <div className="mt-4">
                             <div className="text-6xl font-serif text-white">{pendingAppointments}</div>
                         </div>
                     </div>
 
-                    <div className="glass-panel p-8 border-white/10 shadow-dark-glass hover:-translate-y-1 transition-transform duration-500 rounded-[2rem]">
+                    <div className="glass-card p-8 hover:-translate-y-1 transition-transform duration-500 rounded-[2rem]">
                         <div className="flex flex-row items-center justify-between pb-2">
                             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total de Pacientes</h3>
-                            <Users className="w-5 h-5 text-white/50" />
+                            <Users className="w-5 h-5 text-muted-foreground" />
                         </div>
                         <div className="mt-4">
                             <div className="text-6xl font-serif text-white">{totalPatients}</div>
@@ -87,18 +87,18 @@ export default async function AdminDashboard() {
 
                 <div className="grid lg:grid-cols-[1fr_400px] gap-8">
                     {/* Lista de hoje */}
-                    <section className="glass-panel p-10 border-white/10 rounded-[3rem]">
-                        <h3 className="text-3xl font-serif mb-8 flex items-center gap-4 text-white">
-                            <Calendar className="w-8 h-8 text-emeraldGlow-400" />
+                    <section className="glass-card p-10 rounded-[3rem]">
+                        <h3 className="text-3xl font-serif mb-8 flex items-center gap-4 text-foreground">
+                            <Calendar className="w-8 h-8 text-primary" />
                             Agenda de Hoje
                         </h3>
 
                         <div className="space-y-4">
                             {todayAppointments.length > 0 ? todayAppointments.map((app: any) => (
-                                <div key={app.id} className="flex items-center gap-6 glass p-6 rounded-3xl border-white/5 hover:bg-white/5 hover:-translate-y-1 transition-all duration-300 group">
-                                    <div className="w-20 h-20 bg-obsidian border border-white/10 rounded-2xl flex flex-col items-center justify-center group-hover:border-emeraldGlow-500/30 transition-colors duration-500 shadow-inner">
+                                <div key={app.id} className="flex items-center gap-6 glass-card p-6 rounded-3xl hover:-translate-y-1 transition-all duration-300 group">
+                                    <div className="w-20 h-20 bg-surface border border-border rounded-2xl flex flex-col items-center justify-center group-hover:border-primary/30 transition-colors duration-500 shadow-inner">
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{format(app.startTime, 'MMM', { locale: ptBR })}</span>
-                                        <span className="text-2xl font-serif text-white">{format(app.startTime, 'HH:mm')}</span>
+                                        <span className="text-2xl font-serif text-foreground">{format(app.startTime, 'HH:mm')}</span>
                                     </div>
 
                                     <div className="flex-1">
@@ -119,9 +119,9 @@ export default async function AdminDashboard() {
                                     </div>
                                 </div>
                             )) : (
-                                <div className="py-24 text-center rounded-[2.5rem] bg-white/5 border border-dashed border-white/10">
-                                    <CalendarCheck className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                                    <p className="text-white/70 font-medium text-lg">Nenhum agendamento para hoje.</p>
+                                <div className="py-24 text-center rounded-[2.5rem] bg-surface/40 border border-dashed border-border">
+                                    <CalendarCheck className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+                                    <p className="text-muted-foreground font-medium text-lg">Nenhum agendamento para hoje.</p>
                                 </div>
                             )}
                         </div>
@@ -129,8 +129,8 @@ export default async function AdminDashboard() {
 
                     {/* Notificações e Atividades */}
                     <section>
-                        <div className="glass-panel p-10 border-white/10 h-full rounded-[3rem]">
-                            <h3 className="text-2xl font-serif mb-8 text-white">Atividades Recentes</h3>
+                        <div className="glass-card p-10 h-full rounded-[3rem]">
+                            <h3 className="text-2xl font-serif mb-8 text-foreground">Atividades Recentes</h3>
                             <div className="space-y-8">
                                 {[
                                     { type: 'new', msg: 'Novo agendamento: Ricardo Santos', time: 'Há 10 min' },
@@ -140,10 +140,10 @@ export default async function AdminDashboard() {
                                     <div key={i} className="flex gap-4 group">
                                         <div className={cn(
                                             "w-3 h-3 rounded-full mt-1.5 shrink-0 shadow-sm transition-transform group-hover:scale-125 duration-300",
-                                            activity.type === 'new' ? "bg-emeraldGlow-400 shadow-glow" : activity.type === 'cancel' ? "bg-red-500" : "bg-champagne-400"
+                                            activity.type === 'new' ? "bg-primary shadow-glow" : activity.type === 'cancel' ? "bg-red-500" : "bg-warm"
                                         )} />
                                         <div>
-                                            <p className="text-sm font-bold text-white/90">{activity.msg}</p>
+                                            <p className="text-sm font-bold text-foreground/90">{activity.msg}</p>
                                             <span className="text-xs text-muted-foreground font-medium">{activity.time}</span>
                                         </div>
                                     </div>

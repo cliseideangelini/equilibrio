@@ -70,17 +70,17 @@ export default async function PatientDashboard() {
     else saudacao = "Boa noite";
 
     return (
-        <div className="fixed inset-0 z-40 flex flex-col md:flex-row overflow-hidden font-sans bg-obsidian text-foreground">
+        <div className="fixed inset-0 z-40 flex flex-col md:flex-row overflow-hidden font-sans bg-background text-foreground">
 
             {/* Sidebar Lateral - Desktop */}
-            <aside className="w-full md:w-96 glass-panel border-r border-white/5 flex flex-col p-8 shrink-0 overflow-y-auto relative z-20">
+            <aside className="w-full md:w-96 glass-card border-r border-border/60 flex flex-col p-8 shrink-0 overflow-y-auto relative z-20">
                 <div className="flex items-center gap-4 mb-10 group">
                     <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:bg-emeraldGlow-500/20 transition-colors">
                         <Image src="/logo.png" alt="Logo" width={32} height={32} className="object-contain shrink-0 invert opacity-90" />
                     </div>
                     <div>
-                        <h2 className="font-serif text-xl text-white leading-none tracking-wide">Equilíbrio</h2>
-                        <p className="text-[10px] uppercase font-bold tracking-widest text-emeraldGlow-400 mt-1">Portal do Paciente</p>
+                        <h2 className="font-serif text-xl text-foreground leading-none tracking-wide">Equilíbrio</h2>
+                        <p className="text-[10px] uppercase font-bold tracking-widest text-primary mt-1">Portal do Paciente</p>
                     </div>
                 </div>
 
@@ -99,9 +99,9 @@ export default async function PatientDashboard() {
                 <div className="mt-8 pt-8 border-t border-white/10 space-y-8">
                     {/* Última Sessão na Sidebar */}
                     {lastPastAppointment && (
-                        <div className="glass-panel p-5 border border-emeraldGlow-500/30 relative overflow-hidden group hover:border-emeraldGlow-500/60 transition-colors">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-emeraldGlow-500/10 rounded-full -mr-10 -mt-10 transition-transform duration-500 group-hover:scale-150 blur-xl" />
-                            <h5 className="font-bold uppercase tracking-widest text-emeraldGlow-400 text-[9px] mb-3 flex items-center gap-1.5 relative z-10">
+                        <div className="glass-card rounded-3xl p-5 border border-primary/30 relative overflow-hidden group hover:border-primary/60 transition-colors">
+                            <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10 transition-transform duration-500 group-hover:scale-150 blur-xl" />
+                            <h5 className="font-bold uppercase tracking-widest text-primary text-[9px] mb-3 flex items-center gap-1.5 relative z-10">
                                 <BellRing size={12} /> Última Atividade
                             </h5>
                             <div className="flex items-center gap-4 relative z-10">
@@ -113,7 +113,7 @@ export default async function PatientDashboard() {
                                     <p className="font-bold text-sm text-white/90">{format(lastPastAppointment.startTime, 'HH:mm')}</p>
                                     <p className={cn(
                                         "text-[9px] font-bold uppercase px-2 py-1 rounded-md flex items-center gap-1 mt-1 border",
-                                        lastPastAppointment.status === 'CANCELLED' ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-emeraldGlow-500/10 text-emeraldGlow-400 border-emeraldGlow-500/20"
+                                        lastPastAppointment.status === 'CANCELLED' ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-primary/10 text-primary border-primary/20"
                                     )}>
                                         {lastPastAppointment.status === 'CANCELLED' ? <XCircle size={10} /> : <CheckCircle2 size={10} />}
                                         {lastPastAppointment.status === 'CANCELLED' ? 'Cancelada' : 'Realizada'}
@@ -125,14 +125,14 @@ export default async function PatientDashboard() {
 
                     <nav className="space-y-3">
                         <Link href="/paciente/perfil">
-                            <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-full font-bold text-muted-foreground hover:text-white hover:bg-white/10 transition-all">
+                            <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-full font-bold text-muted-foreground hover:text-foreground hover:bg-surface transition-all">
                                 <User size={20} />
                                 Meu Perfil
                             </Button>
                         </Link>
 
                         <a href="https://wa.me/5519988275290" target="_blank" className="block">
-                            <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-full font-bold text-muted-foreground hover:text-emeraldGlow-400 hover:bg-emeraldGlow-500/10 transition-all">
+                            <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-full font-bold text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all">
                                 <MessageCircle size={20} />
                                 Falar com a Dra.
                             </Button>
@@ -153,13 +153,13 @@ export default async function PatientDashboard() {
                 </div>
 
                 {/* Banner de Aviso de Política */}
-                <div className="bg-emeraldGlow-500/10 border-b border-emeraldGlow-500/20 py-2 relative overflow-hidden shrink-0 backdrop-blur-md z-20">
+                <div className="bg-primary/10 border-b border-primary/20 py-2 relative overflow-hidden shrink-0 backdrop-blur-md z-20">
                     <div className="whitespace-nowrap flex animate-marquee">
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="inline-flex items-center gap-6 mx-8 text-emeraldGlow-400 font-bold text-[10px] tracking-[0.3em] uppercase">
+                            <div key={i} className="inline-flex items-center gap-6 mx-8 text-primary font-bold text-[10px] tracking-[0.3em] uppercase">
                                 <Info size={14} />
                                 Cancelamentos com menos de 3h de antecedência serão cobrados integralmente
-                                <div className="w-1.5 h-1.5 rounded-full bg-emeraldGlow-500/30" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
                             </div>
                         ))}
                     </div>
@@ -168,10 +168,10 @@ export default async function PatientDashboard() {
                 <div className="flex-1 p-6 md:p-12 lg:p-16 relative z-20">
                     <div className="max-w-6xl mx-auto">
                         {/* Header Interno */}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-16 glass-panel p-10 border-white/5 hover:border-white/10 transition-colors">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-16 glass-card p-10 border-border/60 hover:border-primary/30">
                             <div>
-                                <h1 className="text-4xl md:text-6xl font-serif text-white tracking-tight leading-tight">
-                                    {saudacao}, <span className="text-emeraldGlow-400 italic">{patient.name.split(' ')[0]}</span>.
+                                <h1 className="text-4xl md:text-6xl font-serif text-foreground tracking-tight leading-tight">
+                                    {saudacao}, <span className="text-primary italic">{patient.name.split(' ')[0]}</span>.
                                 </h1>
                                 <p className="text-muted-foreground font-medium text-lg mt-4 max-w-md">
                                     Como você está se sentindo hoje?
@@ -179,7 +179,7 @@ export default async function PatientDashboard() {
                             </div>
                             <div className="flex h-fit">
                                 <Link href="/agendar">
-                                    <Button size="lg" className="rounded-full h-14 px-8 font-bold text-xs tracking-widest uppercase shadow-glow hover:shadow-glow-strong hover:-translate-y-1 transition-all duration-300 bg-white text-obsidian border border-white/20">
+                                    <Button size="lg" className="rounded-full h-14 px-8 font-bold text-xs tracking-widest uppercase shadow-glow hover:shadow-glow-lg hover:-translate-y-1 transition-all duration-300 bg-primary text-white border border-primary/20">
                                         Novo Agendamento
                                     </Button>
                                 </Link>
@@ -192,13 +192,13 @@ export default async function PatientDashboard() {
                                 {/* Sessões Futuras */}
                                 <section>
                                     <div className="flex items-center gap-4 mb-8 pl-4">
-                                        <div className="w-12 h-12 glass-panel border-white/10 flex items-center justify-center text-emeraldGlow-400 shadow-sm">
+                                        <div className="w-12 h-12 glass-card flex items-center justify-center text-primary shadow-sm">
                                             <Calendar size={24} />
                                         </div>
-                                        <h3 className="text-2xl font-serif text-white tracking-tight">Suas Próximas Consultas</h3>
+                                        <h3 className="text-2xl font-serif text-foreground tracking-tight">Suas Próximas Consultas</h3>
                                     </div>
 
-                                    <div className="w-full overflow-x-auto glass-panel border-white/10 shadow-dark-glass">
+                                    <div className="w-full overflow-x-auto glass-card border-border/60 shadow-dim">
                                         <table className="w-full text-left border-collapse">
                                             <thead>
                                                 <tr className="border-b border-white/10 bg-white/5">
@@ -214,7 +214,7 @@ export default async function PatientDashboard() {
                                                     <tr key={app.id} className="hover:bg-white/5 transition-colors group">
                                                         <td className="py-6 px-8 whitespace-nowrap">
                                                             <div className="flex items-center gap-4">
-                                                                <div className="w-12 h-12 bg-obsidian border border-white/10 rounded-[1rem] shadow-sm flex flex-col items-center justify-center text-white font-bold leading-none group-hover:border-emeraldGlow-500/30 transition-colors">
+                                                                <div className="w-12 h-12 bg-surface border border-border rounded-[1rem] shadow-sm flex flex-col items-center justify-center text-foreground font-bold leading-none group-hover:border-primary/30 transition-colors">
                                                                     <span className="text-[10px] uppercase text-muted-foreground mb-0.5">{format(app.startTime, 'MMM', { locale: ptBR })}</span>
                                                                     <span className="text-sm font-serif">{format(app.startTime, 'dd')}</span>
                                                                 </div>
@@ -228,8 +228,8 @@ export default async function PatientDashboard() {
                                                             <span className="text-xl font-serif text-white">{format(app.startTime, 'HH:mm')}</span>
                                                         </td>
                                                         <td className="py-6 px-8 whitespace-nowrap">
-                                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 text-white rounded-full font-bold">
-                                                                <div className="w-2 h-2 rounded-full bg-emeraldGlow-400" />
+                                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-surface/80 border border-border text-foreground rounded-full font-bold">
+                                                                <div className="w-2 h-2 rounded-full bg-primary" />
                                                                 <span className="text-[10px] uppercase tracking-widest">{app.type}</span>
                                                             </div>
                                                         </td>
@@ -243,7 +243,7 @@ export default async function PatientDashboard() {
                                                             <div className="flex items-center justify-end gap-3">
                                                                 {app.type === 'ONLINE' && (
                                                                     app.meetLink ? (
-                                                                        <Button asChild size="sm" className="rounded-full h-11 font-bold bg-emeraldGlow-500 hover:bg-emeraldGlow-600 text-white shadow-glow uppercase tracking-widest text-[10px] px-6 flex items-center gap-2">
+                                                                        <Button asChild size="sm" className="rounded-full h-11 font-bold bg-primary hover:bg-primary/90 text-white shadow-glow uppercase tracking-widest text-[10px] px-6 flex items-center gap-2">
                                                                             <a href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`} target="_blank" rel="noopener noreferrer">
                                                                                 <Video size={16} className="mr-1 inline" />
                                                                                 Acessar
@@ -268,7 +268,7 @@ export default async function PatientDashboard() {
                                                             <p className="text-white font-serif text-2xl mb-2">Nenhuma consulta futura.</p>
                                                             <p className="text-muted-foreground font-medium mb-8">Sua agenda está livre no momento.</p>
                                                             <Link href="/agendar">
-                                                                <Button size="lg" className="rounded-full font-bold px-10 h-14 uppercase tracking-widest text-xs bg-white text-obsidian shadow-glow hover:shadow-glow-strong hover:-translate-y-1 transition-all duration-300">Agendar Agora</Button>
+                                                                <Button size="lg" className="rounded-full font-bold px-10 h-14 uppercase tracking-widest text-xs bg-primary text-white shadow-glow hover:-translate-y-1 transition-all duration-300">Agendar Agora</Button>
                                                             </Link>
                                                         </td>
                                                     </tr>
