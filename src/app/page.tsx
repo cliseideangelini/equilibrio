@@ -79,7 +79,7 @@ const STATS = [
 
 const CONTACT_INFO = [
   { icon: Phone,  label: "WhatsApp",    value: "(19) 98827-5290",              href: "https://wa.me/5519988275290" },
-  { icon: MapPin, label: "Localização", value: "Campinas — SP (Presencial)",   href: "#" },
+  { icon: MapPin, label: "Localização", value: "Limeira — SP (Presencial)",   href: "#" },
   { icon: Clock,  label: "Horários",    value: "Seg–Sex: 8h às 20h",           href: "#" },
 ];
 
@@ -481,6 +481,55 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
+          FAQ / DÚVIDAS FREQUENTES
+      ══════════════════════════════════════════════ */}
+      <section
+        id="faq"
+        className="py-24 sm:py-32 px-4 sm:px-6"
+        aria-label="Dúvidas Frequentes"
+      >
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16 reveal">
+            <SectionLabel>Dúvidas Frequentes</SectionLabel>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-foreground leading-tight mb-5">
+              Perguntas comuns
+            </h2>
+            <div className="section-divider mx-auto" />
+          </div>
+
+          <div className="flex flex-col gap-4 reveal">
+            {[
+              {
+                q: "Qual o tempo de duração da sessão?",
+                a: "As sessões têm duração média de 30 a 50 minutos, tempo ideal para desenvolvermos o trabalho terapêutico de forma focada e produtiva."
+              },
+              {
+                q: "Como funciona o cancelamento ou falta?",
+                a: "A sessão desmarcada sem antecedência ou em caso de falta será cobrada integralmente, pois o horário fica reservado exclusivamente para você."
+              },
+              {
+                q: "Qual o valor da consulta e formas de pagamento?",
+                a: "Os valores podem ser consultados diretamente via WhatsApp ou no momento da consulta. Aceitamos Dinheiro, Pix, Cartão de Crédito e Débito."
+              },
+              {
+                q: "Atende por convênio médico?",
+                a: "Somos credenciados aos convênios Doctor Prime e Saúde Bradesco. Nos atendimentos particulares, oferecemos descontos especiais para conveniados Unimed, Hapvida e Frei Galvão, assim como nos pacotes de 4 sessões."
+              },
+            ].map((faq, i) => (
+              <div key={i} className="glass-card rounded-2xl p-6 sm:p-8 border border-border/40 hover:border-primary/30 transition-colors duration-300">
+                <h3 className="font-serif text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
+                  {faq.q}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed pl-3.5 border-l border-border/40">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
           AGENDAMENTO / CONTATO
       ══════════════════════════════════════════════ */}
       <section
@@ -556,7 +605,7 @@ export default function HomePage() {
                   </div>
 
                   <p className="text-xs text-muted-foreground/60">
-                    Atendimento seg–sex, 8h às 20h · Presencial em Campinas–SP e Online
+                    Atendimento seg–sex, 8h às 20h · Presencial em Limeira–SP e Online
                   </p>
                 </div>
               </div>
@@ -708,7 +757,7 @@ export default function HomePage() {
             <ul className="flex flex-col gap-3">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-primary/70" />
-                Campinas — SP
+                Limeira — SP
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Phone className="w-4 h-4 shrink-0 mt-0.5 text-primary/70" />
