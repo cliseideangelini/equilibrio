@@ -228,10 +228,10 @@ export default function HomePage() {
               <div className="relative rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] max-h-[560px] group shadow-dim-lg">
                 {/* Photo */}
                 <Image
-                  src="/clinic-office.png"
-                  alt="Consultório da Cliseide S. Angelini — ambiente acolhedor e profissional"
+                  src="/cliseide.png"
+                  alt="Cliseide S. Angelini — Psicóloga Clínica, especialista em TCC"
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
                 {/* Gradient overlay bottom */}
