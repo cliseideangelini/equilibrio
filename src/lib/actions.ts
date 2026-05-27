@@ -377,6 +377,9 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     // Lógica de Lista de Espera: Notificar interessados
     try {
+        const timeStr = format(appointment.startTime, 'HH:mm');
+        const startTimeStr = format(appointment.startTime, 'yyyy-MM-dd');
+        
         // 1. Prioridade: Quem pediu ESSE horário específico
         const specificInterested = await (prisma as any).waitingList.findMany({
             where: {
