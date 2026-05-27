@@ -14,7 +14,7 @@ export default async function BookingPage() {
     const patientId = cookieStore.get("patient_id")?.value;
 
     if (!patientId) {
-        redirect("/paciente/login?redirect=/agendar");
+        redirect("/login?redirect=/agendar");
     }
 
     const patient = await prisma.patient.findUnique({
@@ -22,7 +22,7 @@ export default async function BookingPage() {
     });
 
     if (!patient) {
-        redirect("/paciente/login?redirect=/agendar");
+        redirect("/login?redirect=/agendar");
     }
 
     const availability = await getPsychologistAvailability();

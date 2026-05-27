@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/paciente') && !pathname.startsWith('/paciente/login') && !pathname.startsWith('/paciente/cadastro')) {
     const patientId = request.cookies.get('patient_id')?.value;
     if (!patientId) {
-      return NextResponse.redirect(new URL('/paciente/login', request.url));
+      return NextResponse.redirect(new URL(`/login?redirect=${encodeURIComponent(pathname)}`, request.url));
     }
   }
 

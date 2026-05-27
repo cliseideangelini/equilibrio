@@ -1,30 +1,56 @@
 "use client";
 
 import { useState } from "react";
-import { loginPsychologist } from "@/lib/actions";
+import { loginPatient, loginPsychologist } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Lock, Mail, ArrowRight } from "lucide-react";
+import { Loader2, Lock, Mail, ArrowRight, Phone, MessageSquare, ShieldCheck, User } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
-export default function AdminLoginPage() {
+export default function UnifiedLoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    
+    // Configurações de Redirecionamento
+    const redirectTo = searchParams.get("redirect") || "/paciente/minha-agenda";
+    const initialRole = searchParams.get("role") === "professional" ? "professional" : "patient";
+
+    const [role, setRole] = useState<"patient" | "professional">(initialRole);
     const [loading, setLoading] = useState(false);
+    
+    // States do Paciente
+    const [phone, setPhone] = useState("");
+    
+    // States do Profissional
     const [email, setEmail] = useState("");
+    
+    // Senha comum
     const [password, setPassword] = useState("");
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const result = await loginPsychologist(email, password);
-            if (result.success) {
-                toast.success("Login realizado com sucesso!");
-                router.push("/area-clinica");
+            if (role === "patient") {
+                const result = await loginPatient(phone, password);
+                if (result.success) {
+                    toast.success("Bem-vindo de volta!");
+                    router.push(redirectTo);
+                } else {
+                    toast.error(result.error);
+                }
             } else {
-                toast.error(result.error);
+                const result = await loginPsychologist(email, password);
+                if (result.success) {
+                    toast.success("Acesso administrativo autorizado!");
+                    router.push("/area-clinica");
+                } else {
+                    toast.error(result.error);
+                }
             }
         } catch (error) {
             toast.error("Erro ao realizar login.");
@@ -34,54 +60,114 @@ export default function AdminLoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center p-6 relative overflow-hidden">
-            {/* Background Decorative */}
-            <div className="absolute top-0 left-0 w-full h-full -z-10">
-                <div className="absolute top-0 left-0 w-1/2 h-full bg-[#94A694]/5 blur-[120px]" />
-                <div className="absolute bottom-0 right-0 w-1/2 h-full bg-[#F2E8DF]/20 blur-[120px]" />
+        <div className="min-h-screen bg-[#121312] text-foreground flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+            
+            {/* Cinematic Aurora Background */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                <div className="absolute top-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-primary/20 blur-[150px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-emeraldGlow-500/10 blur-[120px] animate-pulse delay-1000" />
             </div>
 
-            <div className="max-w-md w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-stone-200/50 border border-stone-100">
-                    <div className="text-center mb-10">
-                        <div className="w-16 h-16 rounded-full bg-[#94A694]/10 flex items-center justify-center mx-auto mb-6">
-                            <Lock className="text-[#94A694]" size={28} />
+            <div className="max-w-md w-full z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                
+                {/* Logo / Header */}
+                <div className="text-center mb-10 flex flex-col items-center">
+                    <Link href="/" className="flex items-center gap-3 mb-4 group">
+                        <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:bg-primary/20 transition-all shadow-md">
+                            <Image src="/logo.png" alt="Logo" width={28} height={28} className="object-contain shrink-0 invert opacity-90" />
                         </div>
-                        <h1 className="text-3xl font-serif italic text-stone-800 mb-2">Área Clínica</h1>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Portal Administrativo</p>
+                        <span className="font-serif text-2xl text-foreground tracking-wide leading-none">Equilíbrio</span>
+                    </Link>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Conexão Segura & Criptografada</p>
+                </div>
+
+                {/* Main Card */}
+                <div className="glass-card rounded-[2.5rem] p-10 border border-white/10 bg-black/40 backdrop-blur-2xl shadow-dim-lg">
+                    
+                    {/* Tab Switcher */}
+                    <div className="grid grid-cols-2 p-1.5 bg-white/5 rounded-2xl border border-white/5 mb-8">
+                        <button
+                            type="button"
+                            onClick={() => { setRole("patient"); setPassword(""); }}
+                            className={cn(
+                                "py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2",
+                                role === "patient" 
+                                    ? "bg-primary text-white shadow-lg" 
+                                    : "text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            <User size={14} />
+                            Paciente
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setRole("professional"); setPassword(""); }}
+                            className={cn(
+                                "py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2",
+                                role === "professional" 
+                                    ? "bg-primary text-white shadow-lg" 
+                                    : "text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            <ShieldCheck size={14} />
+                            Profissional
+                        </button>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">E-mail Profissional</label>
-                            <div className="relative">
-                                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
-                                <Input 
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="exemplo@email.com"
-                                    className="h-14 pl-12 rounded-2xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20"
-                                    required
-                                />
+                        
+                        {role === "patient" ? (
+                            // Campos do Paciente
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">WhatsApp</label>
+                                <div className="relative">
+                                    <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                    <Input 
+                                        type="text"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        placeholder="(00) 00000-0000"
+                                        className="h-14 pl-12 rounded-2xl border-white/10 bg-white/5 focus:bg-white/10 focus:ring-primary/20 text-white placeholder-white/20 transition-all"
+                                        required
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            // Campos do Profissional
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">E-mail Profissional</label>
+                                <div className="relative">
+                                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                    <Input 
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="exemplo@email.com"
+                                        className="h-14 pl-12 rounded-2xl border-white/10 bg-white/5 focus:bg-white/10 focus:ring-primary/20 text-white placeholder-white/20 transition-all"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="space-y-2">
                             <div className="flex justify-between items-center px-1">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-stone-400">Senha</label>
-                                <Link href="/recuperar-senha" size="sm" className="text-[9px] font-bold text-[#94A694] hover:underline">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Senha</label>
+                                <Link 
+                                    href="/recuperar-senha" 
+                                    className="text-[9px] font-bold text-primary hover:underline uppercase tracking-wider"
+                                >
                                     Esqueceu a senha?
                                 </Link>
                             </div>
                             <div className="relative">
-                                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
+                                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
                                 <Input 
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="h-14 pl-12 rounded-2xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20"
+                                    className="h-14 pl-12 rounded-2xl border-white/10 bg-white/5 focus:bg-white/10 focus:ring-primary/20 text-white placeholder-white/20 transition-all"
                                     required
                                 />
                             </div>
@@ -90,22 +176,35 @@ export default function AdminLoginPage() {
                         <Button 
                             type="submit" 
                             disabled={loading}
-                            className="w-full h-14 rounded-2xl bg-[#94A694] hover:bg-[#839583] text-white font-bold text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#94A694]/20 transition-all flex items-center justify-center gap-2 group"
+                            className="w-full h-15 rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-xs uppercase tracking-[0.2em] shadow-glow hover:shadow-glow-lg transition-all flex items-center justify-center gap-2 group py-7"
                         >
                             {loading ? <Loader2 className="animate-spin" /> : (
                                 <>
-                                    Entrar no Painel
+                                    {role === "patient" ? "Acessar Consultas" : "Entrar no Painel"}
                                     <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                                 </>
                             )}
                         </Button>
                     </form>
 
-                    <div className="mt-8 text-center">
-                        <Link href="/" className="text-[10px] font-bold text-stone-400 hover:text-stone-800 transition-colors uppercase tracking-widest">
-                            Voltar para o site
-                        </Link>
-                    </div>
+                    {role === "patient" && (
+                        <div className="mt-10 pt-10 border-t border-white/5 text-center space-y-4">
+                            <p className="text-[10px] text-muted-foreground font-medium">Ainda não tem uma conta?</p>
+                            <Link 
+                                href={`/paciente/cadastro${redirectTo !== "/paciente/minha-agenda" ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`} 
+                                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-colors"
+                            >
+                                Criar Conta e Agendar
+                                <ArrowRight size={12} />
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-8 text-center">
+                    <Link href="/" className="text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest">
+                        Voltar para o Início
+                    </Link>
                 </div>
             </div>
         </div>
