@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import HomeBookingForm from "@/components/HomeBookingForm";
 import {
   ArrowRight,
   Brain,
@@ -22,6 +21,7 @@ import {
   Users,
   Award,
   MessageCircle,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -556,10 +556,50 @@ export default function HomePage() {
           {/* WhatsApp-first contact block */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="contato">
 
-            {/* Main Booking Form */}
+            {/* Patient Portal CTA */}
             <div className="reveal lg:col-span-2">
-              <div className="relative glass-card rounded-3xl overflow-hidden border border-border/40 shadow-dim-lg">
-                <HomeBookingForm />
+              <div className="relative glass-card rounded-3xl p-10 sm:p-14 overflow-hidden border border-primary/20 hover:border-primary/50 transition-colors duration-500 group h-full flex flex-col justify-center">
+                {/* Ambient glow */}
+                <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-primary/10 blur-3xl pointer-events-none group-hover:bg-primary/20 transition-all duration-700" />
+
+                <div className="relative z-10 flex flex-col gap-8">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <Calendar className="w-7 h-7 text-primary" />
+                  </div>
+
+                  <div>
+                    <h3 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-4 leading-tight">
+                      Acesse o Portal do Paciente<br />para agendar sua consulta.
+                    </h3>
+                    <p className="text-muted-foreground text-base leading-relaxed max-w-lg">
+                      O agendamento é feito de forma 100% online, rápida e segura.
+                      Entre na sua conta ou cadastre-se para escolher o melhor dia e horário
+                      para o seu atendimento.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    <Link href="/paciente/login" className="flex-1 sm:flex-none">
+                      <Button
+                        size="lg"
+                        className="w-full sm:w-auto gap-3 h-14 px-8 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl transition-all duration-300 hover:shadow-dim-lg hover:-translate-y-0.5 group/btn"
+                      >
+                        <User className="w-4 h-4" />
+                        Fazer Login
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+                    <Link href="/paciente/cadastro" className="flex-1 sm:flex-none">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full sm:w-auto gap-2 h-14 px-8 text-sm font-semibold border-border/70 text-foreground hover:bg-surface hover:border-primary/40 rounded-xl transition-all duration-300"
+                      >
+                        Criar Conta
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
 
