@@ -51,27 +51,42 @@ export default {
     				'5': 'hsl(var(--chart-5))'
     			},
     			sage: {
-    				'50': '#f4f7f5',
-    				'100': '#e5edea',
-    				'200': '#cedcd6',
-    				'300': '#a8beb4',
-    				'400': '#87a99c',
-    				'500': '#68897d',
-    				'600': '#526e63',
-    				'700': '#435951',
-    				'800': '#384942',
-    				'900': '#303e39',
-    				'950': '#1a2320'
+    				'50': '#f7f9f8',
+    				'100': '#ebf1ef',
+    				'200': '#d5e2dd',
+    				'300': '#b4cac3',
+    				'400': '#8ebaa8',
+    				'500': '#6b9282',
+    				'600': '#527265',
+    				'700': '#435c52',
+    				'800': '#374b43',
+    				'900': '#2f3f39',
+    				'950': '#192420'
     			},
     			teal: {
-    				'950': '#0d1f1f'
+    				'950': '#091c1b'
     			}
     		},
     		borderRadius: {
     			lg: 'var(--radius)',
     			md: 'calc(var(--radius) - 2px)',
-    			sm: 'calc(var(--radius) - 4px)'
-    		}
+    			sm: 'calc(var(--radius) - 4px)',
+                '2xl': '1.5rem',
+                '3xl': '2rem',
+                '4xl': '3rem',
+    		},
+            fontFamily: {
+                sans: ['var(--font-jakarta)', 'sans-serif'],
+            },
+            boxShadow: {
+                'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
+                'glass-sm': '0 4px 16px 0 rgba(31, 38, 135, 0.03)',
+                'glass-lg': '0 12px 48px 0 rgba(31, 38, 135, 0.07)',
+                'floating': '0 20px 40px -15px rgba(0,0,0,0.05)',
+            },
+            backgroundImage: {
+                'mesh-gradient': 'radial-gradient(at 40% 20%, hsla(158, 20%, 90%, 1) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(20, 20%, 95%, 1) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(158, 15%, 95%, 1) 0px, transparent 50%)',
+            }
     	}
     },
     plugins: [require("tailwindcss-animate")],

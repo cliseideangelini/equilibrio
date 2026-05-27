@@ -43,37 +43,39 @@ export function Navbar() {
 
 
     return (
-        <header
-            className={cn(
-                "fixed top-0 w-full z-50 transition-all duration-300",
-                scrolled ? "glass py-3" : "bg-transparent py-5"
-            )}
-        >
-            <div className="container mx-auto px-6 flex items-center justify-between">
+        <div className="fixed top-4 left-0 w-full z-50 px-4 sm:px-6 pointer-events-none flex justify-center transition-all duration-500">
+            <header
+                className={cn(
+                    "pointer-events-auto flex items-center justify-between transition-all duration-500 border",
+                    scrolled 
+                        ? "glass-panel py-3 px-6 w-full max-w-5xl rounded-full shadow-glass-lg border-white/40 bg-white/70 backdrop-blur-xl" 
+                        : "py-4 px-2 w-full max-w-7xl rounded-full border-transparent bg-transparent"
+                )}
+            >
                 <Link href="/" className="flex items-center gap-3 group">
                     <Image
                         src="/logo.png"
                         alt="Equilíbrio Logo"
-                        width={36}
-                        height={36}
-                        className="group-hover:scale-110 transition-transform duration-300 object-contain"
+                        width={32}
+                        height={32}
+                        className="group-hover:scale-110 transition-transform duration-500 object-contain drop-shadow-sm"
                     />
-                    <span className="text-xl font-bold tracking-tight text-foreground">
+                    <span className="text-xl font-bold tracking-tight text-foreground/90 group-hover:text-primary transition-colors">
                         Equilíbrio
                     </span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link href="/#sobre" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#sobre" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
                         Sobre
                     </Link>
-                    <Link href="/#servicos" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#servicos" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
                         Serviços
                     </Link>
-                    <Link href="/#faq" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#faq" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
                         Dúvidas
                     </Link>
-                    <Link href="/#contato" className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/#contato" className="text-[13px] font-semibold text-muted-foreground hover:text-primary hover:scale-105 transition-all">
                         Contato
                     </Link>
                 </nav>
@@ -81,14 +83,14 @@ export function Navbar() {
                 <div className="flex items-center gap-2">
                     {isPatient ? (
                         <Link href="/paciente/minha-agenda">
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold bg-primary/5 rounded-xl">
+                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold hover:bg-primary/10 rounded-full h-10 px-4 transition-all">
                                 <User className="w-4 h-4" />
                                 Minha Agenda
                             </Button>
                         </Link>
                     ) : (
                         <Link href="/paciente/login">
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-primary font-bold">
+                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full h-10 px-4 transition-all">
                                 <User className="w-4 h-4" />
                                 Portal do Paciente
                             </Button>
@@ -96,19 +98,19 @@ export function Navbar() {
                     )}
 
                     <Link href="/login">
-                        <Button variant="ghost" size="sm" className="hidden sm:flex text-muted-foreground hover:text-primary transition-colors font-medium">
+                        <Button variant="ghost" size="sm" className="hidden lg:flex text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full h-10 px-4 transition-all font-medium">
                             Área Clínica
                         </Button>
                     </Link>
 
                     <Link href="/agendar">
-                        <Button className="shadow-lg shadow-primary/20 gap-2 rounded-xl">
+                        <Button className="shadow-glass gap-2 rounded-full h-10 px-6 font-bold hover:scale-105 hover:shadow-glass-lg transition-all duration-300">
                             <Calendar className="w-4 h-4" />
                             Agendar
                         </Button>
                     </Link>
                 </div>
-            </div>
-        </header>
+            </header>
+        </div>
     );
 }

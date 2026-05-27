@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { ConditionalShell } from "@/components/ConditionalShell";
 import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
 
 export const metadata: Metadata = {
   title: "Equilíbrio | Psicologia Clínica - Cliseide S. Angelini",
@@ -25,8 +25,8 @@ export default function RootLayout({
     <html lang="pt-BR" className="scroll-smooth">
       <body
         className={cn(
-          inter.variable,
-          "min-h-screen bg-background font-sans antialiased"
+          jakarta.variable,
+          "min-h-screen bg-background font-sans antialiased bg-mesh-gradient selection:bg-primary/20"
         )}
       >
         <Navbar />

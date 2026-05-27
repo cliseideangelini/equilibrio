@@ -3,35 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 3.9%;
+  --background: 0 0% 99%;
+  --foreground: 0 0% 12%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 3.9%;
+  --card-foreground: 0 0% 12%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 3.9%;
-  --primary: 158 15% 38%;
+  --popover-foreground: 0 0% 12%;
+  --primary: 158 15% 35%;
   --primary-foreground: 0 0% 98%;
-  --secondary: 0 0% 96.1%;
-  --secondary-foreground: 0 0% 9%;
-  --muted: 0 0% 96.1%;
-  --muted-foreground: 0 0% 45.1%;
-  --accent: 160 15% 92%;
-  --accent-foreground: 0 0% 9%;
+  --secondary: 40 15% 96%;
+  --secondary-foreground: 0 0% 15%;
+  --muted: 150 10% 96%;
+  --muted-foreground: 150 5% 45%;
+  --accent: 158 15% 94%;
+  --accent-foreground: 0 0% 12%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 89.8%;
-  --input: 0 0% 89.8%;
-  --ring: 0 0% 3.9%;
-  --radius: 1rem;
+  --border: 150 10% 90%;
+  --input: 150 10% 92%;
+  --ring: 158 15% 35%;
+  --radius: 1.25rem;
 }
 
 @layer base {
   * { @apply border-border; }
-  body { @apply bg-[#FDFCFB] text-foreground antialiased font-sans; }
+  body { 
+    @apply bg-background text-foreground antialiased font-sans;
+    background-color: hsl(var(--background));
+    background-attachment: fixed;
+  }
 }
 
 .glass {
-  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
+  @apply bg-white/60 backdrop-blur-xl border border-white/40 shadow-glass;
+}
+
+.glass-panel {
+  @apply bg-white/80 backdrop-blur-2xl border border-white/50 shadow-glass-lg rounded-[2rem];
 }
 
 @keyframes marquee {
@@ -52,8 +60,8 @@
 
 /* React Day Picker v9 Grid Fix */
 .rdp-root {
-  --rdp-accent-color: #94A694;
-  --rdp-accent-background-color: #F2E8DF;
+  --rdp-accent-color: hsl(var(--primary));
+  --rdp-accent-background-color: hsl(var(--secondary));
   --rdp-day-button-width: 44px;
   --rdp-day-button-height: 44px;
   --rdp-selected-color: white;
@@ -66,29 +74,20 @@
   border-collapse: separate !important;
 }
 
-.rdp-weekdays {
-  display: table-header-group !important;
-}
-
+.rdp-weekdays { display: table-header-group !important; }
 .rdp-weekday {
   display: table-cell !important;
   text-align: center !important;
-  font-size: 9px !important;
-  font-weight: 900 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.2em !important;
-  color: #d1d5db !important;
+  letter-spacing: 0.15em !important;
+  color: hsl(var(--muted-foreground)) !important;
   padding-bottom: 1rem !important;
 }
 
-.rdp-weeks {
-  display: table-row-group !important;
-}
-
-.rdp-week {
-  display: table-row !important;
-}
-
+.rdp-weeks { display: table-row-group !important; }
+.rdp-week { display: table-row !important; }
 .rdp-day {
   display: table-cell !important;
   text-align: center !important;
@@ -102,7 +101,7 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   font-weight: 500 !important;
   border: none !important;
   background: transparent !important;
@@ -110,38 +109,36 @@
 }
 
 .rdp-day_button:hover:not(.rdp-day_selected_button):not(.rdp-day_disabled_button) {
-  background-color: #F2E8DF !important;
-  color: #8c786a !important;
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+  transform: scale(1.05) !important;
 }
 
 .rdp-day_selected .rdp-day_button {
-  background-color: #94A694 !important;
+  background-color: hsl(var(--primary)) !important;
   color: white !important;
-  font-weight: 800 !important;
-  box-shadow: 0 10px 15px -3px rgba(148, 166, 148, 0.3) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 8px 16px -4px hsla(var(--primary), 0.4) !important;
+  transform: scale(1.05) !important;
 }
 
 .rdp-day_today .rdp-day_button {
-  color: #94A694 !important;
+  color: hsl(var(--primary)) !important;
   font-weight: 800 !important;
-  border: 1px solid #94A694 !important;
+  border: 1px solid hsl(var(--primary)) !important;
 }
 
 .rdp-caption_label {
-  font-family: serif !important;
-  font-style: italic !important;
+  font-family: inherit !important;
+  font-weight: 700 !important;
   font-size: 1.25rem !important;
-  color: #1f2937 !important;
-  text-transform: lowercase !important;
-}
-
-.rdp-caption_label::first-letter {
-  text-transform: uppercase !important;
+  color: hsl(var(--foreground)) !important;
+  text-transform: capitalize !important;
 }
 
 .rdp-nav {
   display: flex !important;
-  gap: 1rem !important;
+  gap: 0.5rem !important;
 }
 
 .rdp-nav_button {
@@ -152,12 +149,13 @@
   align-items: center !important;
   justify-content: center !important;
   background: transparent !important;
-  border: none !important;
-  color: #9ca3af !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--muted-foreground)) !important;
   cursor: pointer !important;
+  transition: all 0.3s ease !important;
 }
 
 .rdp-nav_button:hover {
-  background-color: #F2E8DF !important;
-  color: #1f2937 !important;
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--foreground)) !important;
 }
