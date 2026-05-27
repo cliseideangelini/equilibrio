@@ -20,11 +20,12 @@ import {
 } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Calendar, Clock, ChevronLeft, User, Phone, Lock, Mail, ArrowRight } from "lucide-react";
+import { Loader2, Calendar, Clock, ChevronLeft, User, Phone, Lock, Mail, ArrowRight, Video, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 const SCHEDULE_CONFIG = {
     WINDOW_DAYS: 15,
