@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, User, Lock, ArrowRight, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function PatientLoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get("redirect") || "/paciente/minha-agenda";
     const [loading, setLoading] = useState(false);
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
@@ -22,7 +24,7 @@ export default function PatientLoginPage() {
             const result = await loginPatient(phone, password);
             if (result.success) {
                 toast.success("Bem-vindo de volta!");
-                router.push("/paciente/minha-agenda");
+                router.push(redirectTo);
             } else {
                 toast.error(result.error);
             }
@@ -99,9 +101,9 @@ export default function PatientLoginPage() {
                     </form>
 
                     <div className="mt-10 pt-10 border-t border-stone-50 text-center space-y-4">
-                        <p className="text-[10px] text-stone-400 font-medium">Ainda não tem um horário marcado?</p>
-                        <Link href="/agendar" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A694] hover:text-[#839583] transition-colors">
-                            Agendar Primeira Sessão
+                        <p className="text-[10px] text-stone-400 font-medium">Ainda não tem uma conta?</p>
+                        <Link href={`/paciente/cadastro${redirectTo !== "/paciente/minha-agenda" ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`} className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A694] hover:text-[#839583] transition-colors">
+                            Criar Conta e Agendar
                             <ArrowRight size={12} />
                         </Link>
                     </div>

@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, User, Lock, ArrowRight, MessageSquare, UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function PatientRegisterPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get("redirect") || "/paciente/minha-agenda";
     const [loading, setLoading] = useState(false);
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
@@ -30,8 +32,8 @@ export default function PatientRegisterPage() {
             });
             
             if (result.success) {
-                toast.success("Conta criada com sucesso! Faça login para agendar.");
-                router.push("/paciente/login");
+                toast.success("Conta criada e login realizado com sucesso!");
+                router.push(redirectTo);
             } else {
                 toast.error(result.error);
             }
@@ -122,7 +124,7 @@ export default function PatientRegisterPage() {
 
                     <div className="mt-10 pt-10 border-t border-stone-50 text-center space-y-4">
                         <p className="text-[10px] text-stone-400 font-medium">Já possui uma conta?</p>
-                        <Link href="/paciente/login" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A694] hover:text-[#839583] transition-colors">
+                        <Link href={`/paciente/login${redirectTo !== "/paciente/minha-agenda" ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`} className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#94A694] hover:text-[#839583] transition-colors">
                             Fazer Login
                             <ArrowRight size={12} />
                         </Link>

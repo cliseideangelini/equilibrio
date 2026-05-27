@@ -2,12 +2,29 @@ import SimpleBookingForm from "@/components/SimpleBookingForm";
 import { WaitingListDialog } from "@/components/WaitingListDialog";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { getPsychologistAvailability } from "@/lib/actions";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function BookingPage() {
+    const cookieStore = await cookies();
+    const patientId = cookieStore.get("patient_id")?.value;
+
+    if (!patientId) {
+        redirect("/paciente/login?redirect=/agendar");
+    }
+
+    const patient = await prisma.patient.findUnique({
+        where: { id: patientId }
+    });
+
+    if (!patient) {
+        redirect("/paciente/login?redirect=/agendar");
+    }
+
     const availability = await getPsychologistAvailability();
 
     return (
@@ -20,14 +37,19 @@ export default async function BookingPage() {
 
             {/* Início Link */}
             <div className="container mx-auto px-10 pt-10">
-                <Link href="/" className="group inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors">
+                <Link href="/paciente/minha-agenda" className="group inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors">
                     <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Início</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Painel do Paciente</span>
                 </Link>
             </div>
 
             <main className="flex-1 py-12 px-6 flex flex-col items-center">
-                <SimpleBookingForm availabilityRules={availability} />
+                <SimpleBookingForm 
+                    availabilityRules={availability} 
+                    patientName={patient.name} 
+                    patientPhone={patient.phone} 
+                    patientEmail={patient.email || undefined} 
+                />
             </main>
         </div>
     );

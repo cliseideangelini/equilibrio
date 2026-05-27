@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Proteção do Painel do Paciente
-  if (pathname.startsWith('/paciente') && !pathname.includes('/login')) {
+  if (pathname.startsWith('/paciente') && !pathname.startsWith('/paciente/login') && !pathname.startsWith('/paciente/cadastro')) {
     const patientId = request.cookies.get('patient_id')?.value;
     if (!patientId) {
       return NextResponse.redirect(new URL('/paciente/login', request.url));
