@@ -9,26 +9,26 @@ export function LogoutButton() {
 
     if (isOpen) {
         return (
-            <div className="bg-red-50/50 rounded-2xl p-4 border border-red-100 flex flex-col gap-3 animate-in fade-in zoom-in duration-300">
+            <div className="glass-card rounded-2xl p-4 border border-white/10 flex flex-col gap-3 animate-in fade-in zoom-in duration-300 w-56 relative z-50">
                 <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-red-500/70">Opções de Saída</span>
-                    <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-red-500 transition-colors">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Opções de Saída</span>
+                    <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-white transition-colors">
                         <X size={14} />
                     </button>
                 </div>
 
                 <Button
                     variant="outline"
-                    className="w-full justify-start gap-3 h-10 rounded-xl bg-white hover:bg-sage-50 text-foreground border-sage-200"
+                    className="w-full justify-start gap-3 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-white border-white/10 hover:border-white/20 transition-all"
                     onClick={() => window.location.href = "/"}
                 >
-                    <Home size={16} className="text-sage-500" />
+                    <Home size={16} className="text-primary" />
                     Ir para o Início
                 </Button>
 
                 <Button
                     variant="ghost"
-                    className="w-full justify-start gap-3 h-10 rounded-xl bg-red-100/50 hover:bg-red-500 hover:text-white text-red-600 border-transparent transition-all"
+                    className="w-full justify-start gap-3 h-10 rounded-xl bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-transparent transition-all"
                     onClick={() => {
                         document.cookie = "patient_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                         window.location.href = "/paciente/login";
@@ -45,9 +45,9 @@ export function LogoutButton() {
         <Button
             variant="ghost"
             onClick={() => setIsOpen(true)}
-            className="w-full justify-start gap-3 h-12 rounded-2xl text-red-500/40 hover:text-red-500 hover:bg-red-50 transition-all font-bold"
+            className="w-full justify-start gap-3 h-12 rounded-2xl text-muted-foreground hover:text-white hover:bg-white/5 transition-all font-bold"
         >
-            <LogOut size={20} />
+            <LogOut size={20} className="text-primary" />
             Sair da Agenda
         </Button>
     );
