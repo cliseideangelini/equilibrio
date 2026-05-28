@@ -55,7 +55,11 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
         status: app.status,
         type: app.type,
         meetLink: app.meetLink,
-        patient: { id: app.patient.id, name: app.patient.name, phone: "" },
+        patient: { 
+            id: app.patient?.id || "", 
+            name: app.patient?.name || "Paciente Removido", 
+            phone: app.patient?.phone || "" 
+        },
         payment: null
     }));
 
@@ -65,7 +69,10 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
         endTime: new Date(app.endTime).toISOString(),
         status: app.status,
         type: app.type,
-        patient: { id: app.patient.id, name: app.patient.name }
+        patient: { 
+            id: app.patient?.id || "", 
+            name: app.patient?.name || "Paciente Removido" 
+        }
     }));
 
     // Buscar todos os pacientes com informações de fixo/avulso

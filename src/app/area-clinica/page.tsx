@@ -141,7 +141,7 @@ export default async function AreaClinicaDashboard() {
 
                                                     <div>
                                                         <h3 className="text-lg font-bold text-foreground hover:text-primary transition-colors">
-                                                            {app.patient.name}
+                                                            {app.patient?.name || "Paciente Removido"}
                                                         </h3>
                                                         <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-fg">
                                                             <span className="flex items-center gap-1">
@@ -149,14 +149,14 @@ export default async function AreaClinicaDashboard() {
                                                                 {app.type === "ONLINE" ? "Online" : "Presencial"}
                                                             </span>
                                                             <span className="w-1 h-1 rounded-full bg-border" />
-                                                            <span>{app.patient.phone}</span>
+                                                            <span>{app.patient?.phone || ""}</span>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 {/* Actions */}
                                                 <div className="flex items-center gap-2 pt-4 sm:pt-0 border-t border-border/40 sm:border-0 mt-2 sm:mt-0">
-                                                    <Link href={`/area-clinica/prontuarios/${app.patient.id}`}>
+                                                    <Link href={`/area-clinica/prontuarios/${app.patient?.id || ""}`}>
                                                         <button className="px-4 py-2 bg-surface/85 hover:bg-surface border border-border/80 text-foreground text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2">
                                                             <FileText className="w-4 h-4 text-primary" />
                                                             Prontuário
@@ -192,10 +192,10 @@ export default async function AreaClinicaDashboard() {
                             {absentAppointments.map(app => (
                                 <div key={app.id} className="bg-rose-400/5 border border-rose-400/20 rounded-2xl p-4 flex flex-col gap-3 backdrop-blur-md">
                                     <div>
-                                        <p className="text-sm font-bold text-foreground">{app.patient.name} faltou.</p>
+                                        <p className="text-sm font-bold text-foreground">{app.patient?.name || "Paciente Removido"} faltou.</p>
                                         <p className="text-xs text-muted-fg mt-0.5">Sessão de {format(app.startTime, "HH:mm")}</p>
                                     </div>
-                                    <NotifyAbsentButton phone={app.patient.phone} patientName={app.patient.name} />
+                                    <NotifyAbsentButton phone={app.patient?.phone || ""} patientName={app.patient?.name || "Paciente"} />
                                 </div>
                             ))}
                         </div>
