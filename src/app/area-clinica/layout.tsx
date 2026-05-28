@@ -96,7 +96,7 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
             </header>
 
             {/* Page content */}
-            <main className="flex-1 p-8 overflow-auto relative z-10">
+            <main className="flex-1 p-8 relative z-10">
                 <div className="max-w-none px-2 md:px-0">
                     {children}
                 </div>
