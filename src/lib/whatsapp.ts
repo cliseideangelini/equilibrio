@@ -3,51 +3,43 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 /**
- * Sends a WhatsApp notification to the psychologist.
- * It uses the phone number configured in the psychologist's profile.
- * If WHATSAPP_API_URL and WHATSAPP_API_TOKEN are configured, it sends an HTTP POST request.
- * Otherwise, it logs to the console for easy integration.
+ * Sends a WhatsApp notification to the psychologist using CallMeBot API.
+ * It uses the phone number and apikey configured in the psychologist's profile.
  */
 export async function notifyPsychologist(message: string) {
     try {
         const psychologist = await prisma.psychologist.findFirst();
-        if (!psychologist || !psychologist.phone) {
-            console.log("⚠️ [WhatsApp Config] psychologist or phone number not set. Notification skipped.");
-            console.log(`Message would be: \n"${message}"`);
+        
+        if (!psychologist) return;
+        
+        // Verifica se notificações estão ativas e se tem número/chave configurados
+        if (!psychologist.whatsappNotifications || !psychologist.whatsappNumber || !psychologist.whatsappApiKey) {
+            console.log("⚠️ [WhatsApp Config] Notificações desativadas ou dados incompletos. Ignorando envio.");
             return;
         }
 
-        const phone = psychologist.phone.replace(/\D/g, ""); // Keep only numbers
-        const cleanPhone = phone.startsWith("55") ? phone : `55${phone}`;
+        let phone = psychologist.whatsappNumber.replace(/\D/g, ""); // Keep only numbers
+        if (!phone.startsWith("55") && phone.length <= 11) {
+             phone = `55${phone}`;
+        }
 
-        console.log(`💬 [WhatsApp Notification] Sending to ${cleanPhone}:`);
-        console.log(`-----------------------------------------\n${message}\n-----------------------------------------`);
+        console.log(`💬 [WhatsApp Notification] Enviando para ${phone} via CallMeBot...`);
+        
+        const textEncoded = encodeURIComponent(message);
+        const apiKey = psychologist.whatsappApiKey;
+        const apiUrl = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${textEncoded}&apikey=${apiKey}`;
 
-        const apiUrl = process.env.WHATSAPP_API_URL;
-        const token = process.env.WHATSAPP_API_TOKEN;
+        const response = await fetch(apiUrl, { method: "GET" });
 
-        if (apiUrl) {
-            // Standard Z-API / Evolution API format or custom webhook
-            const response = await fetch(apiUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    phone: cleanPhone,
-                    message: message
-                })
-            });
-
-            if (response.ok) {
-                console.log("✅ [WhatsApp] HTTP POST sent successfully.");
-            } else {
-                console.log(`❌ [WhatsApp] Failed to send HTTP POST. Status: ${response.status}`);
-            }
+        if (response.ok) {
+            console.log("✅ [WhatsApp] Mensagem CallMeBot enviada com sucesso.");
+        } else {
+            console.log(`❌ [WhatsApp] Falha ao enviar CallMeBot. Status: ${response.status}`);
+            const errorText = await response.text();
+            console.log(`Motivo: ${errorText}`);
         }
     } catch (err: any) {
-        console.error("❌ [WhatsApp Notification Error] Failed to send notification:", err.message);
+        console.error("❌ [WhatsApp Notification Error] Falha na notificação:", err.message);
     }
 }
 

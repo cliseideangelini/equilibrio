@@ -11,6 +11,9 @@ interface SettingsFormProps {
         email: string;
         crp: string;
         phone: string;
+        whatsappNotifications: boolean;
+        whatsappNumber: string;
+        whatsappApiKey: string;
     };
 }
 
@@ -19,6 +22,9 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
     const [email, setEmail] = useState(psychologist.email);
     const [crp, setCrp] = useState(psychologist.crp);
     const [phone, setPhone] = useState(psychologist.phone);
+    const [whatsappNotifications, setWhatsappNotifications] = useState(psychologist.whatsappNotifications);
+    const [whatsappNumber, setWhatsappNumber] = useState(psychologist.whatsappNumber);
+    const [whatsappApiKey, setWhatsappApiKey] = useState(psychologist.whatsappApiKey);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -34,7 +40,10 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
                 name,
                 email,
                 crp,
-                phone
+                phone,
+                whatsappNotifications,
+                whatsappNumber,
+                whatsappApiKey
             });
             if (result.success) {
                 setSuccess(true);
@@ -97,26 +106,58 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
                 </div>
             </div>
 
-            {/* WhatsApp para Notificações */}
-            <div className="space-y-2">
-                <div className="flex items-center justify-between px-1">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-fg">WhatsApp para Notificações</label>
-                    <span className="text-[8px] font-bold text-primary uppercase tracking-widest bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">Ativo</span>
+            {/* Configurações do CallMeBot (WhatsApp) */}
+            <div className="space-y-4 p-5 bg-white/5 border border-primary/20 rounded-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                            <Phone className="w-4 h-4 text-primary" />
+                            Notificações no WhatsApp (CallMeBot)
+                        </h3>
+                        <p className="text-[10px] text-muted-fg mt-1">
+                            Receba alertas de novos agendamentos e cancelamentos no seu WhatsApp. 
+                            <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noreferrer" className="text-primary hover:underline ml-1">Veja como pegar sua API Key grátis.</a>
+                        </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            className="sr-only peer" 
+                            checked={whatsappNotifications}
+                            onChange={(e) => setWhatsappNotifications(e.target.checked)}
+                        />
+                        <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
                 </div>
-                <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-primary w-4 h-4" />
-                    <input
-                        type="tel"
-                        required
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full h-12 pl-12 pr-4 bg-white/5 border border-primary/20 rounded-2xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-[0_0_15px_-4px_rgba(29,184,127,0.15)]"
-                        placeholder="DDD + Número (ex: 199988275290)"
-                    />
-                </div>
-                <p className="text-[10px] text-muted-fg px-1">
-                    Insira o número completo com DDD (ex: <code className="text-foreground font-mono">199988275290</code>) para receber as notificações.
-                </p>
+
+                {whatsappNotifications && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-fg px-1">Número do WhatsApp</label>
+                            <input
+                                type="tel"
+                                required={whatsappNotifications}
+                                value={whatsappNumber}
+                                onChange={(e) => setWhatsappNumber(e.target.value)}
+                                className="w-full h-10 px-4 bg-black/20 border border-white/10 rounded-xl text-sm font-medium text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                placeholder="Ex: 199988275290 (com DDD)"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-fg px-1">CallMeBot API Key</label>
+                            <input
+                                type="text"
+                                required={whatsappNotifications}
+                                value={whatsappApiKey}
+                                onChange={(e) => setWhatsappApiKey(e.target.value)}
+                                className="w-full h-10 px-4 bg-black/20 border border-white/10 rounded-xl text-sm font-medium text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
+                                placeholder="Sua Chave do CallMeBot"
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Mensagem de Feedback */}

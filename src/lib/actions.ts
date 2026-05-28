@@ -935,6 +935,9 @@ export async function updatePsychologistProfile(data: {
     email: string;
     crp: string;
     phone: string;
+    whatsappNotifications?: boolean;
+    whatsappNumber?: string;
+    whatsappApiKey?: string;
 }) {
     const psychologist = await prisma.psychologist.findFirst();
     if (!psychologist) throw new Error("Psicóloga não encontrada");
@@ -945,7 +948,10 @@ export async function updatePsychologistProfile(data: {
             name: data.name,
             email: data.email,
             crp: data.crp,
-            phone: data.phone
+            phone: data.phone,
+            ...(data.whatsappNotifications !== undefined && { whatsappNotifications: data.whatsappNotifications }),
+            ...(data.whatsappNumber !== undefined && { whatsappNumber: data.whatsappNumber }),
+            ...(data.whatsappApiKey !== undefined && { whatsappApiKey: data.whatsappApiKey }),
         }
     });
 

@@ -39,7 +39,10 @@ export default async function SettingsPage() {
                     name: psychologist.name,
                     email: psychologist.email,
                     crp: psychologist.crp,
-                    phone: psychologist.phone || ""
+                    phone: psychologist.phone || "",
+                    whatsappNotifications: psychologist.whatsappNotifications,
+                    whatsappNumber: psychologist.whatsappNumber || "",
+                    whatsappApiKey: psychologist.whatsappApiKey || ""
                 }} />
             </div>
         </div>
