@@ -12,6 +12,7 @@ import { PsiDivider } from "@/components/PsiDivider";
 
 import { getAppointmentsWithFixed } from "@/lib/actions";
 import { getLocalNow } from "@/lib/utils";
+import { DashboardClock } from "@/components/DashboardClock";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,7 @@ export default async function AreaClinicaDashboard() {
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_-4px_rgba(29,184,127,0.35)]">
                         <Sparkles className="w-3 h-3" /> Painel de Controle
                     </span>
+                    <DashboardClock />
                 </div>
                 <h1 className="text-4xl sm:text-5xl font-serif font-bold text-foreground">
                     {greeting}, <span className="text-gradient font-bold">{greeting === "Bom dia" || greeting === "Boa tarde" ? "Cliseide" : "Cliseide"}</span>.
