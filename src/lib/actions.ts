@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { notifyPsychologist, formatAppointmentDetailsForWhatsApp } from "@/lib/whatsapp";
+import { notifyPsychologist, formatAppointmentDetailsForWhatsApp, notifyPatient, formatDateTimeSimple } from "@/lib/whatsapp";
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -264,6 +264,26 @@ export async function createAppointment(formData: {
         console.error("Failed to notify psychologist:", e);
     }
 
+    // Notify patient of new booking via Meta Cloud API
+    try {
+        const dateStr = formatDateTimeSimple(appointment.startTime);
+        const modalidade = appointment.type === "ONLINE" ? "Online (Google Meet)" : "Presencial";
+        
+        // Dispara mensagem usando o template "agendamento_confirmado"
+        // Parâmetros do template: {{1}} = Nome do paciente, {{2}} = Data e hora, {{3}} = Modalidade
+        await notifyPatient(
+            patient.phone,
+            "agendamento_confirmado",
+            [
+                { type: "text", text: patient.name },
+                { type: "text", text: dateStr },
+                { type: "text", text: modalidade }
+            ]
+        );
+    } catch (e) {
+        console.error("Failed to notify patient of booking:", e);
+    }
+
     revalidatePath('/paciente/minha-agenda');
     return { success: true, appointmentId: appointment.id, meetLink };
 }
@@ -511,10 +531,22 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         console.error("Failed to notify psychologist of cancellation:", e);
     }
 
-    if (isProfessional) {
-        // Gatilho de notificação para o paciente (Simulado aqui, integrar com API de WhatsApp)
-        console.log(`NOTIFICAÇÃO: Enviando aviso para o paciente ${appointment.patient.name} (${appointment.patient.phone}) sobre cancelamento pela profissional.`);
-        // Ex: sendWhatsApp(appointment.patient.phone, `Olá ${appointment.patient.name}, infelizmente a Dra. Cliseide precisou desmarcar seu horário de ${format(appointment.startTime, "dd/MM 'às' HH:mm")}. Entre em contato para reagendarmos.`);
+    // Notify patient of cancellation via Meta Cloud API
+    try {
+        const dateStr = formatDateTimeSimple(appointment.startTime);
+        
+        // Dispara mensagem usando o template "agendamento_cancelado"
+        // Parâmetros do template: {{1}} = Nome do paciente, {{2}} = Data e hora
+        await notifyPatient(
+            appointment.patient.phone,
+            "agendamento_cancelado",
+            [
+                { type: "text", text: appointment.patient.name },
+                { type: "text", text: dateStr }
+            ]
+        );
+    } catch (e) {
+        console.error("Failed to notify patient of cancellation via WhatsApp:", e);
     }
 
     // Lógica de Lista de Espera: Notificar interessados
