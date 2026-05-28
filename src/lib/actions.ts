@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { notifyPsychologist, formatAppointmentDetailsForWhatsApp } from "@/lib/whatsapp";
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -229,6 +230,20 @@ export async function createAppointment(formData: {
             meetLink,
         }
     });
+
+    // Notify psychologist of new booking
+    try {
+        const formattedDetails = formatAppointmentDetailsForWhatsApp({
+            patient,
+            startTime: appointment.startTime,
+            type: appointment.type
+        });
+        await notifyPsychologist(
+            `🔔 *Novo Agendamento Realizado!*\n\n👤 *Paciente*: ${patient.name}\n📞 *Telefone*: ${patient.phone}\n${formattedDetails}`
+        );
+    } catch (e) {
+        console.error("Failed to notify psychologist:", e);
+    }
 
     revalidatePath('/paciente/minha-agenda');
     return { success: true, appointmentId: appointment.id, meetLink };
@@ -462,6 +477,21 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         data: { status: "CANCELLED" }
     });
 
+    // Notify psychologist of cancellation
+    try {
+        const formattedDetails = formatAppointmentDetailsForWhatsApp({
+            patient: appointment.patient,
+            startTime: appointment.startTime,
+            type: appointment.type
+        });
+        const byWho = isProfessional ? "pela Profissional" : "pelo Paciente";
+        await notifyPsychologist(
+            `❌ *Sessão Cancelada!*\n\n👤 *Paciente*: ${appointment.patient.name}\n📞 *Telefone*: ${appointment.patient.phone}\n${formattedDetails}\n🚫 *Motivo*: Cancelado ${byWho}`
+        );
+    } catch (e) {
+        console.error("Failed to notify psychologist of cancellation:", e);
+    }
+
     if (isProfessional) {
         // Gatilho de notificação para o paciente (Simulado aqui, integrar com API de WhatsApp)
         console.log(`NOTIFICAÇÃO: Enviando aviso para o paciente ${appointment.patient.name} (${appointment.patient.phone}) sobre cancelamento pela profissional.`);
@@ -650,6 +680,23 @@ export async function createManualAppointment(data: {
             meetLink: data.type === "ONLINE" ? (data.meetLink || "https://meet.google.com/wnx-geqg-wgs") : null,
         }
     });
+
+    // Notify psychologist of manual booking
+    try {
+        const patient = await prisma.patient.findUnique({ where: { id: data.patientId } });
+        if (patient) {
+            const formattedDetails = formatAppointmentDetailsForWhatsApp({
+                patient,
+                startTime: appointment.startTime,
+                type: appointment.type
+            });
+            await notifyPsychologist(
+                `🔔 *Novo Agendamento Manual Realizado!*\n\n👤 *Paciente*: ${patient.name}\n📞 *Telefone*: ${patient.phone}\n${formattedDetails}`
+            );
+        }
+    } catch (e) {
+        console.error("Failed to notify psychologist of manual booking:", e);
+    }
 
     revalidatePath('/area-clinica');
     revalidatePath('/area-clinica/agenda');
@@ -878,6 +925,29 @@ export async function resetPatientPassword(patientId: string) {
         }
     });
     revalidatePath(`/area-clinica/prontuarios/${patientId}`);
+    return { success: true };
+}
+
+export async function updatePsychologistProfile(data: {
+    name: string;
+    email: string;
+    crp: string;
+    phone: string;
+}) {
+    const psychologist = await prisma.psychologist.findFirst();
+    if (!psychologist) throw new Error("Psicóloga não encontrada");
+
+    await prisma.psychologist.update({
+        where: { id: psychologist.id },
+        data: {
+            name: data.name,
+            email: data.email,
+            crp: data.crp,
+            phone: data.phone
+        }
+    });
+
+    revalidatePath('/area-clinica');
     return { success: true };
 }
 
