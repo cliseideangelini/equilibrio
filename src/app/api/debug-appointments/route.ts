@@ -19,6 +19,28 @@ export async function GET() {
             }
         });
 
+        let updatedCount = 0;
+        for (const app of apps) {
+            if (app.startTime.toISOString() === "2026-05-28T14:30:00.000Z") {
+                const newStart = new Date("2026-05-28T17:30:00.000Z");
+                const newEnd = new Date("2026-05-28T18:00:00.000Z");
+
+                await prisma.appointment.update({
+                    where: { id: app.id },
+                    data: {
+                        startTime: newStart,
+                        endTime: newEnd,
+                        status: "PENDING"
+                    }
+                });
+                updatedCount++;
+                
+                // Update local list for return
+                app.startTime = newStart;
+                app.endTime = newEnd;
+            }
+        }
+
         const formattedApps = apps.map(app => ({
             id: app.id,
             startTimeISO: app.startTime.toISOString(),
@@ -31,6 +53,8 @@ export async function GET() {
         return NextResponse.json({
             status: "ok",
             count: apps.length,
+            updatedCount,
+            message: "Corrected any 14:30 UTC shifted appointments to 17:30 UTC (14:30 local).",
             appointments: formattedApps
         });
     } catch (err: any) {
