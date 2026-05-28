@@ -26,7 +26,17 @@ interface PageProps {
 
 export default async function ClinicianAgenda({ searchParams }: PageProps) {
     const params = await searchParams;
-    const selectedDate = params.date ? parseISO(params.date) : new Date();
+    let selectedDate = new Date();
+    if (params.date) {
+        try {
+            const parsed = parseISO(params.date);
+            if (!isNaN(parsed.getTime())) {
+                selectedDate = parsed;
+            }
+        } catch (e) {
+            // fallback
+        }
+    }
     const view = params.view || "day";
 
     // Buscar agendamentos do mês inteiro para o calendário mensal
@@ -37,11 +47,11 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
 
     // Agendamentos específicos do dia para o AgendaClient
     const dayAppointments = allAppointments.filter(app => 
-        format(app.startTime, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd")
+        format(new Date(app.startTime), "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd")
     ).map(app => ({
         id: app.id,
-        startTime: app.startTime.toISOString(),
-        endTime: app.endTime.toISOString(),
+        startTime: new Date(app.startTime).toISOString(),
+        endTime: new Date(app.endTime).toISOString(),
         status: app.status,
         type: app.type,
         meetLink: app.meetLink,
@@ -51,8 +61,8 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
 
     const serializedAllAppointments = allAppointments.map(app => ({
         id: app.id,
-        startTime: app.startTime.toISOString(),
-        endTime: app.endTime.toISOString(),
+        startTime: new Date(app.startTime).toISOString(),
+        endTime: new Date(app.endTime).toISOString(),
         status: app.status,
         type: app.type,
         patient: { id: app.patient.id, name: app.patient.name }
