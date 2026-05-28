@@ -25,6 +25,18 @@ export default async function AreaClinicaDashboard() {
     const completedAppointments = dailyAppointments.filter(a => a.status === "COMPLETED");
     const absentAppointments = dailyAppointments.filter(a => a.status === "ABSENT");
 
+    // Message logic based on sessions status
+    let sessionMessage = "";
+    if (dailyAppointments.length === 0) {
+        sessionMessage = "Você não tem nenhuma sessão programada para hoje.";
+    } else if (pendingAppointments.length === 0) {
+        sessionMessage = "Você já concluiu todos os seus atendimentos de hoje!";
+    } else if (pendingAppointments.length === 1) {
+        sessionMessage = "Você ainda tem 1 sessão a realizar hoje.";
+    } else {
+        sessionMessage = `Você ainda tem ${pendingAppointments.length} sessões a realizar hoje.`;
+    }
+
     // Dynamic Greeting
     const hour = today.getHours();
     let greeting = "Boa noite";
@@ -46,7 +58,7 @@ export default async function AreaClinicaDashboard() {
                     {greeting}, <span className="text-gradient font-bold">{greeting === "Bom dia" || greeting === "Boa tarde" ? "Cliseide" : "Cliseide"}</span>.
                 </h1>
                 <p className="text-muted-fg text-lg">
-                    Hoje é {format(today, "EEEE, d 'de' MMMM", { locale: ptBR })}. Você tem <strong className="text-primary font-semibold">{dailyAppointments.length} sessões</strong> programadas.
+                    Hoje é {format(today, "EEEE, d 'de' MMMM", { locale: ptBR })}. <strong className="text-primary font-semibold">{sessionMessage}</strong>
                 </p>
             </header>
 
