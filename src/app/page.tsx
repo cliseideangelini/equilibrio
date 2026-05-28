@@ -71,12 +71,6 @@ const CREDENTIALS = [
   "Formação em Terapia de Casal",
 ];
 
-const STATS = [
-  { value: "12",   label: "Anos de experiência", icon: Clock },
-  { value: "+500", label: "Pacientes atendidos",  icon: Users },
-  { value: "4",    label: "Especialidades",       icon: Award },
-  { value: "100%", label: "Dedicação clínica",    icon: Star },
-];
 
 const CONTACT_INFO = [
   { icon: Phone,  label: "WhatsApp",    value: "(19) 98827-5290",              href: "https://wa.me/5519988275290" },
@@ -264,27 +258,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          STATS BAR
-      ══════════════════════════════════════════════ */}
-      <section aria-label="Indicadores da clínica" className="py-10 border-y border-border/40 bg-surface/30 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            {STATS.map(({ value, label, icon: Icon }) => (
-              <div
-                key={label}
-                className="reveal flex flex-col items-center text-center gap-2"
-              >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-1">
-                  <Icon className="w-4.5 h-4.5 text-primary" />
-                </div>
-                <p className="font-serif text-3xl sm:text-4xl font-bold text-foreground">{value}</p>
-                <p className="text-xs text-muted-foreground font-medium leading-snug">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ══════════════════════════════════════════════
           SOBRE A PROFISSIONAL
