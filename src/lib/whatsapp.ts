@@ -1,6 +1,4 @@
 import prisma from "@/lib/prisma";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 /**
  * Sends a WhatsApp notification to the psychologist using CallMeBot API.
@@ -48,7 +46,22 @@ export function formatAppointmentDetailsForWhatsApp(app: {
     startTime: Date;
     type: string;
 }) {
-    const dateFormatted = format(new Date(app.startTime), "dd/MM 'às' HH:mm", { locale: ptBR });
+    const formatter = new Intl.DateTimeFormat("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+    
+    const parts = formatter.formatToParts(new Date(app.startTime));
+    const map = parts.reduce((acc, part) => {
+        acc[part.type] = part.value;
+        return acc;
+    }, {} as Record<string, string>);
+
+    const dateFormatted = `${map.day}/${map.month} às ${map.hour}:${map.minute}`;
     const modalidade = app.type === "ONLINE" ? "Online (Google Meet)" : "Presencial";
     return `📅 Data: ${dateFormatted}\n💻 Modalidade: ${modalidade}`;
 }
