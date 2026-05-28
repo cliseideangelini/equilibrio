@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -81,6 +82,24 @@ export function PolicyWidget() {
 }
 
 export function HistoryTimelineWidget({ appointments }: { appointments: any[] }) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return (
+            <div className="glass-card rounded-[2.5rem] p-8 border border-white/10 animate-pulse bg-white/5 min-h-[200px]">
+                <div className="w-1/4 h-3 bg-white/10 rounded mb-6" />
+                <div className="space-y-4">
+                    <div className="w-2/3 h-12 bg-white/5 rounded-xl" />
+                    <div className="w-2/3 h-12 bg-white/5 rounded-xl" />
+                </div>
+            </div>
+        );
+    }
+
     if (appointments.length === 0) {
         return (
             <div className="glass-card rounded-[2.5rem] p-8 border border-white/10 text-center">

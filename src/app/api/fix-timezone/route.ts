@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,12 @@ export async function GET() {
                 });
                 updatedCount++;
             }
+        }
+
+        if (updatedCount > 0) {
+            revalidatePath('/paciente/minha-agenda');
+            revalidatePath('/area-clinica');
+            revalidatePath('/area-clinica/agenda');
         }
 
         return NextResponse.json({

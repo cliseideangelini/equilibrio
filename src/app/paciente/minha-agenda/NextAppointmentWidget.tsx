@@ -10,8 +10,10 @@ import { CancellationButton } from "@/components/CancellationButton";
 export function NextAppointmentWidget({ appointments }: { appointments: any[] }) {
     const nextApp = appointments[0]; // Assumes they are sorted ascending
     const [timeLeft, setTimeLeft] = useState<{ days: number, hours: number, minutes: number } | null>(null);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         if (!nextApp) return;
 
         const interval = setInterval(() => {
@@ -31,6 +33,19 @@ export function NextAppointmentWidget({ appointments }: { appointments: any[] })
 
         return () => clearInterval(interval);
     }, [nextApp]);
+
+    if (!mounted) {
+        return (
+            <div className="glass-card rounded-[2.5rem] p-8 md:p-10 h-full flex flex-col justify-between border-primary/20 animate-pulse bg-white/5 min-h-[300px]">
+                <div className="space-y-4">
+                    <div className="w-1/3 h-3 bg-white/10 rounded" />
+                    <div className="w-2/3 h-8 bg-white/10 rounded" />
+                    <div className="w-1/2 h-4 bg-white/10 rounded" />
+                </div>
+                <div className="w-full h-12 bg-white/5 rounded-2xl mt-8" />
+            </div>
+        );
+    }
 
     if (!nextApp) {
         return (
