@@ -103,7 +103,7 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
             <div className="px-8 py-4 bg-stone-50/50 rounded-[2rem] border border-stone-100 flex items-center justify-between text-[10px] text-stone-400 font-bold uppercase tracking-[0.2em]">
                 <div className="flex items-center gap-6">
                     <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Sincronizado</span>
-                    <span className="flex items-center gap-2">{appointments.length} Registros na visualização atual</span>
+                    <span className="flex items-center gap-2">{view === 'day' ? dayAppointments.length : allAppointments.length} Registros na visualização atual</span>
                 </div>
                 <div>
                     Última Atualização: {format(new Date(), 'HH:mm:ss')}

@@ -39,9 +39,9 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    "px-4 py-2 rounded-xl text-sm font-bold transition-all decoration-2 underline-offset-4",
+                                    "px-4 py-2 rounded-xl text-sm font-bold transition-all",
                                     pathname === item.href
-                                        ? "bg-stone-900 text-white shadow-lg shadow-stone-200"
+                                        ? "bg-primary text-white shadow-md shadow-primary/20"
                                         : "text-stone-400 hover:text-stone-700 hover:bg-stone-100"
                                 )}
                             >
