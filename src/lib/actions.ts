@@ -173,6 +173,29 @@ export async function createAppointment(formData: {
     startTime.setHours(hours, mins, 0, 0);
     const endTime = addMinutes(startTime, 30);
 
+    // Prevent double booking
+    const dayOfWeek = getDay(startTime);
+    const overlapApp = await prisma.appointment.findFirst({
+        where: {
+            startTime: {
+                gte: startTime,
+                lt: endTime,
+            },
+            status: { not: 'CANCELLED' },
+            deletedAt: null
+        }
+    });
+
+    const fixedPatients = await prisma.patient.findMany({
+        where: { isFixed: true, fixedDayOfWeek: dayOfWeek, deletedAt: null }
+    });
+    const fixedTimes = fixedPatients.map(p => p.fixedTime);
+    const isFixedOccupied = fixedTimes.includes(time);
+
+    if (overlapApp || isFixedOccupied) {
+        return { success: false, error: "Este horário já foi reservado por outro paciente. Por favor, escolha outro horário." };
+    }
+
     const meetLink = type === "ONLINE" ? "https://meet.google.com/wnx-geqg-wgs" : null;
 
     const appointment = await prisma.appointment.create({
@@ -568,6 +591,30 @@ export async function createManualAppointment(data: {
 
     const startTime = new Date(data.date);
     const endTime = addMinutes(startTime, 30);
+
+    // Prevent double booking
+    const timeStr = format(startTime, 'HH:mm');
+    const dayOfWeek = getDay(startTime);
+    const overlapApp = await prisma.appointment.findFirst({
+        where: {
+            startTime: {
+                gte: startTime,
+                lt: endTime,
+            },
+            status: { not: 'CANCELLED' },
+            deletedAt: null
+        }
+    });
+
+    const fixedPatients = await prisma.patient.findMany({
+        where: { isFixed: true, fixedDayOfWeek: dayOfWeek, deletedAt: null }
+    });
+    const fixedTimes = fixedPatients.map(p => p.fixedTime);
+    const isFixedOccupied = fixedTimes.includes(timeStr);
+
+    if (overlapApp || isFixedOccupied) {
+        throw new Error("Este horário já está reservado por outra consulta.");
+    }
 
     const appointment = await prisma.appointment.create({
         data: {
