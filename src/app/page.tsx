@@ -174,7 +174,7 @@ export default function HomePage() {
 
               {/* CTA buttons */}
               <div className="animate-fade-up delay-300 flex flex-col sm:flex-row gap-3 pt-2">
-                <Link href="/#agendamento">
+                <Link href="/paciente/login">
                   <Button
                     size="lg"
                     className="gap-2.5 h-13 px-7 text-sm font-bold uppercase tracking-wider bg-primary text-white hover:bg-primary/90 hover:shadow-glow rounded-xl transition-all duration-300 w-full sm:w-auto group"
@@ -370,7 +370,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="servicos"
-        className="py-24 sm:py-32 px-4 sm:px-6 bg-surface/20"
+        className="py-16 sm:py-24 px-4 sm:px-6 bg-surface/20"
         aria-label="Especialidades e serviços"
       >
         <div className="max-w-7xl mx-auto">
@@ -422,7 +422,7 @@ export default function HomePage() {
                 </ul>
 
                 {/* CTA */}
-                <Link href="/#agendamento">
+                <Link href="/paciente/login">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -449,7 +449,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="faq"
-        className="py-24 sm:py-32 px-4 sm:px-6"
+        className="py-16 sm:py-24 px-4 sm:px-6"
         aria-label="Dúvidas Frequentes"
       >
         <div className="max-w-4xl mx-auto">
@@ -498,7 +498,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="agendamento"
-        className="py-24 sm:py-32 px-4 sm:px-6"
+        className="py-16 sm:py-24 px-4 sm:px-6"
         aria-label="Agendamento e contato"
       >
         <div className="max-w-7xl mx-auto">
@@ -689,7 +689,7 @@ export default function HomePage() {
               {[
                 { label: "Área do Paciente",     href: "/paciente/login" },
                 { label: "Minha Agenda",          href: "/paciente/minha-agenda" },
-                { label: "Agendar Consulta",      href: "/agendar" },
+                { label: "Agendar Consulta",      href: "/paciente/login" },
                 { label: "Acesso Profissional",   href: "/admin" },
               ].map(({ label, href }) => (
                 <li key={label}>

@@ -122,7 +122,7 @@ export function Navbar() {
               </Link>
 
               {/* Primary CTA */}
-              <Link href="/#agendamento">
+              <Link href="/paciente/login">
                 <Button
                   size="sm"
                   className={cn(
@@ -183,7 +183,7 @@ export function Navbar() {
               Acesso Profissional
             </Button>
           </Link>
-          <Link href="/#agendamento" onClick={() => setMenuOpen(false)}>
+          <Link href="/paciente/login" onClick={() => setMenuOpen(false)}>
             <Button className="w-full gap-2 rounded-xl h-12 text-xs font-bold uppercase tracking-wider bg-primary text-white hover:bg-primary/90 hover:shadow-glow transition-all">
               <Calendar className="w-4 h-4" />
               Agendar Consulta
