@@ -345,9 +345,57 @@ export async function deleteWaitingListEntry(id: string) {
     return { success: true };
 }
 
+export async function resolveFixedVirtualAppointment(id: string, defaultStatus: AppointmentStatus = AppointmentStatus.CONFIRMED): Promise<string> {
+    if (id.startsWith("fixed-")) {
+        const parts = id.substring("fixed-".length);
+        const dateStr = parts.slice(-12);
+        const patientId = parts.slice(0, -13);
+
+        const year = parseInt(dateStr.slice(0, 4), 10);
+        const month = parseInt(dateStr.slice(4, 6), 10) - 1;
+        const day = parseInt(dateStr.slice(6, 8), 10);
+        const hours = parseInt(dateStr.slice(8, 10), 10);
+        const minutes = parseInt(dateStr.slice(10, 12), 10);
+        
+        const startTime = new Date(year, month, day, hours, minutes, 0, 0);
+        const endTime = addMinutes(startTime, 30);
+
+        // Check if an appointment already exists for this slot
+        const existing = await prisma.appointment.findFirst({
+            where: {
+                patientId,
+                startTime,
+                deletedAt: null
+            }
+        });
+
+        if (existing) {
+            return existing.id;
+        }
+
+        const psychologist = await prisma.psychologist.findFirst();
+        if (!psychologist) throw new Error("Psicóloga não encontrada no sistema.");
+
+        const created = await prisma.appointment.create({
+            data: {
+                startTime,
+                endTime,
+                psychologistId: psychologist.id,
+                patientId,
+                status: defaultStatus,
+                type: "ONLINE",
+            }
+        });
+
+        return created.id;
+    }
+    return id;
+}
+
 export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false, isProfessional: boolean = false) {
+    const resolvedId = await resolveFixedVirtualAppointment(appointmentId, AppointmentStatus.CONFIRMED);
     const appointment = await prisma.appointment.findUnique({
-        where: { id: appointmentId },
+        where: { id: resolvedId },
         include: { psychologist: true, patient: true }
     });
 
@@ -366,7 +414,7 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
     }
 
     await prisma.appointment.update({
-        where: { id: appointmentId },
+        where: { id: resolvedId },
         data: { status: "CANCELLED" }
     });
 
@@ -425,8 +473,9 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 }
 
 export async function confirmAppointment(id: string) {
+    const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
     const app = await prisma.appointment.update({
-        where: { id },
+        where: { id: resolvedId },
         data: { status: "CONFIRMED" },
         select: { patientId: true }
     });
@@ -436,8 +485,9 @@ export async function confirmAppointment(id: string) {
 }
 
 export async function setAbsent(id: string) {
+    const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
     await prisma.appointment.update({
-        where: { id },
+        where: { id: resolvedId },
         data: { status: AppointmentStatus.ABSENT }
     });
 
@@ -447,8 +497,9 @@ export async function setAbsent(id: string) {
 }
 
 export async function completeAppointment(id: string) {
+    const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
     await prisma.appointment.update({
-        where: { id },
+        where: { id: resolvedId },
         data: { status: AppointmentStatus.COMPLETED }
     });
 
