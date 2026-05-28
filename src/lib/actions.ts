@@ -266,19 +266,11 @@ export async function createAppointment(formData: {
 
     // Notify patient of new booking via Meta Cloud API
     try {
-        const dateStr = formatDateTimeSimple(appointment.startTime);
-        const modalidade = appointment.type === "ONLINE" ? "Online (Google Meet)" : "Presencial";
-        
-        // Dispara mensagem usando o template "agendamento_confirmado"
-        // Parâmetros do template: {{1}} = Nome do paciente, {{2}} = Data e hora, {{3}} = Modalidade
+        // Dispara mensagem usando o template padrão "hello_world" que já vem pré-aprovado pela Meta
         await notifyPatient(
             patient.phone,
-            "agendamento_confirmado",
-            [
-                { type: "text", text: patient.name },
-                { type: "text", text: dateStr },
-                { type: "text", text: modalidade }
-            ]
+            "hello_world",
+            []
         );
     } catch (e) {
         console.error("Failed to notify patient of booking:", e);
@@ -533,17 +525,11 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     // Notify patient of cancellation via Meta Cloud API
     try {
-        const dateStr = formatDateTimeSimple(appointment.startTime);
-        
-        // Dispara mensagem usando o template "agendamento_cancelado"
-        // Parâmetros do template: {{1}} = Nome do paciente, {{2}} = Data e hora
+        // Dispara mensagem usando o template padrão "hello_world" que já vem pré-aprovado pela Meta
         await notifyPatient(
             appointment.patient.phone,
-            "agendamento_cancelado",
-            [
-                { type: "text", text: appointment.patient.name },
-                { type: "text", text: dateStr }
-            ]
+            "hello_world",
+            []
         );
     } catch (e) {
         console.error("Failed to notify patient of cancellation via WhatsApp:", e);
