@@ -49,6 +49,27 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
     const [availableSlots, setAvailableSlots] = useState<string[]>([]);
     const [modality, setModality] = useState<"ONLINE" | "PRESENCIAL">("ONLINE");
 
+    const getFortnightRange = () => {
+        const today = new Date();
+        const day = today.getDate();
+        const year = today.getFullYear();
+        const month = today.getMonth(); // 0-indexed
+        
+        if (day <= 15) {
+            return {
+                start: startOfToday(),
+                end: new Date(year, month, 15, 23, 59, 59, 999)
+            };
+        } else {
+            return {
+                start: startOfToday(),
+                end: new Date(year, month + 1, 0, 23, 59, 59, 999) // Last day of month
+            };
+        }
+    };
+
+    const fortnightRange = getFortnightRange();
+
     // Fetch slots when date changes
     useEffect(() => {
         if (selectedDate) {
@@ -125,7 +146,7 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
                             onSelect={setSelectedDate}
                             disabled={[
                                 { before: startOfToday() },
-                                { after: addDays(startOfToday(), SCHEDULE_CONFIG.WINDOW_DAYS) },
+                                { after: fortnightRange.end },
                                 { dayOfWeek: [0, 6] }
                             ]}
                             locale={ptBR}

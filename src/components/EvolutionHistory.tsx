@@ -35,8 +35,8 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
             }
 
             let matchesStatus = true;
-            if (activeTab === 'realizadas') matchesStatus = app.status === 'CONFIRMED' || app.status === 'COMPLETED';
-            else if (activeTab === 'pendentes') matchesStatus = app.status === 'PENDING';
+            if (activeTab === 'realizadas') matchesStatus = app.status === 'COMPLETED';
+            else if (activeTab === 'pendentes') matchesStatus = app.status === 'PENDING' || app.status === 'CONFIRMED';
             else if (activeTab === 'canceladas') matchesStatus = app.status === 'CANCELLED';
             else if (activeTab === 'ausentes') matchesStatus = app.status === 'ABSENT';
 
@@ -46,8 +46,8 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
 
     const stats = useMemo(() => {
         return {
-            realizadas: appointments.filter(a => a.status === 'CONFIRMED' || a.status === 'COMPLETED').length,
-            pendentes: appointments.filter(a => a.status === 'PENDING').length,
+            realizadas: appointments.filter(a => a.status === 'COMPLETED').length,
+            pendentes: appointments.filter(a => a.status === 'PENDING' || a.status === 'CONFIRMED').length,
             canceladas: appointments.filter(a => a.status === 'CANCELLED').length,
             ausentes: appointments.filter(a => a.status === 'ABSENT').length,
         };
@@ -132,7 +132,7 @@ export function EvolutionHistory({ appointments, patientId }: EvolutionHistoryPr
 
 function TimelineItem({ app, appointments, patientId }: { app: any, appointments: any[], patientId: string }) {
     const [expanded, setExpanded] = useState(false);
-    const isCompleted = app.status === 'CONFIRMED' || app.status === 'COMPLETED';
+    const isCompleted = app.status === 'COMPLETED';
     
     return (
         <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group animate-in fade-in slide-in-from-bottom-4 duration-500">

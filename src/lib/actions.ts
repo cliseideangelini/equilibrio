@@ -33,7 +33,7 @@ export async function getAvailableSlots(dateString: string) {
     const dayOfWeek = new Date(`${dateClean}T12:00:00Z`).getUTCDay();
     const now = new Date(); // Standard actual UTC now
 
-    // 1. Regra de Janela de 15 Dias
+    // 1. Regra de Quinzena (Dia 01 a 15, ou Dia 16 a 30/31)
     const todayStr = new Intl.DateTimeFormat("en-CA", {
         timeZone: "America/Sao_Paulo",
         year: "numeric",
@@ -42,10 +42,27 @@ export async function getAvailableSlots(dateString: string) {
     }).format(now);
     
     const todayStart = new Date(`${todayStr}T00:00:00-03:00`);
-    const maxDate = new Date(todayStart.getTime() + 15 * 24 * 60 * 60 * 1000); // 15 days
+    
+    // Determinar limites da quinzena baseados na data local de São Paulo
+    const localDay = parseInt(todayStr.split("-")[2], 10);
+    const localMonth = parseInt(todayStr.split("-")[1], 10) - 1; // 0-indexed
+    const localYear = parseInt(todayStr.split("-")[0], 10);
+
+    let startLimit: Date;
+    let endLimit: Date;
+
+    if (localDay <= 15) {
+        startLimit = new Date(`${localYear}-${String(localMonth + 1).padStart(2, '0')}-01T00:00:00-03:00`);
+        endLimit = new Date(`${localYear}-${String(localMonth + 1).padStart(2, '0')}-15T23:59:59-03:00`);
+    } else {
+        startLimit = new Date(`${localYear}-${String(localMonth + 1).padStart(2, '0')}-16T00:00:00-03:00`);
+        const lastDay = new Date(localYear, localMonth + 1, 0).getDate();
+        endLimit = new Date(`${localYear}-${String(localMonth + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}T23:59:59-03:00`);
+    }
+
     const selectedDayStart = new Date(`${dateClean}T00:00:00-03:00`);
 
-    if (selectedDayStart < todayStart || selectedDayStart > maxDate) return [];
+    if (selectedDayStart < todayStart || selectedDayStart > endLimit) return [];
     if (dayOfWeek === 0 || dayOfWeek === 6) return []; // Ocultar finais de semana
 
     const availabilities = await prisma.availability.findMany({
