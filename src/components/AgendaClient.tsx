@@ -21,8 +21,8 @@ import Link from "next/link";
 
 interface Appointment {
     id: string;
-    startTime: Date;
-    endTime: Date;
+    startTime: string | Date;
+    endTime: string | Date;
     status: string;
     type: string;
     meetLink: string | null;
@@ -38,7 +38,7 @@ interface Appointment {
 
 interface AgendaClientProps {
     initialAppointments: Appointment[];
-    initialDate: Date;
+    initialDate: string | Date;
 }
 
 export function AgendaClient({ initialAppointments, initialDate }: AgendaClientProps) {
@@ -92,7 +92,7 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                         <CalendarIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg group-hover:text-foreground transition-colors pointer-events-none" />
                         <input
                             type="date"
-                            defaultValue={format(initialDate, "yyyy-MM-dd")}
+                            defaultValue={format(new Date(initialDate), "yyyy-MM-dd")}
                             onChange={handleDateChange}
                             className="h-10 pl-11 pr-4 rounded-xl bg-surface/75 border border-border/80 text-[10px] font-black uppercase tracking-widest text-foreground outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer hover:bg-surface transition-all"
                         />
@@ -245,7 +245,7 @@ function ActionMenu({ appointment }: { appointment: Appointment }) {
                         <div className="px-2 py-1">
                             <CancellationButton
                                 appointmentId={appointment.id}
-                                startTime={appointment.startTime.toISOString()}
+                                startTime={new Date(appointment.startTime).toISOString()}
                                 variant="ghost"
                                 className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/10"
                             />

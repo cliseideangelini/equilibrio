@@ -51,8 +51,23 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
     const dayAppointments = allAppointments.filter(app => 
         format(app.startTime, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd")
     ).map(app => ({
-        ...app,
-        patient: { ...app.patient, phone: "" }
+        id: app.id,
+        startTime: app.startTime.toISOString(),
+        endTime: app.endTime.toISOString(),
+        status: app.status,
+        type: app.type,
+        meetLink: app.meetLink,
+        patient: { id: app.patient.id, name: app.patient.name, phone: "" },
+        payment: null
+    }));
+
+    const serializedAllAppointments = allAppointments.map(app => ({
+        id: app.id,
+        startTime: app.startTime.toISOString(),
+        endTime: app.endTime.toISOString(),
+        status: app.status,
+        type: app.type,
+        patient: { id: app.patient.id, name: app.patient.name }
     }));
 
     // Buscar todos os pacientes com informações de fixo/avulso
@@ -129,9 +144,9 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
             </header>
 
             {view === 'day' ? (
-                <AgendaClient initialAppointments={dayAppointments as any} initialDate={selectedDate} />
+                <AgendaClient initialAppointments={dayAppointments as any} initialDate={selectedDate.toISOString()} />
             ) : view === 'month' ? (
-                <MonthlyCalendarClient initialAppointments={allAppointments as any} />
+                <MonthlyCalendarClient initialAppointments={serializedAllAppointments as any} />
             ) : (
                 <AgendaConfigClient initialAvailabilities={availabilities} patients={patients} />
             )}
