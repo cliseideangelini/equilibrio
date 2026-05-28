@@ -17,6 +17,7 @@ import { AgendaConfigClient } from "@/components/AgendaConfigClient";
 import Link from "next/link";
 
 import { getAppointmentsWithFixed } from "@/lib/actions";
+import { getLocalNow } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,7 @@ interface PageProps {
 
 export default async function ClinicianAgenda({ searchParams }: PageProps) {
     const params = await searchParams;
-    let selectedDate = new Date();
+    let selectedDate = getLocalNow();
     if (params.date) {
         try {
             const parsed = parseISO(params.date);
@@ -168,7 +169,7 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
                     </span>
                 </div>
                 <div>
-                    Última Atualização: {format(new Date(), 'HH:mm:ss')}
+                    Última Atualização: {format(getLocalNow(), 'HH:mm:ss')}
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import { addDays, isWeekend, startOfDay, setHours, setMinutes, isAfter, isBefore, addMinutes } from "date-fns";
+import { getLocalNow } from "@/lib/utils";
 
 export const SCHEDULE_CONFIG = {
     SHIFT_1: { start: { h: 7, m: 0 }, end: { h: 11, m: 30 } },
@@ -8,7 +9,7 @@ export const SCHEDULE_CONFIG = {
 };
 
 export function isDateWithinSchedulingWindow(date: Date): boolean {
-    const today = startOfDay(new Date());
+    const today = startOfDay(getLocalNow());
     const maxDate = addDays(today, SCHEDULE_CONFIG.WINDOW_DAYS);
     
     if (isWeekend(date)) return false;

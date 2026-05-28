@@ -14,11 +14,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AdminNavBar } from "@/components/AdminNavBar";
+import { getLocalNow } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-    const today = new Date();
+    const today = getLocalNow();
 
     // Buscar agendamentos de hoje
     const todayAppointments = await prisma.appointment.findMany({

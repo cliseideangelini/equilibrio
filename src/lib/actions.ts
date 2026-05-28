@@ -18,6 +18,7 @@ import {
     setMinutes,
     subDays
 } from "date-fns";
+import { getLocalNow } from "@/lib/utils";
 
 export async function getPsychologistAvailability() {
     const psychologist = await prisma.psychologist.findFirst({
@@ -29,10 +30,10 @@ export async function getPsychologistAvailability() {
 export async function getAvailableSlots(dateString: string) {
     const date = new Date(dateString);
     const dayOfWeek = getDay(date);
-    const now = new Date();
+    const now = getLocalNow();
 
     // 1. Regra de Janela de 15 Dias
-    const today = startOfDay(new Date());
+    const today = startOfDay(getLocalNow());
     const maxDate = endOfDay(addMinutes(addMinutes(today, 15 * 24 * 60), -1)); // 15 dias
     if (isBefore(date, today) || isAfter(date, maxDate)) return [];
     if (dayOfWeek === 0 || dayOfWeek === 6) return []; // Ocultar finais de semana
@@ -401,7 +402,7 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     if (!appointment) throw new Error("Agendamento não encontrado");
 
-    const now = new Date();
+    const now = getLocalNow();
     const hoursUntilSession = (appointment.startTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
     // Se for o profissional cancelando, não tem regra de 3h, mas dispara notificação pro paciente
@@ -533,7 +534,7 @@ export async function saveEvolution(patientId: string, appointmentId: string, co
             patientId,
             appointmentId,
             isDraft,
-            date: date || new Date()
+            date: date || getLocalNow()
         }
     });
 

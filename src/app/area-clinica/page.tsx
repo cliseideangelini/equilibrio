@@ -11,11 +11,12 @@ import { NotifyAbsentButton } from "@/components/NotifyAbsentButton";
 import { PsiDivider } from "@/components/PsiDivider";
 
 import { getAppointmentsWithFixed } from "@/lib/actions";
+import { getLocalNow } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function AreaClinicaDashboard() {
-    const today = new Date();
+    const today = getLocalNow();
 
     const dailyAppointments = await getAppointmentsWithFixed(startOfDay(today), endOfDay(today));
 
