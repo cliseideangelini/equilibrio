@@ -28,14 +28,22 @@ export async function getPsychologistAvailability() {
 }
 
 export async function getAvailableSlots(dateString: string) {
-    const date = new Date(dateString);
-    const dayOfWeek = getDay(date);
-    const now = getLocalNow();
+    const dayOfWeek = new Date(`${dateString}T12:00:00Z`).getUTCDay();
+    const now = new Date(); // Standard actual UTC now
 
     // 1. Regra de Janela de 15 Dias
-    const today = startOfDay(getLocalNow());
-    const maxDate = endOfDay(addMinutes(addMinutes(today, 15 * 24 * 60), -1)); // 15 dias
-    if (isBefore(date, today) || isAfter(date, maxDate)) return [];
+    const todayStr = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).format(now);
+    
+    const todayStart = new Date(`${todayStr}T00:00:00-03:00`);
+    const maxDate = new Date(todayStart.getTime() + 15 * 24 * 60 * 60 * 1000); // 15 days
+    const selectedDayStart = new Date(`${dateString}T00:00:00-03:00`);
+
+    if (selectedDayStart < todayStart || selectedDayStart > maxDate) return [];
     if (dayOfWeek === 0 || dayOfWeek === 6) return []; // Ocultar finais de semana
 
     const availabilities = await prisma.availability.findMany({
@@ -52,11 +60,14 @@ export async function getAvailableSlots(dateString: string) {
     });
     const fixedTimes = fixedPatients.map(p => p.fixedTime);
 
+    const startOfDaySP = new Date(`${dateString}T00:00:00-03:00`);
+    const endOfDaySP = new Date(`${dateString}T23:59:59-03:00`);
+
     const appointments = await prisma.appointment.findMany({
         where: {
             startTime: {
-                gte: startOfDay(date),
-                lte: endOfDay(date),
+                gte: startOfDaySP,
+                lte: endOfDaySP,
             },
             status: { not: 'CANCELLED' },
             deletedAt: null
@@ -71,22 +82,31 @@ export async function getAvailableSlots(dateString: string) {
         let currentMinutes = availability.startTime;
 
         while (currentMinutes + sessionDuration <= availability.endTime) {
-            const slotStart = addMinutes(startOfDay(date), currentMinutes);
+            const hours = Math.floor(currentMinutes / 60);
+            const minutes = currentMinutes % 60;
+            const slotStart = new Date(`${dateString}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00-03:00`);
             const slotEnd = addMinutes(slotStart, sessionDuration);
 
             let isWithinDeadline = true;
 
             if (currentMinutes < 870) {
-                const realDeadline = addMinutes(subDays(startOfDay(date), 1), 21 * 60);
-                if (isAfter(now, realDeadline)) isWithinDeadline = false;
+                const prevDayStr = new Intl.DateTimeFormat("en-CA", {
+                    timeZone: "America/Sao_Paulo",
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit"
+                }).format(new Date(selectedDayStart.getTime() - 24 * 60 * 60 * 1000));
+                
+                const realDeadline = new Date(`${prevDayStr}T21:00:00-03:00`);
+                if (now > realDeadline) isWithinDeadline = false;
             }
             else if (currentMinutes >= 870 && currentMinutes < 900) {
-                const realDeadline = addMinutes(slotStart, -120);
-                if (isAfter(now, realDeadline)) isWithinDeadline = false;
+                const realDeadline = new Date(slotStart.getTime() - 2 * 60 * 60 * 1000);
+                if (now > realDeadline) isWithinDeadline = false;
             }
             else {
-                const realDeadline = addMinutes(slotStart, -30);
-                if (isAfter(now, realDeadline)) isWithinDeadline = false;
+                const realDeadline = new Date(slotStart.getTime() - 30 * 60 * 1000);
+                if (now > realDeadline) isWithinDeadline = false;
             }
 
             if (isWithinDeadline) {
@@ -96,12 +116,13 @@ export async function getAvailableSlots(dateString: string) {
                     return (
                         (isAfter(slotStart, appStart) && isBefore(slotStart, appEnd)) ||
                         (isAfter(slotEnd, appStart) && isBefore(slotEnd, appEnd)) ||
-                        (format(slotStart, 'HH:mm') === format(appStart, 'HH:mm'))
+                        (slotStart.getTime() === appStart.getTime())
                     );
                 });
 
-                if (!isOccupied && !fixedTimes.includes(format(slotStart, 'HH:mm'))) {
-                    slots.push(format(slotStart, 'HH:mm'));
+                const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                if (!isOccupied && !fixedTimes.includes(timeStr)) {
+                    slots.push(timeStr);
                 }
             }
 
@@ -168,13 +189,12 @@ export async function createAppointment(formData: {
 
     if (!psychologist) return { success: false, error: "Psicóloga não encontrada no sistema. Verifique o cadastro." };
 
-    const [hours, mins] = time.split(':').map(Number);
-    const startTime = new Date(date);
-    startTime.setHours(hours, mins, 0, 0);
+    const startTime = new Date(`${date}T${time}:00-03:00`);
     const endTime = addMinutes(startTime, 30);
 
     // Prevent double booking
-    const dayOfWeek = getDay(startTime);
+    const localDateForDay = new Date(startTime.getTime() - 3 * 60 * 60 * 1000);
+    const dayOfWeek = localDateForDay.getUTCDay();
     const overlapApp = await prisma.appointment.findFirst({
         where: {
             startTime: {
@@ -593,8 +613,11 @@ export async function createManualAppointment(data: {
     const endTime = addMinutes(startTime, 30);
 
     // Prevent double booking
-    const timeStr = format(startTime, 'HH:mm');
-    const dayOfWeek = getDay(startTime);
+    const localDate = new Date(startTime.getTime() - 3 * 60 * 60 * 1000);
+    const hoursStr = String(localDate.getUTCHours()).padStart(2, '0');
+    const minutesStr = String(localDate.getUTCMinutes()).padStart(2, '0');
+    const timeStr = `${hoursStr}:${minutesStr}`;
+    const dayOfWeek = localDate.getUTCDay();
     const overlapApp = await prisma.appointment.findFirst({
         where: {
             startTime: {
