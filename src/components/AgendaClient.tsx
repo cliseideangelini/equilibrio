@@ -197,15 +197,27 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                         </span>
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
-                                        <div className="flex items-center justify-end">
                                             {app.status === 'COMPLETED' ? (
                                                 <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-4">Sessão Finalizada</span>
                                             ) : app.status === 'CANCELLED' ? (
                                                 <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-4">Cancelada</span>
                                             ) : (
-                                                <ActionMenu appointment={app} />
+                                                <div className="flex items-center justify-end gap-2 pr-2">
+                                                    {app.status === 'CONFIRMED' && (
+                                                        <AbsentButton
+                                                            appointmentId={app.id}
+                                                            variant="outline"
+                                                            className="h-8 px-4 rounded-xl border-amber-500/25 bg-amber-500/5 text-[9px] font-black uppercase tracking-widest text-amber-400 hover:bg-amber-500/15 hover:border-amber-500/40 hover:text-amber-300 transition-all"
+                                                        />
+                                                    )}
+                                                    <CancellationButton
+                                                        appointmentId={app.id}
+                                                        startTime={new Date(app.startTime).toISOString()}
+                                                        variant="outline"
+                                                        className="h-8 px-4 rounded-xl border-rose-500/25 bg-rose-500/5 text-[9px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/15 hover:border-rose-500/40 hover:text-rose-300 transition-all"
+                                                    />
+                                                </div>
                                             )}
-                                        </div>
                                     </td>
                                 </tr>
                             )) : (
@@ -219,50 +231,6 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                     </table>
                 </div>
             </div>
-        </div>
-    );
-}
-
-function ActionMenu({ appointment }: { appointment: Appointment }) {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div className="relative">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsOpen(!isOpen)}
-                className="h-9 px-4 rounded-xl border-border/80 text-[9px] font-black uppercase tracking-widest text-muted-fg hover:text-foreground hover:bg-surface/85 transition-all gap-2"
-            >
-                Ações <ChevronRight size={12} className={cn("transition-transform", isOpen ? "rotate-90" : "")} />
-            </Button>
-
-            {isOpen && (
-                <>
-                    <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 bottom-full mb-2 w-48 bg-surface border border-border/80 rounded-2xl shadow-xl z-40 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-
-                        <div className="px-2 py-1">
-                            <CancellationButton
-                                appointmentId={appointment.id}
-                                startTime={new Date(appointment.startTime).toISOString()}
-                                variant="ghost"
-                                className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/10"
-                            />
-                        </div>
-
-                        {appointment.status === 'CONFIRMED' && (
-                            <div className="px-2 py-1">
-                                <AbsentButton
-                                    appointmentId={appointment.id}
-                                    variant="ghost"
-                                    className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-amber-500 hover:bg-amber-500/10"
-                                />
-                            </div>
-                        )}
-                    </div>
-                </>
-            )}
         </div>
     );
 }
