@@ -21,9 +21,11 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
 
     return (
         <div className="min-h-screen bg-[#050507] text-foreground font-sans flex flex-col relative overflow-x-hidden">
-            {/* Background Orbs to match Homepage */}
-            <div aria-hidden className="orb w-[500px] h-[500px] bg-primary/8 -top-40 -left-20 animate-orb" />
-            <div aria-hidden className="orb w-[400px] h-[400px] bg-warm/5 bottom-0 right-0 animate-orb-slow" />
+            {/* Ambient Background Glows - Fixed to decouple from scroll repaint */}
+            <div aria-hidden className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="orb w-[500px] h-[500px] bg-primary/8 -top-40 -left-20 animate-orb" />
+                <div className="orb w-[400px] h-[400px] bg-warm/5 bottom-0 right-0 animate-orb-slow" />
+            </div>
 
             {/* Subtle grid overlay */}
             <div
