@@ -89,7 +89,7 @@ export function ManualBookingDialog({ patients }: ManualBookingDialogProps) {
                                     setSearch(e.target.value);
                                     if (selectedPatientId) setSelectedPatientId(null);
                                 }}
-                                className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 transition-all"
+                                className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all"
                             />
                         </div>
 
@@ -124,7 +124,7 @@ export function ManualBookingDialog({ patients }: ManualBookingDialogProps) {
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 transition-all cursor-pointer"
+                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all cursor-pointer"
                                 />
                             </div>
                         </div>
@@ -137,7 +137,7 @@ export function ManualBookingDialog({ patients }: ManualBookingDialogProps) {
                                     step="1800"
                                     value={time}
                                     onChange={(e) => setTime(e.target.value)}
-                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 transition-all cursor-pointer"
+                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all cursor-pointer"
                                 />
                             </div>
                         </div>

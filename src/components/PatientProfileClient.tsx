@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, User, Mail, Phone, Lock, Save, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { updatePatientProfile } from "@/lib/actions";
 
 export default function PatientProfilePage({ patient }: { patient: any }) {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const mustChange = searchParams.get("must_change") === "true";
+    
     const [loading, setLoading] = useState(false);
     
     const [name, setName] = useState(patient.name);
@@ -28,7 +31,7 @@ export default function PatientProfilePage({ patient }: { patient: any }) {
             });
             if (result.success) {
                 toast.success("Perfil atualizado com sucesso!");
-                router.refresh();
+                router.push("/paciente/minha-agenda");
             } else {
                 toast.error(result.error);
             }
@@ -55,6 +58,13 @@ export default function PatientProfilePage({ patient }: { patient: any }) {
                     <h1 className="text-4xl font-serif text-white mb-2 tracking-tight">Meu <span className="italic text-primary">Perfil</span></h1>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Gerencie seus dados e segurança</p>
                 </div>
+
+                {mustChange && (
+                    <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-bold uppercase tracking-wider mb-8 flex items-center gap-2.5 animate-pulse relative z-10 shadow-lg shadow-rose-950/20">
+                        <Lock size={14} className="text-rose-400 shrink-0" />
+                        <span>Por segurança, altere sua senha padrão para continuar.</span>
+                    </div>
+                )}
 
                 <form onSubmit={handleSave} className="space-y-8 relative z-10">
                     <div className="grid gap-6">

@@ -617,11 +617,12 @@ export async function logout() {
 export async function updatePatientProfile(data: { name: string, email: string, password?: string }) {
     const cookieStore = await cookies();
     const patientId = cookieStore.get('patient_id')?.value;
-    if (!patientId) return { success: false, error: 'N�o autorizado' };
+    if (!patientId) return { success: false, error: 'Não autorizado' };
 
     const updateData: any = { name: data.name, email: data.email };
     if (data.password) {
         updateData.password = await bcrypt.hash(data.password, 10);
+        updateData.mustChangePassword = false;
     }
 
     await prisma.patient.update({
@@ -662,7 +663,8 @@ export async function registerPatient(formData: {
             phone,
             username,
             dateOfBirth: new Date(dateOfBirth),
-            password: hashedPassword
+            password: hashedPassword,
+            mustChangePassword: password === "psicologa123"
         }
     });
 
@@ -794,5 +796,18 @@ export async function getAppointmentsWithFixed(startDate: Date, endDate: Date) {
     }
 
     return combined.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+}
+
+export async function resetPatientPassword(patientId: string) {
+    const hashedPassword = await bcrypt.hash("psicologa123", 10);
+    await prisma.patient.update({
+        where: { id: patientId },
+        data: {
+            password: hashedPassword,
+            mustChangePassword: true
+        }
+    });
+    revalidatePath(`/area-clinica/prontuarios/${patientId}`);
+    return { success: true };
 }
 

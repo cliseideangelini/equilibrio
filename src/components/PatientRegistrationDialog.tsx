@@ -25,14 +25,20 @@ export function PatientRegistrationDialog() {
         e.preventDefault();
         setIsPending(true);
         try {
-            // registerPatient expects password, but for manual admin registration
-            // we might want a version without mandatory password or a default one.
-            // Using a default password for now or I can add a specialized action.
+            const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+            const cleanUsername = formData.name
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, "") + randomSuffix;
+
             await registerPatient({
                 name: formData.name,
                 phone: formData.phone,
                 email: formData.email,
-                password: "mudar123", // Senha padrão para primeiro acesso
+                username: cleanUsername,
+                dateOfBirth: "2000-01-01",
+                password: "psicologa123", // Senha padrão para primeiro acesso
             });
             setIsOpen(false);
             setFormData({ name: "", phone: "", email: "" });
@@ -70,7 +76,7 @@ export function PatientRegistrationDialog() {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="Ex: Ana Silva..."
-                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 transition-all"
+                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all"
                                 />
                             </div>
                         </div>
@@ -85,7 +91,7 @@ export function PatientRegistrationDialog() {
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     placeholder="11 99999-0000"
-                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 transition-all"
+                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all"
                                 />
                             </div>
                         </div>
@@ -99,7 +105,7 @@ export function PatientRegistrationDialog() {
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     placeholder="ana@email.com"
-                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-stone-100 transition-all"
+                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all"
                                 />
                             </div>
                         </div>
@@ -113,7 +119,7 @@ export function PatientRegistrationDialog() {
                         {isPending ? <Loader2 className="animate-spin" /> : "Salvar Cadastro"}
                     </Button>
                     <p className="text-[9px] text-center text-stone-400 uppercase tracking-widest leading-relaxed px-4">
-                        O paciente poderá acessar o sistema usando o número de WhatsApp e a senha padrão <span className="text-stone-900 font-bold">mudar123</span>
+                        O paciente poderá acessar o sistema usando o número de WhatsApp e a senha padrão <span className="text-stone-900 font-bold">psicologa123</span>
                     </p>
                 </form>
             </DialogContent>

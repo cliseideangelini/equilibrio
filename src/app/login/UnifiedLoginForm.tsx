@@ -39,7 +39,12 @@ export default function UnifiedLoginForm() {
                 const result = await loginPatient(phone, password);
                 if (result.success) {
                     toast.success("Bem-vindo de volta!");
-                    router.push(redirectTo);
+                    if (result.mustChangePassword) {
+                        toast.info("Por segurança, altere sua senha padrão para continuar.");
+                        router.push("/paciente/perfil?must_change=true");
+                    } else {
+                        router.push(redirectTo);
+                    }
                 } else {
                     toast.error(result.error);
                 }

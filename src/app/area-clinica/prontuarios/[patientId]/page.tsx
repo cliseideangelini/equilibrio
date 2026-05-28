@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { EvolutionDialog } from "@/components/EvolutionDialog";
 import { AttachmentUpload } from "@/components/AttachmentUpload";
 import { EvolutionHistory } from "@/components/EvolutionHistory";
+import { ResetPasswordButton } from "@/components/ResetPasswordButton";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +108,7 @@ export default async function PatientRecordPage({ params }: { params: Promise<{ 
                         <div className="text-[9px] text-muted-fg font-bold uppercase tracking-tight mt-1">
                             Desde {format(patient.createdAt, 'dd/MM/yyyy')}
                         </div>
+                        <ResetPasswordButton patientId={patient.id} />
                     </div>
                 </div>
 
