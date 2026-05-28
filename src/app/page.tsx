@@ -126,7 +126,7 @@ export default function HomePage() {
           HERO
       ══════════════════════════════════════════════ */}
       <section
-        className="relative min-h-[100svh] flex items-center pt-24 pb-16 px-4 sm:px-6 overflow-hidden"
+        className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 px-4 sm:px-6 overflow-hidden"
         aria-label="Hero — Apresentação da clínica"
       >
         {/* Orbs de fundo */}
@@ -248,23 +248,13 @@ export default function HomePage() {
 
           </div>
         </div>
-
-        {/* Scroll cue */}
-        <div className="absolute bottom-6 inset-x-0 flex justify-center animate-fade-in delay-700">
-          <div className="flex flex-col items-center gap-2 text-muted-foreground/40">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Role para baixo</span>
-            <div className="w-px h-10 bg-gradient-to-b from-muted-foreground/40 to-transparent" />
-          </div>
-        </div>
       </section>
-
-
       {/* ══════════════════════════════════════════════
           SOBRE A PROFISSIONAL
       ══════════════════════════════════════════════ */}
       <section
         id="sobre"
-        className="py-24 sm:py-32 px-4 sm:px-6"
+        className="py-16 sm:py-24 px-4 sm:px-6"
         aria-label="Sobre Cliseide S. Angelini"
       >
         <div className="max-w-7xl mx-auto">
