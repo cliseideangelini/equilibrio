@@ -118,7 +118,7 @@ export default async function AreaClinicaDashboard() {
                                                 isAbsent || isCancelled ? "border-border/40 opacity-60" :
                                                     "border-border/80"
                                         )}>
-                                            <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
+                                            <div className="flex flex-col gap-4">
                                                 
                                                 {/* Time and Patient Info */}
                                                 <div className="flex items-center gap-5">
@@ -154,8 +154,8 @@ export default async function AreaClinicaDashboard() {
                                                     </div>
                                                 </div>
 
-                                                {/* Actions */}
-                                                <div className="flex items-center gap-2 pt-4 sm:pt-0 border-t border-border/40 sm:border-0 mt-2 sm:mt-0">
+                                                {/* Actions at the bottom for full responsiveness */}
+                                                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/40">
                                                     <Link href={`/area-clinica/prontuarios/${app.patient?.id || ""}`}>
                                                         <button className="px-4 py-2 bg-surface/85 hover:bg-surface border border-border/80 text-foreground text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2">
                                                             <FileText className="w-4 h-4 text-primary" />
