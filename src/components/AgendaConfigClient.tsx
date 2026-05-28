@@ -125,6 +125,8 @@ export function AgendaConfigClient({ initialAvailabilities, patients }: AgendaCo
                 const res = await updatePsychologistAvailability(availabilities);
                 if (res.success) {
                     showToast("Sua agenda e horários livres foram atualizados no sistema!", "success");
+                } else {
+                    showToast("Erro ao salvar disponibilidades: " + (res as any).error, "error");
                 }
             } catch (err: any) {
                 showToast("Erro ao salvar disponibilidades: " + err.message, "error");
@@ -147,6 +149,8 @@ export function AgendaConfigClient({ initialAvailabilities, patients }: AgendaCo
                         p.id === patientId ? { ...p, isFixed, fixedDayOfWeek: day, fixedTime: time } : p
                     ));
                     showToast("Agenda fixa do paciente atualizada com sucesso!", "success");
+                } else {
+                    showToast("Erro ao salvar agenda do paciente: " + (res as any).error, "error");
                 }
             } catch (err: any) {
                 showToast("Erro ao salvar agenda do paciente: " + err.message, "error");
