@@ -126,7 +126,7 @@ export default function HomePage() {
           HERO
       ══════════════════════════════════════════════ */}
       <section
-        className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 px-4 sm:px-6 overflow-hidden"
+        className="relative pt-32 pb-4 sm:pt-40 sm:pb-8 px-4 sm:px-6 overflow-hidden"
         aria-label="Hero — Apresentação da clínica"
       >
         {/* Orbs de fundo */}
@@ -254,7 +254,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="sobre"
-        className="py-16 sm:py-24 px-4 sm:px-6"
+        className="pt-12 pb-16 sm:pt-16 sm:pb-24 px-4 sm:px-6"
         aria-label="Sobre Cliseide S. Angelini"
       >
         <div className="max-w-7xl mx-auto">

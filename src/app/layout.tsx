@@ -59,12 +59,6 @@ export default function RootLayout({
         <ConditionalShell />
         <Toaster position="top-center" richColors />
 
-        {/* Version badge — desktop only */}
-        <div className="fixed bottom-4 right-5 pointer-events-none z-[100] hidden md:block">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 bg-surface/60 backdrop-blur px-2 py-1 rounded-md border border-border/30">
-            v2.0
-          </span>
-        </div>
       </body>
     </html>
   );
