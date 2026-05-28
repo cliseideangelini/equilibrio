@@ -700,7 +700,7 @@ export default function HomePage() {
                 { label: "Área do Paciente",     href: "/paciente/login" },
                 { label: "Minha Agenda",          href: "/paciente/minha-agenda" },
                 { label: "Agendar Consulta",      href: "/paciente/login" },
-                { label: "Acesso Profissional",   href: "/admin" },
+                { label: "Acesso Profissional",   href: "/area-clinica" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link

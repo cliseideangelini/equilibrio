@@ -110,7 +110,7 @@ export function Navbar() {
               </Link>
 
               {/* Acesso Profissional */}
-              <Link href="/admin">
+              <Link href="/area-clinica">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -177,7 +177,7 @@ export function Navbar() {
               {isPatient ? "Minha Agenda" : "Área do Paciente"}
             </Button>
           </Link>
-          <Link href="/admin" onClick={() => setMenuOpen(false)}>
+          <Link href="/area-clinica" onClick={() => setMenuOpen(false)}>
             <Button variant="outline" className="w-full gap-2 rounded-xl h-12 text-xs font-bold uppercase tracking-wider border-border/70 text-muted-foreground hover:text-foreground hover:bg-surface">
               <ShieldCheck className="w-4 h-4" />
               Acesso Profissional
