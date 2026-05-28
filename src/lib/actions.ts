@@ -626,3 +626,53 @@ export async function registerPatient(formData: {
 
     return { success: true, patient };
 }
+
+export async function updatePsychologistAvailability(availabilities: { dayOfWeek: number; startTimeStr: string; endTimeStr: string }[]) {
+    const psychologist = await prisma.psychologist.findFirst({
+        where: { email: 'cliseideangelini@gmail.com' }
+    });
+    if (!psychologist) throw new Error("Psicóloga não encontrada");
+
+    // Limpa disponibilidades antigas
+    await prisma.availability.deleteMany({
+        where: { psychologistId: psychologist.id }
+    });
+
+    // Cria novas disponibilidades
+    const data = availabilities.map(av => {
+        const [sh, sm] = av.startTimeStr.split(":").map(Number);
+        const [eh, em] = av.endTimeStr.split(":").map(Number);
+        return {
+            dayOfWeek: av.dayOfWeek,
+            startTime: sh * 60 + sm,
+            endTime: eh * 60 + em,
+            psychologistId: psychologist.id
+        };
+    });
+
+    await prisma.availability.createMany({
+        data
+    });
+
+    revalidatePath('/area-clinica');
+    revalidatePath('/area-clinica/agenda');
+    revalidatePath('/agendar');
+    return { success: true };
+}
+
+export async function updatePatientFixedSchedule(patientId: string, isFixed: boolean, fixedDayOfWeek?: number | null, fixedTime?: string | null) {
+    await prisma.patient.update({
+        where: { id: patientId },
+        data: {
+            isFixed,
+            fixedDayOfWeek: isFixed ? fixedDayOfWeek : null,
+            fixedTime: isFixed ? fixedTime : null
+        }
+    });
+
+    revalidatePath('/area-clinica');
+    revalidatePath('/area-clinica/agenda');
+    revalidatePath('/area-clinica/pacientes');
+    return { success: true };
+}
+

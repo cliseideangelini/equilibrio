@@ -4,6 +4,7 @@ import { PatientRegistrationDialog } from "@/components/PatientRegistrationDialo
 import { ManualBookingDialog } from "@/components/ManualBookingDialog";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { AppointmentStatus } from "@prisma/client";
+import { Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -67,13 +68,18 @@ export default async function ProntuariosIndex() {
     patients.sort((a, b) => a.name.localeCompare(b.name));
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 relative z-10">
             <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <h2 className="text-4xl font-light text-stone-900 tracking-tight">
-                        Histórico <span className="italic font-serif text-stone-500">Clínico</span>
+                    <div className="flex items-center gap-1.5 mb-1">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                            <Sparkles className="w-2.5 h-2.5" /> Histórico Clínico
+                        </span>
+                    </div>
+                    <h2 className="text-4xl font-light text-foreground tracking-tight">
+                        Histórico <span className="italic font-serif text-muted-fg">Clínico</span>
                     </h2>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-fg">
                         Repositório Permanente de Prontuários e Evoluções
                     </p>
                 </div>
@@ -88,3 +94,4 @@ export default async function ProntuariosIndex() {
         </div>
     );
 }
+

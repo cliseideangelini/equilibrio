@@ -69,32 +69,32 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
     return (
         <div className="space-y-10">
             {/* Control Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/60 p-2 rounded-[2rem] border border-stone-100 shadow-sm">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-surface/40 p-2 rounded-[2rem] border border-border/80 shadow-sm backdrop-blur-md">
                 <form 
                     className="flex flex-1 items-center gap-2 px-4 w-full"
                     onSubmit={(e) => { e.preventDefault(); setSearch(search); }}
                 >
                     <button type="submit">
-                        <Search className="text-stone-300 hover:text-stone-900 transition-colors" size={16} />
+                        <Search className="text-muted-fg hover:text-foreground transition-colors" size={16} />
                     </button>
                     <input
                         type="text"
                         placeholder="Pesquisar por paciente ou telefone..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="bg-transparent border-0 outline-none text-sm font-medium text-stone-600 placeholder:text-stone-300 w-full"
+                        className="bg-transparent border-0 outline-none text-sm font-semibold text-foreground placeholder:text-muted-fg w-full"
                     />
                 </form>
 
                 <div className="flex items-center gap-3 pr-2 w-full md:w-auto">
                     {/* Seletor de Data */}
                     <div className="relative group">
-                        <CalendarIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-hover:text-stone-900 transition-colors pointer-events-none" />
+                        <CalendarIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg group-hover:text-foreground transition-colors pointer-events-none" />
                         <input
                             type="date"
                             defaultValue={format(initialDate, "yyyy-MM-dd")}
                             onChange={handleDateChange}
-                            className="h-10 pl-11 pr-4 rounded-xl bg-stone-50 border-0 text-[10px] font-black uppercase tracking-widest text-stone-600 outline-none focus:ring-2 focus:ring-stone-100 cursor-pointer hover:bg-stone-100 transition-all"
+                            className="h-10 pl-11 pr-4 rounded-xl bg-surface/75 border border-border/80 text-[10px] font-black uppercase tracking-widest text-foreground outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer hover:bg-surface transition-all"
                         />
                     </div>
 
@@ -112,40 +112,40 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-stone-100 rounded-[2.5rem] shadow-xl shadow-stone-200/40 overflow-hidden">
+            <div className="bg-surface/20 border border-border/80 rounded-[2.5rem] shadow-xl overflow-hidden backdrop-blur-md">
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
-                        <thead className="bg-stone-50/30 border-b border-stone-100">
+                        <thead className="bg-surface/50 border-b border-border/80">
                             <tr>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400 w-[140px]">Horário</th>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Paciente</th>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400 w-[140px]">Modalidade</th>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400 w-[120px]">Status</th>
-                                <th className="py-4 px-8 text-right font-black text-[10px] uppercase tracking-[0.2em] text-stone-400 w-[400px]">Ações</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg w-[140px]">Horário</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg">Paciente</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg w-[140px]">Modalidade</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg w-[120px]">Status</th>
+                                <th className="py-4 px-8 text-right font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg w-[400px]">Ações</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-stone-50">
+                        <tbody className="divide-y divide-border/40">
                             {filteredAppointments.length > 0 ? filteredAppointments.map((app, idx) => (
                                 <tr key={app.id} className={cn(
-                                    "hover:bg-stone-50/50 transition-all group",
-                                    idx % 2 === 1 ? "bg-stone-50/10" : "bg-white"
+                                    "hover:bg-surface/40 transition-all group border-b border-border/40",
+                                    idx % 2 === 1 ? "bg-surface/10" : "bg-transparent"
                                 )}>
                                     <td className="py-6 px-8 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-stone-900 shadow-sm" />
-                                            <span className="text-sm font-black text-stone-900 font-mono italic">{format(new Date(app.startTime), 'HH:mm')}</span>
-                                            <ChevronRight size={12} className="text-stone-200" />
-                                            <span className="text-[10px] font-bold text-stone-400 font-mono">{format(new Date(app.endTime), 'HH:mm')}</span>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(29,184,127,0.5)]" />
+                                            <span className="text-sm font-black text-foreground font-mono italic">{format(new Date(app.startTime), 'HH:mm')}</span>
+                                            <ChevronRight size={12} className="text-muted-fg" />
+                                            <span className="text-[10px] font-bold text-muted-fg font-mono">{format(new Date(app.endTime), 'HH:mm')}</span>
                                         </div>
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-[1.2rem] bg-stone-100 flex items-center justify-center text-stone-400 transition-all shadow-sm border border-stone-200/50">
+                                            <div className="w-10 h-10 rounded-[1.2rem] bg-surface/80 flex items-center justify-center text-primary transition-all shadow-sm border border-border/80">
                                                 <span className="font-black text-[10px] uppercase tracking-widest">{app.patient.name.charAt(0)}</span>
                                             </div>
                                             <Link href={`/area-clinica/prontuarios/${app.patient.id}`} className="hover:opacity-75 transition-opacity">
-                                                <h4 className="text-sm font-bold text-stone-800 tracking-tight">{app.patient.name}</h4>
-                                                <p className="text-[10px] text-stone-400 font-mono italic">{app.patient.phone}</p>
+                                                <h4 className="text-sm font-bold text-foreground hover:text-primary transition-colors tracking-tight">{app.patient.name}</h4>
+                                                <p className="text-[10px] text-muted-fg font-mono italic">{app.patient.phone}</p>
                                             </Link>
                                         </div>
                                     </td>
@@ -155,21 +155,21 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                                 href={app.meetLink.startsWith('http') ? app.meetLink : `https://${app.meetLink}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-[1rem] border border-blue-100 shadow-sm hover:bg-blue-100 hover:border-blue-200 transition-all group/link"
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-400/10 text-blue-400 rounded-[1rem] border border-blue-400/20 shadow-sm hover:bg-blue-400/20 transition-all group/link"
                                             >
-                                                <Video size={10} className="text-blue-500 group-hover/link:scale-110 transition-transform" />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.15em]">
+                                                <Video size={10} className="text-blue-400 group-hover/link:scale-110 transition-transform" />
+                                                <span className="text-[9px] font-bold uppercase tracking-wider">
                                                     {app.type}
                                                 </span>
                                             </a>
                                         ) : (
-                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stone-50 text-stone-500 rounded-[1rem] border border-stone-100 shadow-sm">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-surface/50 text-muted-fg rounded-[1rem] border border-border shadow-sm">
                                                 {app.type === 'ONLINE' ? (
-                                                    <Video size={10} className="text-blue-500" />
+                                                    <Video size={10} className="text-blue-400" />
                                                 ) : (
-                                                    <MapPin size={10} className="text-stone-500" />
+                                                    <MapPin size={10} className="text-warm" />
                                                 )}
-                                                <span className="text-[10px] font-black uppercase tracking-[0.15em]">
+                                                <span className="text-[9px] font-bold uppercase tracking-wider">
                                                     {app.type}
                                                 </span>
                                             </div>
@@ -178,17 +178,17 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                     <td className="py-6 px-8 whitespace-nowrap">
                                         <span className={cn(
                                             "inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm",
-                                            app.status === 'CONFIRMED' ? "bg-blue-50 text-blue-600 border-blue-100/50" :
-                                                app.status === 'COMPLETED' ? "bg-emerald-50 text-emerald-600 border-emerald-100/50" :
-                                                    app.status === 'CANCELLED' ? "bg-amber-50 text-amber-600 border-amber-100/50" :
-                                                        app.status === 'ABSENT' ? "bg-red-50 text-red-600 border-red-100/50" :
-                                                            "bg-stone-50 text-stone-600 border-stone-100/50"
+                                            app.status === 'CONFIRMED' ? "bg-blue-400/10 text-blue-400 border-blue-400/20" :
+                                                app.status === 'COMPLETED' ? "bg-primary/10 text-primary border-primary/20 shadow-[0_0_10px_-2px_rgba(29,184,127,0.3)]" :
+                                                    app.status === 'CANCELLED' ? "bg-surface border-border text-muted-fg" :
+                                                        app.status === 'ABSENT' ? "bg-rose-400/10 text-rose-400 border-rose-400/20" :
+                                                            "bg-surface border-border text-muted-fg"
                                         )}>
                                             <span className={cn("w-1.5 h-1.5 rounded-full mr-2",
-                                                app.status === 'CONFIRMED' ? "bg-blue-500 shadow-blue-500/20 shadow-lg" :
-                                                    app.status === 'COMPLETED' ? "bg-emerald-500 shadow-emerald-500/20 shadow-lg" :
-                                                        app.status === 'CANCELLED' ? "bg-amber-500" :
-                                                            "bg-red-500"
+                                                app.status === 'CONFIRMED' ? "bg-blue-400" :
+                                                    app.status === 'COMPLETED' ? "bg-primary shadow-[0_0_6px_rgba(29,184,127,0.5)]" :
+                                                        app.status === 'CANCELLED' ? "bg-muted-fg" :
+                                                            "bg-rose-400"
                                             )} />
                                             {app.status === 'CONFIRMED' ? 'Confirmado' :
                                                 app.status === 'COMPLETED' ? 'Realizado' :
@@ -199,9 +199,9 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                     <td className="py-6 px-8 whitespace-nowrap">
                                         <div className="flex items-center justify-end">
                                             {app.status === 'COMPLETED' ? (
-                                                <span className="text-[10px] font-black uppercase text-stone-300 tracking-widest italic pr-4">Sessão Finalizada</span>
+                                                <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-4">Sessão Finalizada</span>
                                             ) : app.status === 'CANCELLED' ? (
-                                                <span className="text-[10px] font-black uppercase text-stone-300 tracking-widest italic pr-4">Cancelada</span>
+                                                <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-4">Cancelada</span>
                                             ) : (
                                                 <ActionMenu appointment={app} />
                                             )}
@@ -210,8 +210,8 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="py-32 text-center bg-stone-50/10">
-                                        <h5 className="text-xl font-light text-stone-400 tracking-tight">Nenhum agendamento <span className="italic">encontrado</span> para este filtro.</h5>
+                                    <td colSpan={5} className="py-32 text-center">
+                                        <h5 className="text-xl font-light text-muted-fg tracking-tight">Nenhum agendamento <span className="italic">encontrado</span> para este filtro.</h5>
                                     </td>
                                 </tr>
                             )}
@@ -232,7 +232,7 @@ function ActionMenu({ appointment }: { appointment: Appointment }) {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsOpen(!isOpen)}
-                className="h-9 px-4 rounded-xl border-stone-100 text-[9px] font-black uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-all gap-2"
+                className="h-9 px-4 rounded-xl border-border/80 text-[9px] font-black uppercase tracking-widest text-muted-fg hover:text-foreground hover:bg-surface/85 transition-all gap-2"
             >
                 Ações <ChevronRight size={12} className={cn("transition-transform", isOpen ? "rotate-90" : "")} />
             </Button>
@@ -240,14 +240,14 @@ function ActionMenu({ appointment }: { appointment: Appointment }) {
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-stone-100 rounded-2xl shadow-xl z-40 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute right-0 mt-2 w-48 bg-surface border border-border/80 rounded-2xl shadow-xl z-40 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
                         <div className="px-2 py-1">
                             <CancellationButton
                                 appointmentId={appointment.id}
                                 startTime={appointment.startTime.toISOString()}
                                 variant="ghost"
-                                className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50"
+                                className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/10"
                             />
                         </div>
 
@@ -256,7 +256,7 @@ function ActionMenu({ appointment }: { appointment: Appointment }) {
                                 <AbsentButton
                                     appointmentId={appointment.id}
                                     variant="ghost"
-                                    className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-amber-600 hover:bg-amber-50"
+                                    className="w-full justify-start h-10 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-amber-500 hover:bg-amber-500/10"
                                 />
                             </div>
                         )}
@@ -274,23 +274,23 @@ function DropdownFilter({ current, onChange, options }: { current: string | null
             <Button
                 variant="ghost"
                 onClick={() => setIsOpen(!isOpen)}
-                className="h-10 rounded-xl bg-stone-50 text-stone-400 hover:text-stone-900 gap-2 font-bold text-[10px] uppercase tracking-widest group px-6"
+                className="h-10 rounded-xl bg-surface/80 border border-border/80 text-muted-fg hover:text-foreground gap-2 font-bold text-[10px] uppercase tracking-widest group px-6"
             >
-                <Filter size={14} className={cn("transition-colors", current ? "text-stone-900" : "text-stone-300")} />
+                <Filter size={14} className={cn("transition-colors", current ? "text-foreground" : "text-muted-fg")} />
                 {options.find(o => o.value === current)?.label || "Filtros"}
             </Button>
 
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-stone-100 rounded-2xl shadow-xl z-20 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute right-0 mt-2 w-48 bg-surface border border-border/80 rounded-2xl shadow-xl z-20 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         {options.map(opt => (
                             <button
                                 key={opt.label}
                                 onClick={() => { onChange(opt.value); setIsOpen(false); }}
                                 className={cn(
-                                    "w-full px-4 py-2.5 text-left text-[9px] font-black uppercase tracking-widest transition-colors hover:bg-stone-50",
-                                    current === opt.value ? "text-stone-900 bg-stone-50" : "text-stone-400"
+                                    "w-full px-4 py-2.5 text-left text-[9px] font-black uppercase tracking-widest transition-colors hover:bg-surface/80",
+                                    current === opt.value ? "text-primary bg-primary/10" : "text-muted-fg"
                                 )}
                             >
                                 {opt.label}
@@ -302,3 +302,4 @@ function DropdownFilter({ current, onChange, options }: { current: string | null
         </div>
     );
 }
+

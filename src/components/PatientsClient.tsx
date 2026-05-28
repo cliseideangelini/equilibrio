@@ -45,88 +45,88 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
     return (
         <div className="space-y-8">
             {/* Control Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/60 p-2 rounded-[2rem] border border-stone-100 shadow-sm">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-surface/40 p-2 rounded-[2rem] border border-border/80 shadow-sm backdrop-blur-md">
                 <div className="flex flex-1 items-center gap-2 px-4 w-full">
-                    <Search className="text-stone-300 pointer-events-none" size={16} />
+                    <Search className="text-muted-fg pointer-events-none" size={16} />
                     <input
                         type="text"
                         placeholder="Buscar paciente por nome ou telefone..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="bg-transparent border-0 outline-none text-sm font-medium text-stone-600 placeholder:text-stone-300 w-full h-10"
+                        className="bg-transparent border-0 outline-none text-sm font-semibold text-foreground placeholder:text-muted-fg w-full h-10"
                     />
                 </div>
             </div>
 
             {/* Patients Grid (Table Format) */}
-            <div className="bg-white border border-stone-100 rounded-[2.5rem] shadow-xl shadow-stone-200/40 overflow-hidden">
+            <div className="bg-surface/20 border border-border/80 rounded-[2.5rem] shadow-xl overflow-hidden backdrop-blur-md">
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
-                        <thead className="bg-stone-50/30 border-b border-stone-100">
+                        <thead className="bg-surface/50 border-b border-border/80">
                             <tr>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Paciente</th>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">WhatsApp</th>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Próxima Consulta</th>
-                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-stone-400 text-center">Sessões</th>
-                                <th className="py-4 px-8 text-right font-black text-[10px] uppercase tracking-[0.2em] text-stone-400">Ações</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg">Paciente</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg">WhatsApp</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg">Próxima Consulta</th>
+                                <th className="py-4 px-8 text-left font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg text-center">Sessões</th>
+                                <th className="py-4 px-8 text-right font-black text-[10px] uppercase tracking-[0.2em] text-muted-fg">Ações</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-stone-50">
+                        <tbody className="divide-y divide-border/40">
                             {filteredPatients.length > 0 ? filteredPatients.map((patient, idx) => (
                                 <tr key={patient.id} className={cn(
-                                    "hover:bg-stone-50/50 transition-all group",
-                                    idx % 2 === 1 ? "bg-stone-50/10" : "bg-white"
+                                    "hover:bg-surface/40 transition-all group border-b border-border/40",
+                                    idx % 2 === 1 ? "bg-surface/10" : "bg-transparent"
                                 )}>
                                     <td className="py-5 px-8 whitespace-nowrap">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-[1.2rem] bg-stone-100 flex items-center justify-center text-stone-400 group-hover:bg-stone-900 group-hover:text-white transition-all shadow-sm border border-stone-200/50 font-black text-[11px] uppercase tracking-widest">
+                                            <div className="w-10 h-10 rounded-[1.2rem] bg-surface/80 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-foreground transition-all shadow-sm border border-border/80 font-black text-[11px] uppercase tracking-widest">
                                                 {patient.name.charAt(0)}
                                             </div>
                                             <div>
-                                                <h4 className="text-sm font-bold text-stone-800 tracking-tight">{patient.name}</h4>
+                                                <h4 className="text-sm font-bold text-foreground hover:text-primary transition-colors tracking-tight">{patient.name}</h4>
                                                 {patient.hasAppointmentThisWeek && (
-                                                    <span className="text-[9px] text-emerald-500 font-black uppercase tracking-widest flex items-center gap-1 mt-0.5">
+                                                    <span className="text-[9px] text-primary font-black uppercase tracking-widest flex items-center gap-1 mt-0.5 shadow-[0_0_10px_rgba(29,184,127,0.15)]">
                                                         <Calendar size={10} /> Agendado esta semana
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="py-5 px-8 whitespace-nowrap font-mono text-[11px] text-stone-400">
+                                    <td className="py-5 px-8 whitespace-nowrap font-mono text-[11px] text-muted-fg">
                                         {patient.phone}
                                     </td>
                                     <td className="py-5 px-8 whitespace-nowrap">
                                         {patient.nextAppointmentDate ? (
                                             <div className="flex flex-col">
-                                                <span className="text-[11px] font-bold text-stone-700">
+                                                <span className="text-[11px] font-bold text-foreground">
                                                     {format(new Date(patient.nextAppointmentDate), "dd 'de' MMMM", { locale: ptBR })}
                                                 </span>
-                                                <span className="text-[10px] text-stone-300 font-mono">
+                                                <span className="text-[10px] text-muted-fg font-mono">
                                                     {format(new Date(patient.nextAppointmentDate), "EEEE', às ' HH:mm", { locale: ptBR })}
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-stone-200 italic">Sem consulta futura</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-fg/40 italic">Sem consulta futura</span>
                                         )}
                                     </td>
                                     <td className="py-5 px-8 whitespace-nowrap text-center">
-                                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-stone-50 text-stone-500 text-[11px] font-black border border-stone-100">
+                                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface/80 text-primary border border-border/80 text-[11px] font-black">
                                             {patient._count.appointments}
                                         </span>
                                     </td>
                                     <td className="py-5 px-8 whitespace-nowrap text-right">
                                         <Link href={`/area-clinica/prontuarios/${patient.id}`}>
-                                            <Button variant="outline" size="sm" className="h-9 px-5 rounded-xl border-stone-100 text-[9px] font-black uppercase tracking-widest text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-all gap-2">
-                                                Ver Prontuário <ChevronRight size={12} />
+                                            <Button variant="outline" size="sm" className="h-9 px-5 rounded-xl border-border/80 text-[9px] font-black uppercase tracking-widest text-muted-fg hover:text-foreground hover:bg-surface/85 transition-all gap-2">
+                                                Ver Prontuário <ChevronRight size={12} className="text-primary" />
                                             </Button>
                                         </Link>
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="py-32 text-center bg-stone-50/10">
-                                        <User className="w-12 h-12 text-stone-100 mx-auto mb-4" />
-                                        <h5 className="text-xl font-light text-stone-400 tracking-tight">Nenhum paciente <span className="italic">encontrado</span>.</h5>
+                                    <td colSpan={5} className="py-32 text-center">
+                                        <User className="w-12 h-12 text-muted-fg/40 mx-auto mb-4" />
+                                        <h5 className="text-xl font-light text-muted-fg tracking-tight">Nenhum paciente <span className="italic">encontrado</span>.</h5>
                                     </td>
                                 </tr>
                             )}
@@ -137,3 +137,4 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
         </div>
     );
 }
+

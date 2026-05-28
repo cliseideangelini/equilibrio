@@ -3,6 +3,7 @@ import { PatientsClient } from "@/components/PatientsClient";
 import { PatientRegistrationDialog } from "@/components/PatientRegistrationDialog";
 import { ManualBookingDialog } from "@/components/ManualBookingDialog";
 import { startOfWeek, endOfWeek } from "date-fns";
+import { Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -29,8 +30,6 @@ export default async function PatientsList() {
         }
     });
 
-    // Precisamos de uma query separada para a flag de semanal ou processar em JS
-    // Vamos processar em JS para economizar queries, buscando apenas as IDs de quem tem consulta essa semana
     const semanalApps = await prisma.appointment.findMany({
         where: {
             startTime: {
@@ -69,13 +68,18 @@ export default async function PatientsList() {
     });
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 relative z-10">
             <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <h2 className="text-4xl font-light text-stone-900 tracking-tight">
-                        Seus <span className="italic font-serif text-stone-500">Pacientes</span>
+                    <div className="flex items-center gap-1.5 mb-1">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                            <Sparkles className="w-2.5 h-2.5" /> Prontuários Clinicos
+                        </span>
+                    </div>
+                    <h2 className="text-4xl font-light text-foreground tracking-tight">
+                        Seus <span className="italic font-serif text-muted-fg">Pacientes</span>
                     </h2>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-fg">
                         Gestão Completa de Prontuários e Evoluções
                     </p>
                 </div>
@@ -90,3 +94,4 @@ export default async function PatientsList() {
         </div>
     );
 }
+
