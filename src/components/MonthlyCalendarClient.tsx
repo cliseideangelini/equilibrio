@@ -32,10 +32,11 @@ interface Appointment {
 
 interface MonthlyCalendarProps {
     initialAppointments: Appointment[];
+    initialDate?: string;
 }
 
-export function MonthlyCalendarClient({ initialAppointments }: MonthlyCalendarProps) {
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+export function MonthlyCalendarClient({ initialAppointments, initialDate }: MonthlyCalendarProps) {
+    const [currentMonth, setCurrentMonth] = useState(() => initialDate ? new Date(initialDate) : new Date());
 
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);

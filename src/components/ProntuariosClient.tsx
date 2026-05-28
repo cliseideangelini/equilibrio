@@ -101,7 +101,7 @@ export function ProntuariosClient({ initialPatients }: ProntuariosClientProps) {
                                                 <span className="text-[11px] font-bold text-foreground">
                                                     {format(new Date(patient.lastAppointmentDate), "dd 'de' MMMM", { locale: ptBR })}
                                                 </span>
-                                                <span className="text-[10px] text-muted-fg font-mono">
+                                                <span className="text-[10px] text-muted-fg font-mono" suppressHydrationWarning>
                                                     Há {Math.floor((new Date().getTime() - new Date(patient.lastAppointmentDate).getTime()) / (1000 * 60 * 60 * 24))} dias
                                                 </span>
                                             </div>

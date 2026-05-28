@@ -26,10 +26,14 @@ interface EvolutionDialogProps {
 export function EvolutionDialog({ patientId, appointmentId, initialContent = "", trigger }: EvolutionDialogProps) {
     const [open, setOpen] = useState(false);
     const [content, setContent] = useState(initialContent);
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState("");
     const [isPending, setIsPending] = useState(false);
     const [isSavingDraft, setIsSavingDraft] = useState(false);
     const lastSavedContent = useRef(initialContent);
+
+    useEffect(() => {
+        setDate(new Date().toISOString().split('T')[0]);
+    }, []);
 
     // Simple debounce implementation
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -105,7 +109,7 @@ export function EvolutionDialog({ patientId, appointmentId, initialContent = "",
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="w-full h-12 px-4 rounded-xl bg-stone-50 border border-stone-100 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-stone-100 transition-all"
+                            className="w-full h-12 px-4 rounded-xl bg-stone-50 border border-stone-100 text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-100 transition-all"
                         />
                     </div>
                     <div className="flex-1 flex flex-col min-h-[350px]">

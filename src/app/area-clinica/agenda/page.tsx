@@ -155,7 +155,7 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
             {view === 'day' ? (
                 <AgendaClient initialAppointments={dayAppointments as any} initialDate={selectedDate.toISOString()} />
             ) : view === 'month' ? (
-                <MonthlyCalendarClient initialAppointments={serializedAllAppointments as any} />
+                <MonthlyCalendarClient initialAppointments={serializedAllAppointments as any} initialDate={selectedDate.toISOString()} />
             ) : (
                 <AgendaConfigClient initialAvailabilities={availabilities} patients={patients} />
             )}

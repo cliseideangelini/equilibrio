@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -30,9 +30,13 @@ export function ManualBookingDialog({ patients }: ManualBookingDialogProps) {
     const [isPending, setIsPending] = useState(false);
     const [search, setSearch] = useState("");
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-    const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+    const [date, setDate] = useState("");
     const [time, setTime] = useState("09:00");
     const [type, setType] = useState<"ONLINE" | "PRESENCIAL">("ONLINE");
+
+    useEffect(() => {
+        setDate(format(new Date(), "yyyy-MM-dd"));
+    }, []);
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
