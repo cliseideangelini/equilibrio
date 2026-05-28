@@ -21,7 +21,6 @@ import {
 
 export async function getPsychologistAvailability() {
     const psychologist = await prisma.psychologist.findFirst({
-        where: { email: 'cliseideangelini@gmail.com' },
         include: { availabilities: true }
     });
     return psychologist?.availabilities || [];
@@ -41,7 +40,6 @@ export async function getAvailableSlots(dateString: string) {
     const availabilities = await prisma.availability.findMany({
         where: {
             dayOfWeek,
-            psychologist: { email: 'cliseideangelini@gmail.com' }
         }
     });
 
@@ -165,9 +163,7 @@ export async function createAppointment(formData: {
         });
     }
 
-    const psychologist = await prisma.psychologist.findFirst({
-        where: { email: 'cliseideangelini@gmail.com' }
-    });
+    const psychologist = await prisma.psychologist.findFirst();
 
     if (!psychologist) return { success: false, error: "Psicóloga não encontrada no sistema. Verifique o cadastro." };
 
@@ -514,9 +510,7 @@ export async function createManualAppointment(data: {
     type: "ONLINE" | "PRESENCIAL";
     meetLink?: string;
 }) {
-    const psychologist = await prisma.psychologist.findFirst({
-        where: { email: 'cliseideangelini@gmail.com' }
-    });
+    const psychologist = await prisma.psychologist.findFirst();
 
     if (!psychologist) throw new Error("Psicóloga não encontrada");
 
@@ -629,9 +623,7 @@ export async function registerPatient(formData: {
 
 export async function updatePsychologistAvailability(availabilities: { dayOfWeek: number; startTimeStr: string; endTimeStr: string }[]) {
     try {
-        const psychologist = await prisma.psychologist.findFirst({
-            where: { email: 'cliseideangelini@gmail.com' }
-        });
+        const psychologist = await prisma.psychologist.findFirst();
         if (!psychologist) throw new Error("Psicóloga não encontrada");
 
         // Limpa disponibilidades antigas

@@ -90,13 +90,16 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
     });
 
     // Buscar as regras de disponibilidade da psicóloga
-    const availabilities = await prisma.availability.findMany({
-        where: { psychologist: { email: 'cliseideangelini@gmail.com' } },
-        orderBy: [
-            { dayOfWeek: 'asc' },
-            { startTime: 'asc' }
-        ]
-    });
+    const psychologist = await prisma.psychologist.findFirst();
+    const availabilities = psychologist 
+        ? await prisma.availability.findMany({
+            where: { psychologistId: psychologist.id },
+            orderBy: [
+                { dayOfWeek: 'asc' },
+                { startTime: 'asc' }
+            ]
+          })
+        : [];
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-1000 relative z-10">
