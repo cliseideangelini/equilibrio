@@ -574,10 +574,21 @@ export async function setAbsent(id: string) {
 
 export async function completeAppointment(id: string) {
     const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
-    await prisma.appointment.update({
+    const updatedAppointment = await prisma.appointment.update({
         where: { id: resolvedId },
-        data: { status: AppointmentStatus.COMPLETED }
+        data: { status: AppointmentStatus.COMPLETED },
+        include: { patient: true }
     });
+
+    if (updatedAppointment.patient.isFixed) {
+        try {
+            await notifyPsychologist(
+                `📝 *Consulta Finalizada!*\n\n👤 *Paciente*: ${updatedAppointment.patient.name}\n\n⚠️ *Atenção*: Última consulta realizada. Lembre-se de reagendar os próximos 15 dias fixos para este paciente.`
+            );
+        } catch (e) {
+            console.error("Failed to notify psychologist of completed fixed appointment:", e);
+        }
+    }
 
     revalidatePath('/area-clinica');
     revalidatePath('/area-clinica/agenda');

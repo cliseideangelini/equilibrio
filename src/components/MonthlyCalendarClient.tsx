@@ -30,12 +30,15 @@ interface Appointment {
     };
 }
 
+import { useRouter } from "next/navigation";
+
 interface MonthlyCalendarProps {
     initialAppointments: Appointment[];
     initialDate?: string;
 }
 
 export function MonthlyCalendarClient({ initialAppointments, initialDate }: MonthlyCalendarProps) {
+    const router = useRouter();
     const [currentMonth, setCurrentMonth] = useState(() => initialDate ? new Date(initialDate) : new Date());
 
     const monthStart = startOfMonth(currentMonth);
@@ -56,8 +59,17 @@ export function MonthlyCalendarClient({ initialAppointments, initialDate }: Mont
         return map;
     }, [initialAppointments]);
 
-    const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-    const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+    const handlePrevMonth = () => {
+        const prev = subMonths(currentMonth, 1);
+        setCurrentMonth(prev);
+        router.push(`/area-clinica/agenda?view=month&date=${format(prev, "yyyy-MM-dd")}`);
+    };
+
+    const handleNextMonth = () => {
+        const next = addMonths(currentMonth, 1);
+        setCurrentMonth(next);
+        router.push(`/area-clinica/agenda?view=month&date=${format(next, "yyyy-MM-dd")}`);
+    };
 
     const getStatusColor = (status: AppointmentStatus) => {
         switch (status) {
