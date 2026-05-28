@@ -29,7 +29,8 @@ export async function getPsychologistAvailability() {
 }
 
 export async function getAvailableSlots(dateString: string) {
-    const dayOfWeek = new Date(`${dateString}T12:00:00Z`).getUTCDay();
+    const dateClean = dateString.substring(0, 10);
+    const dayOfWeek = new Date(`${dateClean}T12:00:00Z`).getUTCDay();
     const now = new Date(); // Standard actual UTC now
 
     // 1. Regra de Janela de 15 Dias
@@ -42,7 +43,7 @@ export async function getAvailableSlots(dateString: string) {
     
     const todayStart = new Date(`${todayStr}T00:00:00-03:00`);
     const maxDate = new Date(todayStart.getTime() + 15 * 24 * 60 * 60 * 1000); // 15 days
-    const selectedDayStart = new Date(`${dateString}T00:00:00-03:00`);
+    const selectedDayStart = new Date(`${dateClean}T00:00:00-03:00`);
 
     if (selectedDayStart < todayStart || selectedDayStart > maxDate) return [];
     if (dayOfWeek === 0 || dayOfWeek === 6) return []; // Ocultar finais de semana
@@ -61,8 +62,8 @@ export async function getAvailableSlots(dateString: string) {
     });
     const fixedTimes = fixedPatients.map(p => p.fixedTime);
 
-    const startOfDaySP = new Date(`${dateString}T00:00:00-03:00`);
-    const endOfDaySP = new Date(`${dateString}T23:59:59-03:00`);
+    const startOfDaySP = new Date(`${dateClean}T00:00:00-03:00`);
+    const endOfDaySP = new Date(`${dateClean}T23:59:59-03:00`);
 
     const appointments = await prisma.appointment.findMany({
         where: {
@@ -85,7 +86,7 @@ export async function getAvailableSlots(dateString: string) {
         while (currentMinutes + sessionDuration <= availability.endTime) {
             const hours = Math.floor(currentMinutes / 60);
             const minutes = currentMinutes % 60;
-            const slotStart = new Date(`${dateString}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00-03:00`);
+            const slotStart = new Date(`${dateClean}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00-03:00`);
             const slotEnd = addMinutes(slotStart, sessionDuration);
 
             let isWithinDeadline = true;
