@@ -191,7 +191,8 @@ export async function createAppointment(formData: {
 
     if (!psychologist) return { success: false, error: "Psicóloga não encontrada no sistema. Verifique o cadastro." };
 
-    const startTime = new Date(`${date}T${time}:00-03:00`);
+    const dateClean = date.substring(0, 10);
+    const startTime = new Date(`${dateClean}T${time}:00-03:00`);
     const endTime = addMinutes(startTime, 30);
 
     // Prevent double booking
