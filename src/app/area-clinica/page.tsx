@@ -23,7 +23,7 @@ export default async function AreaClinicaDashboard() {
 
     const pendingAppointments = dailyAppointments.filter(a => a.status === "PENDING" || a.status === "CONFIRMED");
     const completedAppointments = dailyAppointments.filter(a => a.status === "COMPLETED");
-    const absentAppointments = dailyAppointments.filter(a => a.status === "ABSENT");
+    const absentAppointments = dailyAppointments.filter(a => a.status === "ABSENT" || a.status === "CANCELLED");
 
     // Message logic based on sessions status
     let sessionMessage = "";
@@ -67,7 +67,7 @@ export default async function AreaClinicaDashboard() {
                 {[
                     { label: "A Realizar", value: pendingAppointments.length, icon: Clock, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
                     { label: "Realizadas", value: completedAppointments.length, icon: CheckCircle, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
-                    { label: "Ausências", value: absentAppointments.length, icon: AlertCircle, color: "text-rose-400", bg: "bg-rose-400/10", border: "border-rose-400/20" },
+                    { label: "Ausências/Canceladas", value: absentAppointments.length, icon: AlertCircle, color: "text-rose-400", bg: "bg-rose-400/10", border: "border-rose-400/20" },
                     { label: "Total do Dia", value: dailyAppointments.length, icon: FileText, color: "text-warm", bg: "bg-warm/10", border: "border-warm/20" },
                 ].map((s, i) => (
                     <div key={i} className={cn("bg-surface/40 border rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md hover:translate-y-[-2px] transition-all duration-300", s.border)}>
