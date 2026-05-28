@@ -240,7 +240,7 @@ function ActionMenu({ appointment }: { appointment: Appointment }) {
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-surface border border-border/80 rounded-2xl shadow-xl z-40 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute right-0 bottom-full mb-2 w-48 bg-surface border border-border/80 rounded-2xl shadow-xl z-40 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
                         <div className="px-2 py-1">
                             <CancellationButton
