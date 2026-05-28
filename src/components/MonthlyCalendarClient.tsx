@@ -60,53 +60,54 @@ export function MonthlyCalendarClient({ initialAppointments }: MonthlyCalendarPr
 
     const getStatusColor = (status: AppointmentStatus) => {
         switch (status) {
-            case "COMPLETED": return "bg-emerald-100 text-emerald-700 border-emerald-200";
-            case "ABSENT": return "bg-red-100 text-red-700 border-red-200";
-            case "CANCELLED": return "bg-amber-100 text-amber-700 border-amber-200";
-            case "CONFIRMED": return "bg-blue-100 text-blue-700 border-blue-200";
-            default: return "bg-stone-100 text-stone-600 border-stone-200";
+            case "COMPLETED": return "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15";
+            case "ABSENT": return "bg-rose-500/10 text-rose-400 border-rose-500/20 hover:bg-rose-500/15";
+            case "CANCELLED": return "bg-white/5 text-muted-fg border-border/40 hover:bg-white/10";
+            case "CONFIRMED": return "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/15";
+            default: return "bg-surface/60 text-muted-fg border-border/60 hover:bg-surface/80";
         }
     };
 
     return (
-        <div className="bg-white rounded-[2.5rem] border border-stone-100 shadow-2xl shadow-stone-200/40 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="bg-surface/30 rounded-[2.5rem] border border-border/60 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 backdrop-blur-md relative z-10">
             {/* Header */}
-            <div className="p-8 flex items-center justify-between border-b border-stone-50 bg-stone-50/30">
+            <div className="p-8 flex items-center justify-between border-b border-border/40 bg-surface/20">
                 <div className="space-y-1">
-                    <h3 className="text-3xl font-light text-stone-900 tracking-tight">
-                        Calendário <span className="italic font-serif text-stone-500">Mensal</span>
+                    <h3 className="text-3xl font-light text-foreground tracking-tight">
+                        Calendário <span className="italic font-serif text-muted-fg">Mensal</span>
                     </h3>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
                         Visualização de Fluxo e Agendamentos
                     </p>
                 </div>
+
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-white rounded-2xl border border-stone-100 p-1 shadow-sm">
-                        <button onClick={handlePrevMonth} className="p-3 hover:bg-stone-50 rounded-xl transition-all text-stone-400 hover:text-stone-900">
-                            <ChevronLeft size={20} />
+                    <div className="flex items-center bg-surface/50 rounded-2xl border border-border/80 p-1 shadow-sm backdrop-blur-md">
+                        <button onClick={handlePrevMonth} className="p-3 hover:bg-surface rounded-xl transition-all text-muted-fg hover:text-foreground">
+                            <ChevronLeft size={16} />
                         </button>
-                        <div className="px-6 text-xs font-black uppercase tracking-[0.2em] text-stone-800 min-w-[180px] text-center">
+                        <div className="px-6 text-xs font-bold uppercase tracking-[0.2em] text-foreground min-w-[180px] text-center">
                             {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
                         </div>
-                        <button onClick={handleNextMonth} className="p-3 hover:bg-stone-50 rounded-xl transition-all text-stone-400 hover:text-stone-900">
-                            <ChevronRight size={20} />
+                        <button onClick={handleNextMonth} className="p-3 hover:bg-surface rounded-xl transition-all text-muted-fg hover:text-foreground">
+                            <ChevronRight size={16} />
                         </button>
                     </div>
                 </div>
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-7 border-b border-stone-50">
+            <div className="grid grid-cols-7 border-b border-border/40 bg-surface/10">
                 {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day) => (
-                    <div key={day} className="py-4 text-center text-[9px] font-black uppercase tracking-widest text-stone-300 border-r border-stone-50 last:border-r-0 bg-stone-50/10">
+                    <div key={day} className="py-4 text-center text-[9px] font-black uppercase tracking-widest text-muted-fg/80 border-r border-border/40 last:border-r-0">
                         {day}
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-7">
+            <div className="grid grid-cols-7 bg-surface/5">
                 {blanks.map((i) => (
-                    <div key={`blank-${i}`} className="min-h-[160px] bg-stone-50/5 border-r border-b border-stone-50 last:border-r-0" />
+                    <div key={`blank-${i}`} className="min-h-[160px] bg-black/10 border-r border-b border-border/40 last:border-r-0" />
                 ))}
                 {days.map((day) => {
                     const dateKey = format(day, "yyyy-MM-dd");
@@ -117,19 +118,19 @@ export function MonthlyCalendarClient({ initialAppointments }: MonthlyCalendarPr
                         <div 
                             key={dateKey} 
                             className={cn(
-                                "min-h-[160px] p-4 border-r border-b border-stone-50 last:border-r-0 hover:bg-stone-50/30 transition-all group",
-                                isTodayDate && "bg-stone-50/20"
+                                "min-h-[160px] p-4 border-r border-b border-border/40 last:border-r-0 hover:bg-surface/20 transition-all group",
+                                isTodayDate && "bg-primary/5 border-primary/20"
                             )}
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <span className={cn(
-                                    "text-sm font-bold flex items-center justify-center w-7 h-7 rounded-lg transition-all",
-                                    isTodayDate ? "bg-stone-900 text-white shadow-lg" : "text-stone-400 group-hover:text-stone-900"
+                                    "text-xs font-bold flex items-center justify-center w-7 h-7 rounded-lg transition-all",
+                                    isTodayDate ? "bg-primary text-foreground shadow-[0_0_15px_-4px_rgba(29,184,127,0.35)]" : "text-muted-fg group-hover:text-foreground"
                                 )}>
                                     {format(day, "d")}
                                 </span>
                                 {apps.length > 0 && (
-                                    <span className="text-[8px] font-black uppercase tracking-tighter text-stone-300">
+                                    <span className="text-[8px] font-bold uppercase tracking-widest text-primary">
                                         {apps.length} {apps.length === 1 ? 'Sessão' : 'Sessões'}
                                     </span>
                                 )}
@@ -149,7 +150,7 @@ export function MonthlyCalendarClient({ initialAppointments }: MonthlyCalendarPr
                                     </Link>
                                 ))}
                                 {apps.length > 4 && (
-                                    <div className="text-[7px] font-black uppercase tracking-widest text-stone-300 text-center pt-1">
+                                    <div className="text-[8px] font-bold uppercase tracking-widest text-muted-fg text-center pt-1 animate-pulse">
                                         + {apps.length - 4} mais
                                     </div>
                                 )}

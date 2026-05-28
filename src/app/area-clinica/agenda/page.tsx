@@ -16,6 +16,8 @@ import { MonthlyCalendarClient } from "@/components/MonthlyCalendarClient";
 import { AgendaConfigClient } from "@/components/AgendaConfigClient";
 import Link from "next/link";
 
+import { getAppointmentsWithFixed } from "@/lib/actions";
+
 export const dynamic = "force-dynamic";
 
 interface PageProps {
@@ -31,21 +33,7 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
     const monthStart = startOfMonth(selectedDate);
     const monthEnd = endOfMonth(selectedDate);
 
-    const allAppointments = await prisma.appointment.findMany({
-        where: {
-            startTime: {
-                gte: monthStart,
-                lte: monthEnd,
-            },
-            deletedAt: null
-        },
-        include: {
-            patient: {
-                select: { id: true, name: true }
-            },
-        },
-        orderBy: { startTime: 'asc' }
-    });
+    const allAppointments = await getAppointmentsWithFixed(monthStart, monthEnd);
 
     // Agendamentos específicos do dia para o AgendaClient
     const dayAppointments = allAppointments.filter(app => 

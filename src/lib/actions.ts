@@ -676,3 +676,69 @@ export async function updatePatientFixedSchedule(patientId: string, isFixed: boo
     return { success: true };
 }
 
+import { eachDayOfInterval } from "date-fns";
+
+export async function getAppointmentsWithFixed(startDate: Date, endDate: Date) {
+    const actualAppointments = await prisma.appointment.findMany({
+        where: {
+            startTime: {
+                gte: startDate,
+                lte: endDate,
+            },
+            deletedAt: null
+        },
+        include: {
+            patient: true
+        },
+        orderBy: { startTime: 'asc' }
+    });
+
+    const fixedPatients = await prisma.patient.findMany({
+        where: { isFixed: true, deletedAt: null }
+    });
+
+    const combined = [...actualAppointments];
+
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+    for (const day of days) {
+        const dayOfWeek = getDay(day);
+        const matchingPatients = fixedPatients.filter(p => p.fixedDayOfWeek === dayOfWeek);
+
+        for (const patient of matchingPatients) {
+            if (!patient.fixedTime) continue;
+            const [hours, minutes] = patient.fixedTime.split(":").map(Number);
+            const slotStart = setMinutes(setHours(startOfDay(day), hours), minutes);
+            const slotEnd = addMinutes(slotStart, 30);
+
+            const isOverlap = actualAppointments.some(app => {
+                const appStart = new Date(app.startTime);
+                const appEnd = new Date(app.endTime);
+                return (
+                    (isAfter(slotStart, appStart) && isBefore(slotStart, appEnd)) ||
+                    (isAfter(slotEnd, appStart) && isBefore(slotEnd, appEnd)) ||
+                    (slotStart.getTime() === appStart.getTime())
+                );
+            });
+
+            if (!isOverlap) {
+                combined.push({
+                    id: `fixed-${patient.id}-${format(slotStart, 'yyyyMMddHHmm')}`,
+                    startTime: slotStart,
+                    endTime: slotEnd,
+                    status: "CONFIRMED",
+                    type: "ONLINE",
+                    meetLink: null,
+                    psychologistId: "",
+                    patientId: patient.id,
+                    deletedAt: null,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    patient: patient as any
+                });
+            }
+        }
+    }
+
+    return combined.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+}
+

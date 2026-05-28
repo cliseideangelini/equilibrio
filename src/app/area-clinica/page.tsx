@@ -10,18 +10,14 @@ import { CancellationButton } from "@/components/CancellationButton";
 import { NotifyAbsentButton } from "@/components/NotifyAbsentButton";
 import { PsiDivider } from "@/components/PsiDivider";
 
+import { getAppointmentsWithFixed } from "@/lib/actions";
+
 export const dynamic = "force-dynamic";
 
 export default async function AreaClinicaDashboard() {
     const today = new Date();
 
-    const dailyAppointments = await prisma.appointment.findMany({
-        where: {
-            startTime: { gte: startOfDay(today), lte: endOfDay(today) },
-        },
-        include: { patient: true },
-        orderBy: { startTime: "asc" },
-    });
+    const dailyAppointments = await getAppointmentsWithFixed(startOfDay(today), endOfDay(today));
 
     const pendingAppointments = dailyAppointments.filter(a => a.status === "PENDING" || a.status === "CONFIRMED");
     const completedAppointments = dailyAppointments.filter(a => a.status === "COMPLETED");
