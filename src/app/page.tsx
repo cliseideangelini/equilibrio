@@ -24,6 +24,7 @@ import {
   User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PsiDivider } from "@/components/PsiDivider";
 
 /* ─────────────────────────────────────────────────────────────
    DATA — Conteúdo da clínica
@@ -249,12 +250,15 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <PsiDivider />
+
       {/* ══════════════════════════════════════════════
           SOBRE A PROFISSIONAL
       ══════════════════════════════════════════════ */}
       <section
         id="sobre"
-        className="pt-12 pb-16 sm:pt-16 sm:pb-24 px-4 sm:px-6"
+        className="py-8 sm:py-12 px-4 sm:px-6"
         aria-label="Sobre Cliseide S. Angelini"
       >
         <div className="max-w-7xl mx-auto">
@@ -365,12 +369,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PsiDivider />
+
       {/* ══════════════════════════════════════════════
           SERVIÇOS / ESPECIALIDADES
       ══════════════════════════════════════════════ */}
       <section
         id="servicos"
-        className="py-16 sm:py-24 px-4 sm:px-6 bg-surface/20"
+        className="py-8 sm:py-12 px-4 sm:px-6 bg-surface/20"
         aria-label="Especialidades e serviços"
       >
         <div className="max-w-7xl mx-auto">
@@ -444,12 +450,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PsiDivider />
+
       {/* ══════════════════════════════════════════════
           FAQ / DÚVIDAS FREQUENTES
       ══════════════════════════════════════════════ */}
       <section
         id="faq"
-        className="py-16 sm:py-24 px-4 sm:px-6"
+        className="py-8 sm:py-12 px-4 sm:px-6"
         aria-label="Dúvidas Frequentes"
       >
         <div className="max-w-4xl mx-auto">
@@ -493,12 +501,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PsiDivider />
+
       {/* ══════════════════════════════════════════════
           AGENDAMENTO / CONTATO
       ══════════════════════════════════════════════ */}
       <section
         id="agendamento"
-        className="py-16 sm:py-24 px-4 sm:px-6"
+        className="py-8 sm:py-12 px-4 sm:px-6"
         aria-label="Agendamento e contato"
       >
         <div className="max-w-7xl mx-auto">
