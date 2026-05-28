@@ -33,8 +33,6 @@
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
-
   body {
     @apply antialiased font-sans;
     background-color: hsl(var(--background));
@@ -99,8 +97,9 @@
   .orb {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(90px);
+    filter: blur(60px);
     pointer-events: none;
+    transform: translate3d(0, 0, 0);
     will-change: transform;
   }
 
