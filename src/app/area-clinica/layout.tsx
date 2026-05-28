@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { LogOut, User, Sparkles } from "lucide-react";
+import { logout } from "@/lib/actions";
 
 export default function AreaClinicaLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -82,8 +83,8 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
                     </div>
 
                     <button
-                        onClick={() => {
-                            document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                        onClick={async () => {
+                            await logout();
                             router.push("/login");
                         }}
                         className="flex items-center gap-2 px-3 py-2 text-muted-fg hover:text-rose-500 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all rounded-xl group"

@@ -5,12 +5,13 @@ import { LogOut, LayoutDashboard, Calendar, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { logout } from "@/lib/actions";
 
 export function AdminNavBar() {
     const router = useRouter();
 
-    const handleLogout = () => {
-        document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    const handleLogout = async () => {
+        await logout();
         router.push("/login");
     };
 
