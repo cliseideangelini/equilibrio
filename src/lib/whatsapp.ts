@@ -23,7 +23,7 @@ export async function notifyPsychologist(message: string) {
 
         console.log(`💬 [WhatsApp Baileys] Enviando aviso para a psicóloga no número ${phone}...`);
         
-        const apiUrl = `http://localhost:3001/send`;
+        const apiUrl = `https://equilibrio-production.up.railway.app/send`;
 
         const response = await fetch(apiUrl, {
             method: "POST",
@@ -57,7 +57,7 @@ export async function notifyPatient(patientPhone: string, message: string) {
 
         console.log(`💬 [WhatsApp Baileys] Enviando mensagem para o paciente ${phone}...`);
 
-        const apiUrl = `http://localhost:3001/send`;
+        const apiUrl = `https://equilibrio-production.up.railway.app/send`;
         
         const response = await fetch(apiUrl, {
             method: "POST",

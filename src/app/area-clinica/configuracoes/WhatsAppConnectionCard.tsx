@@ -10,7 +10,7 @@ export function WhatsAppConnectionCard() {
 
     const checkStatus = async () => {
         try {
-            const res = await fetch("http://localhost:3001/status");
+            const res = await fetch("https://equilibrio-production.up.railway.app/status");
             const data = await res.json();
             
             if (data.connected) {
@@ -28,7 +28,7 @@ export function WhatsAppConnectionCard() {
 
     const fetchQrCode = async () => {
         try {
-            const res = await fetch("http://localhost:3001/qr");
+            const res = await fetch("https://equilibrio-production.up.railway.app/qr");
             const data = await res.json();
             if (data.qr) {
                 setQrCode(data.qr);
@@ -41,7 +41,7 @@ export function WhatsAppConnectionCard() {
     const handleLogout = async () => {
         setStatus("loading");
         try {
-            await fetch("http://localhost:3001/logout", { method: "POST" });
+            await fetch("https://equilibrio-production.up.railway.app/logout", { method: "POST" });
             // Espera um segundo para o backend reiniciar a sessão
             setTimeout(checkStatus, 2000);
         } catch (error) {
