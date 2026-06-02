@@ -264,13 +264,11 @@ export async function createAppointment(formData: {
         console.error("Failed to notify psychologist:", e);
     }
 
-    // Notify patient of new booking via Meta Cloud API
+    // Notify patient of new booking via local Baileys API
     try {
-        // Dispara mensagem usando o template padrão "hello_world" que já vem pré-aprovado pela Meta
         await notifyPatient(
             patient.phone,
-            "hello_world",
-            []
+            `Olá ${patient.name}! Seu agendamento na Clínica Equilíbrio foi confirmado com sucesso!\n\n${formattedDetails}`
         );
     } catch (e) {
         console.error("Failed to notify patient of booking:", e);
@@ -523,13 +521,11 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         console.error("Failed to notify psychologist of cancellation:", e);
     }
 
-    // Notify patient of cancellation via Meta Cloud API
+    // Notify patient of cancellation via local Baileys API
     try {
-        // Dispara mensagem usando o template padrão "hello_world" que já vem pré-aprovado pela Meta
         await notifyPatient(
             appointment.patient.phone,
-            "hello_world",
-            []
+            `Olá ${appointment.patient.name}. Informamos que o seu agendamento na Clínica Equilíbrio foi CANCELADO.\n\n${formattedDetails}`
         );
     } catch (e) {
         console.error("Failed to notify patient of cancellation via WhatsApp:", e);

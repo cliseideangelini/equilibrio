@@ -4,6 +4,7 @@ import { useState } from "react";
 import { updatePsychologistProfile } from "@/lib/actions";
 import { User, Mail, Award, Phone, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WhatsAppConnectionCard } from "./WhatsAppConnectionCard";
 
 interface SettingsFormProps {
     psychologist: {
@@ -24,7 +25,6 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
     const [phone, setPhone] = useState(psychologist.phone);
     const [whatsappNotifications, setWhatsappNotifications] = useState(psychologist.whatsappNotifications);
     const [whatsappNumber, setWhatsappNumber] = useState(psychologist.whatsappNumber);
-    const [whatsappApiKey, setWhatsappApiKey] = useState(psychologist.whatsappApiKey);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
                 phone,
                 whatsappNotifications,
                 whatsappNumber,
-                whatsappApiKey
+                whatsappApiKey: "" // We keep this empty string to satisfy the types/db without changing Prisma schema for now
             });
             if (result.success) {
                 setSuccess(true);
@@ -106,7 +106,10 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
                 </div>
             </div>
 
-            {/* Configurações do CallMeBot (WhatsApp) */}
+            {/* Configuração do Disparo via WhatsApp Web */}
+            <WhatsAppConnectionCard />
+            
+            {/* Configurações do Número que Recebe Alertas */}
             <div className="space-y-4 p-5 bg-white/5 border border-primary/20 rounded-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
                 
@@ -114,11 +117,10 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
                     <div>
                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                             <Phone className="w-4 h-4 text-primary" />
-                            Notificações no WhatsApp (CallMeBot)
+                            Receber Alertas
                         </h3>
                         <p className="text-[10px] text-muted-fg mt-1">
-                            Receba alertas de novos agendamentos e cancelamentos no seu WhatsApp. 
-                            <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noreferrer" className="text-primary hover:underline ml-1">Veja como pegar sua API Key grátis.</a>
+                            Selecione se você quer receber mensagens no seu número pessoal quando uma consulta for agendada ou cancelada.
                         </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -133,9 +135,9 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
                 </div>
 
                 {whatsappNotifications && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-fg px-1">Número do WhatsApp</label>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-fg px-1">Seu Número do WhatsApp Pessoal</label>
                             <input
                                 type="tel"
                                 required={whatsappNotifications}
@@ -143,17 +145,6 @@ export function SettingsForm({ psychologist }: SettingsFormProps) {
                                 onChange={(e) => setWhatsappNumber(e.target.value)}
                                 className="w-full h-10 px-4 bg-black/20 border border-white/10 rounded-xl text-sm font-medium text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                                 placeholder="Ex: 199988275290 (com DDD)"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-fg px-1">CallMeBot API Key</label>
-                            <input
-                                type="text"
-                                required={whatsappNotifications}
-                                value={whatsappApiKey}
-                                onChange={(e) => setWhatsappApiKey(e.target.value)}
-                                className="w-full h-10 px-4 bg-black/20 border border-white/10 rounded-xl text-sm font-medium text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
-                                placeholder="Sua Chave do CallMeBot"
                             />
                         </div>
                     </div>

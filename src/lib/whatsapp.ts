@@ -10,9 +10,9 @@ export async function notifyPsychologist(message: string) {
         
         if (!psychologist) return;
         
-        // Verifica se notificações estão ativas e se tem número/chave configurados
-        if (!psychologist.whatsappNotifications || !psychologist.whatsappNumber || !psychologist.whatsappApiKey) {
-            console.log("⚠️ [WhatsApp Config] Notificações desativadas ou dados incompletos. Ignorando envio.");
+        // Verifica se notificações estão ativas e se tem número configurado
+        if (!psychologist.whatsappNotifications || !psychologist.whatsappNumber) {
+            console.log("⚠️ [WhatsApp Config] Notificações desativadas ou número não configurado. Ignorando envio.");
             return;
         }
 
@@ -21,18 +21,25 @@ export async function notifyPsychologist(message: string) {
              phone = `55${phone}`;
         }
 
-        console.log(`💬 [WhatsApp Notification] Enviando para ${phone} via CallMeBot...`);
+        console.log(`💬 [WhatsApp Baileys] Enviando aviso para a psicóloga no número ${phone}...`);
         
-        const textEncoded = encodeURIComponent(message);
-        const apiKey = psychologist.whatsappApiKey;
-        const apiUrl = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${textEncoded}&apikey=${apiKey}`;
+        const apiUrl = `http://localhost:3001/send`;
 
-        const response = await fetch(apiUrl, { method: "GET" });
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                phone: phone,
+                message: message
+            })
+        });
 
         if (response.ok) {
-            console.log("✅ [WhatsApp] Mensagem CallMeBot enviada com sucesso.");
+            console.log("✅ [WhatsApp Baileys] Aviso enviado com sucesso para a psicóloga.");
         } else {
-            console.log(`❌ [WhatsApp] Falha ao enviar CallMeBot. Status: ${response.status}`);
+            console.log(`❌ [WhatsApp Baileys] Falha ao enviar aviso. Status: ${response.status}`);
             const errorText = await response.text();
             console.log(`Motivo: ${errorText}`);
         }
@@ -41,60 +48,38 @@ export async function notifyPsychologist(message: string) {
     }
 }
 
-export async function notifyPatient(patientPhone: string, templateName: string, parameters: any[]) {
+export async function notifyPatient(patientPhone: string, message: string) {
     try {
-        const token = process.env.WHATSAPP_ACCESS_TOKEN;
-        const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-
-        if (!token || !phoneId) {
-            console.log("⚠️ [WhatsApp Meta] Token ou Phone Number ID não configurados nas variáveis de ambiente. Ignorando envio.");
-            return;
-        }
-
         let phone = patientPhone.replace(/\D/g, ""); // Keep only numbers
         if (!phone.startsWith("55") && phone.length <= 11) {
              phone = `55${phone}`;
         }
 
-        console.log(`💬 [WhatsApp Meta] Enviando template "${templateName}" para o paciente ${phone}...`);
+        console.log(`💬 [WhatsApp Baileys] Enviando mensagem para o paciente ${phone}...`);
 
-        const apiUrl = `https://graph.facebook.com/v20.0/${phoneId}/messages`;
+        const apiUrl = `http://localhost:3001/send`;
         
         const response = await fetch(apiUrl, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                messaging_product: "whatsapp",
-                to: phone,
-                type: "template",
-                template: {
-                    name: templateName,
-                    language: {
-                        code: "pt_BR"
-                    },
-                    components: parameters.length > 0 ? [
-                        {
-                            type: "body",
-                            parameters: parameters
-                        }
-                    ] : []
-                }
+                phone: phone,
+                message: message
             })
         });
 
         if (response.ok) {
             const data = await response.json();
-            console.log("✅ [WhatsApp Meta] Mensagem enviada com sucesso para o paciente:", data);
+            console.log("✅ [WhatsApp Baileys] Mensagem enviada com sucesso para o paciente:", data);
         } else {
-            console.log(`❌ [WhatsApp Meta] Falha ao enviar mensagem. Status: ${response.status}`);
+            console.log(`❌ [WhatsApp Baileys] Falha ao enviar mensagem. Status: ${response.status}`);
             const errorText = await response.text();
             console.log(`Motivo: ${errorText}`);
         }
     } catch (err: any) {
-        console.error("❌ [WhatsApp Meta Error] Falha na notificação do paciente:", err.message);
+        console.error("❌ [WhatsApp Baileys Error] Falha na notificação do paciente:", err.message);
     }
 }
 
