@@ -88,7 +88,7 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
                     <button
                         onClick={async () => {
                             await logout();
-                            router.push("/login");
+                            window.location.href = "/login";
                         }}
                         className="flex items-center gap-2 px-3 py-2 text-muted-fg hover:text-rose-500 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all rounded-xl group"
                     >
