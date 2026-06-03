@@ -6,6 +6,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { LogOut, User, Sparkles } from "lucide-react";
 import { logout } from "@/lib/actions";
+import { WhatsAppStatusIndicator } from "@/components/WhatsAppStatusIndicator";
 
 export default function AreaClinicaLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -80,7 +81,10 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
                             <User size={18} />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-muted-fg leading-none mb-0.5">Profissional</span>
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-muted-fg leading-none">Profissional</span>
+                                <WhatsAppStatusIndicator />
+                            </div>
                             <span className="text-sm font-bold text-foreground leading-none">Cliseide S. Angelini</span>
                         </div>
                     </div>
