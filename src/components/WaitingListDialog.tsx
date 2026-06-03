@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { addToWaitingList, getAvailableSlots } from "@/lib/actions";
+import { addToWaitingList, getAvailableSlots, getPatientWaitingList } from "@/lib/actions";
 import { Loader2, CalendarHeart, CheckCircle2, Clock, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDay } from "date-fns";
@@ -43,6 +43,14 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
         specificTime: "",
         preferredShift: "MANHA" as "MANHA" | "TARDE"
     });
+
+    const [myWaitingList, setMyWaitingList] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (open && formData.phone) {
+            getPatientWaitingList(formData.phone).then(setMyWaitingList).catch(console.error);
+        }
+    }, [open, formData.phone]);
 
     // Helper: Dias de atendimento (ex: [1, 2, 4])
     const workingDays = useMemo(() => Array.from(new Set(rules.map(r => r.dayOfWeek))), [rules]);
@@ -213,12 +221,18 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                                     <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-1">
                                                         <CalendarIcon size={10} /> Dias Preferidos
                                                     </label>
-                                                    <Input
+                                                    <select
                                                         value={formData.preferredDays}
-                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, preferredDays: e.target.value })}
-                                                        placeholder="Ex: Seg e Ter"
-                                                        className="rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-primary/20 h-12"
-                                                    />
+                                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, preferredDays: e.target.value })}
+                                                        className="rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:ring-primary/20 h-12 px-3 text-sm text-white outline-none appearance-none"
+                                                    >
+                                                        <option value="" className="bg-[#1A1C23] text-white">Qualquer dia</option>
+                                                        <option value="Segunda-feira" className="bg-[#1A1C23] text-white">Segunda-feira</option>
+                                                        <option value="Terça-feira" className="bg-[#1A1C23] text-white">Terça-feira</option>
+                                                        <option value="Quarta-feira" className="bg-[#1A1C23] text-white">Quarta-feira</option>
+                                                        <option value="Quinta-feira" className="bg-[#1A1C23] text-white">Quinta-feira</option>
+                                                        <option value="Sexta-feira" className="bg-[#1A1C23] text-white">Sexta-feira</option>
+                                                    </select>
                                                 </div>
                                                 <div className="grid gap-2">
                                                     <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-1">
@@ -276,20 +290,46 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                                             )}
                                                         >
                                                             <option value="" className="bg-[#1A1C23] text-white">Selecione...</option>
-                                                            {availableSlotsForDate.map(slot => {
-                                                                const isFree = realAvailableSlots.includes(slot);
-                                                                return (
-                                                                    <option key={slot} value={slot} className="bg-[#1A1C23] text-white">
-                                                                        {slot} {isFree ? "(Livre - Agende já)" : "(Ocupado - Fila)"}
+                                                            <optgroup label="Horários Livres (Agende Já)" className="bg-[#1A1C23] text-emerald-400 font-bold">
+                                                                {availableSlotsForDate.filter(slot => realAvailableSlots.includes(slot)).map(slot => (
+                                                                    <option key={slot} value={slot} className="bg-[#1A1C23] text-emerald-400 font-normal">
+                                                                        {slot}
                                                                     </option>
-                                                                );
-                                                            })}
+                                                                ))}
+                                                            </optgroup>
+                                                            <optgroup label="Horários Ocupados (Fila de Espera)" className="bg-[#1A1C23] text-stone-400 font-bold mt-2">
+                                                                {availableSlotsForDate.filter(slot => !realAvailableSlots.includes(slot)).map(slot => (
+                                                                    <option key={slot} value={slot} className="bg-[#1A1C23] text-white font-normal">
+                                                                        {slot}
+                                                                    </option>
+                                                                ))}
+                                                            </optgroup>
                                                         </select>
                                                     )}
                                                 </div>
                                             </div>
                                         )}
                                     </div>
+                                    
+                                    {/* Exibir horários já na fila */}
+                                    {myWaitingList.length > 0 && (
+                                        <div className="mt-4 p-4 rounded-xl bg-white/5 border border-white/10">
+                                            <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
+                                                <CalendarHeart size={12} /> Você já está na fila para:
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {myWaitingList.map(item => (
+                                                    <span key={item.id} className="px-2 py-1 bg-white/10 rounded-md text-[10px] text-white">
+                                                        {item.specificDate ? (
+                                                            `${new Date(item.specificDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} às ${item.specificTime}`
+                                                        ) : (
+                                                            `${item.preferredDays || 'Qualquer dia'} - ${item.preferredShift === 'MANHA' ? 'Manhã' : 'Tarde'}`
+                                                        )}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <DialogFooter className="mt-8">
                                     {isSelectedTimeAvailable ? (
@@ -303,8 +343,13 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                     ) : (
                                         <Button
                                             type="submit"
-                                            disabled={isPending || (mode === "specific" && !isDayValid)}
-                                            className="w-full bg-white text-black hover:bg-stone-200 rounded-2xl h-14 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                                            disabled={
+                                                isPending || 
+                                                (mode === "specific" && !isDayValid) ||
+                                                (mode === "specific" && myWaitingList.some(w => w.specificDate && new Date(w.specificDate).toISOString().split('T')[0] === formData.specificDate && w.specificTime === formData.specificTime)) ||
+                                                (mode === "general" && myWaitingList.some(w => !w.specificDate && w.preferredDays === formData.preferredDays && w.preferredShift === formData.preferredShift))
+                                            }
+                                            className="w-full bg-white text-black hover:bg-stone-200 rounded-2xl h-14 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                                         >
                                             {isPending ? <Loader2 size={16} className="animate-spin text-black" /> : "Confirmar na Lista de Espera"}
                                         </Button>

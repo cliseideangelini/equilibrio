@@ -434,6 +434,13 @@ export async function getWaitingList() {
     });
 }
 
+export async function getPatientWaitingList(phone: string) {
+    return await prisma.waitingList.findMany({
+        where: { phone, status: "PENDING" },
+        orderBy: { createdAt: 'desc' }
+    });
+}
+
 export async function updateWaitingListStatus(id: string, status: string) {
     await prisma.waitingList.update({
         where: { id },
