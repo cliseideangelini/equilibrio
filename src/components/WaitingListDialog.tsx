@@ -91,12 +91,12 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
         }
     }, [formData.specificDate, mode, isDayValid]);
 
-    const hasAvailableSlots = realAvailableSlots.length > 0;
+    const isSelectedTimeAvailable = mode === "specific" && formData.specificTime && realAvailableSlots.includes(formData.specificTime);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name || !formData.phone) return;
-        if (mode === "specific" && (!isDayValid || hasAvailableSlots)) return;
+        if (mode === "specific" && (!isDayValid || isSelectedTimeAvailable)) return;
 
         setIsPending(true);
         try {
@@ -262,23 +262,28 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                                         <div className="flex items-center justify-center h-12 bg-white/5 border border-white/10 rounded-xl">
                                                             <Loader2 size={16} className="animate-spin text-muted-foreground" />
                                                         </div>
-                                                    ) : hasAvailableSlots ? (
-                                                        <div className="flex flex-col justify-center h-12 px-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
-                                                            <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest leading-tight">Vagas abertas!</p>
-                                                            <p className="text-[8px] text-emerald-400/80 leading-tight mt-0.5">Agende pelo calendário.</p>
-                                                        </div>
                                                     ) : (
                                                         <select
                                                             required={mode === "specific"}
                                                             disabled={!formData.specificDate || !isDayValid}
                                                             value={formData.specificTime}
                                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, specificTime: e.target.value })}
-                                                            className="rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:ring-primary/20 h-12 px-3 text-sm text-white outline-none appearance-none disabled:opacity-30 disabled:cursor-not-allowed"
+                                                            className={cn(
+                                                                "rounded-xl border h-12 px-3 text-sm outline-none appearance-none disabled:opacity-30 disabled:cursor-not-allowed transition-all",
+                                                                isSelectedTimeAvailable 
+                                                                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 focus:border-emerald-500/50" 
+                                                                    : "bg-white/5 border-white/10 text-white focus:border-primary/50 focus:ring-primary/20"
+                                                            )}
                                                         >
                                                             <option value="" className="bg-[#1A1C23] text-white">Selecione...</option>
-                                                            {availableSlotsForDate.map(slot => (
-                                                                <option key={slot} value={slot} className="bg-[#1A1C23] text-white">{slot}</option>
-                                                            ))}
+                                                            {availableSlotsForDate.map(slot => {
+                                                                const isFree = realAvailableSlots.includes(slot);
+                                                                return (
+                                                                    <option key={slot} value={slot} className="bg-[#1A1C23] text-white">
+                                                                        {slot} {isFree ? "(Livre - Agende já)" : "(Ocupado - Fila)"}
+                                                                    </option>
+                                                                );
+                                                            })}
                                                         </select>
                                                     )}
                                                 </div>
@@ -287,7 +292,7 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                     </div>
                                 </div>
                                 <DialogFooter className="mt-8">
-                                    {mode === "specific" && hasAvailableSlots ? (
+                                    {isSelectedTimeAvailable ? (
                                         <Button
                                             type="button"
                                             onClick={() => setOpen(false)}
