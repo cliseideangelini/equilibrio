@@ -523,9 +523,14 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     // Notify patient of cancellation via local Baileys API
     try {
+        let chargeNotice = "";
+        if (!isProfessional && hoursUntilSession <= 3) {
+            chargeNotice = "\n\n⚠️ *Aviso Importante*: Como o cancelamento foi realizado com menos de 3 horas de antecedência, informamos que o valor da consulta será cobrado integralmente, conforme nossa política de agendamentos.";
+        }
+
         await notifyPatient(
             appointment.patient.phone,
-            `Olá ${appointment.patient.name}. Informamos que o seu agendamento na Clínica Equilíbrio foi CANCELADO.\n\n${formattedDetails}`
+            `Olá ${appointment.patient.name}. Informamos que o seu agendamento na Clínica Equilíbrio foi CANCELADO.\n\n${formattedDetails}${chargeNotice}`
         );
     } catch (e) {
         console.error("Failed to notify patient of cancellation via WhatsApp:", e);
@@ -537,7 +542,7 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         const startTimeStr = format(appointment.startTime, 'yyyy-MM-dd');
         
         // 1. Prioridade: Quem pediu ESSE horário específico
-        const specificInterested = await (prisma as any).waitingList.findMany({
+        const specificInterested = await prisma.waitingList.findMany({
             where: {
                 status: "PENDING",
                 specificTime: timeStr,
@@ -549,7 +554,7 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         });
 
         // 2. Geral: Quem está na lista esperando qualquer vaga
-        const generalInterested = await (prisma as any).waitingList.findMany({
+        const generalInterested = await prisma.waitingList.findMany({
             where: {
                 status: "PENDING",
                 specificDate: null
@@ -560,13 +565,23 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
         if (allToNotify.length > 0) {
             // Marcar como notificados
-            await (prisma as any).waitingList.updateMany({
-                where: { id: { in: allToNotify.map((i: any) => i.id) } },
+            await prisma.waitingList.updateMany({
+                where: { id: { in: allToNotify.map(i => i.id) } },
                 data: { status: "NOTIFIED" }
             });
 
-            // Nota: Integrar com API de WhatsApp real aqui no futuro
-            // Ex: sendWhatsApp(i.phone, `Vaga aberta! Agende agora: equilibrium.com/agendar?date=${startTimeStr}&time=${timeStr}`)
+            // Disparar WhatsApp para todos (First come, first served)
+            const dateFormatted = format(appointment.startTime, "dd/MM 'às' HH:mm");
+            for (const interested of allToNotify) {
+                try {
+                    await notifyPatient(
+                        interested.phone,
+                        `🌟 *Vaga Liberada!*\n\nOlá ${interested.name}, um horário que você aguardava acabou de ser liberado na Clínica Equilíbrio para *${dateFormatted}*!\n\nCorra para garantir: https://www.cliseide.com.br/agendar\n\n_(O primeiro a agendar fica com a vaga)_`
+                    );
+                } catch (err) {
+                    console.error("Erro ao notificar paciente da lista de espera:", err);
+                }
+            }
         }
     } catch (e) {
         console.error("Erro ao processar lista de espera:", e);

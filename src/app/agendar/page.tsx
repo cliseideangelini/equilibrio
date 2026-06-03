@@ -48,6 +48,9 @@ export default async function BookingPage() {
             </div>
 
             <main className="flex-1 py-12 px-6 flex flex-col items-center relative z-20">
+                <div className="w-full max-w-4xl flex justify-end mb-6">
+                    <WaitingListDialog rules={availability} />
+                </div>
                 <SimpleBookingForm 
                     availabilityRules={availability} 
                     patientName={patient.name} 
