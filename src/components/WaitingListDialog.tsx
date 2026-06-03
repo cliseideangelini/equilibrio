@@ -125,9 +125,9 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" className="h-10 px-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all group gap-2">
-                    <CalendarHeart size={14} className="text-primary group-hover:text-primary transition-colors" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest hidden md:inline">Entrar na Lista de Espera</span>
+                <Button variant="outline" className="h-10 px-6 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/15 hover:border-primary/50 text-white hover:text-primary-foreground transition-all group gap-2 shadow-[0_0_15px_rgba(var(--primary),0.05)] hover:shadow-[0_0_25px_rgba(var(--primary),0.15)]">
+                    <CalendarHeart size={14} className="text-primary group-hover:scale-110 transition-transform duration-300" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary/90 group-hover:text-primary transition-colors hidden md:inline">Entrar na Lista de Espera</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0A0A0A] text-white">
