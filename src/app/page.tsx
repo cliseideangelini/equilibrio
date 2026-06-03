@@ -76,7 +76,7 @@ const CREDENTIALS = [
 const CONTACT_INFO = [
   { icon: Phone,  label: "WhatsApp",    value: "(19) 98827-5290",              href: "https://wa.me/5519988275290" },
   { icon: MapPin, label: "Localização", value: "Limeira — SP (Presencial)",   href: "#" },
-  { icon: Clock,  label: "Horários",    value: "Seg–Sex: 8h às 20h",           href: "#" },
+  { icon: Clock,  label: "Horários",    value: "Seg–Sex: 8h às 18h",           href: "#" },
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -730,7 +730,7 @@ export default function HomePage() {
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Clock className="w-4 h-4 shrink-0 mt-0.5 text-primary/70" />
-                Seg–Sex: 8h às 20h
+                Seg–Sex: 8h às 18h
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-primary/70" />
