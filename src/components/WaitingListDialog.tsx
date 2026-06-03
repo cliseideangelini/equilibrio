@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { addToWaitingList, getAvailableSlots, getPatientWaitingList } from "@/lib/actions";
-import { Loader2, CalendarHeart, CheckCircle2, Clock, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
+import { addToWaitingList, getAvailableSlots, getPatientWaitingList, deleteWaitingListEntry } from "@/lib/actions";
+import { Loader2, CalendarHeart, CheckCircle2, Clock, Calendar as CalendarIcon, ArrowRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDay } from "date-fns";
 
@@ -98,6 +98,17 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
             setRealAvailableSlots([]);
         }
     }, [formData.specificDate, mode, isDayValid]);
+
+    const hasAvailableSlots = realAvailableSlots.length > 0;
+
+    const handleDeleteWaitlist = async (id: string) => {
+        try {
+            await deleteWaitingListEntry(id);
+            setMyWaitingList(prev => prev.filter(item => item.id !== id));
+        } catch (e) {
+            console.error("Error deleting waitlist entry:", e);
+        }
+    };
 
     const isSelectedTimeAvailable = mode === "specific" && formData.specificTime && realAvailableSlots.includes(formData.specificTime);
 
@@ -319,12 +330,19 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                             </p>
                                             <div className="flex flex-wrap gap-2">
                                                 {myWaitingList.map(item => (
-                                                    <span key={item.id} className="px-2 py-1 bg-white/10 rounded-md text-[10px] text-white">
+                                                    <span key={item.id} className="group px-2 py-1 bg-white/10 rounded-md text-[10px] text-white flex items-center gap-1 transition-all">
                                                         {item.specificDate ? (
                                                             `${new Date(item.specificDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} às ${item.specificTime}`
                                                         ) : (
                                                             `${item.preferredDays || 'Qualquer dia'} - ${item.preferredShift === 'MANHA' ? 'Manhã' : 'Tarde'}`
                                                         )}
+                                                        <button 
+                                                            type="button" 
+                                                            onClick={() => handleDeleteWaitlist(item.id)}
+                                                            className="text-muted-foreground hover:text-red-400 p-0.5 rounded-full hover:bg-white/10 transition-colors ml-1"
+                                                        >
+                                                            <X size={10} />
+                                                        </button>
                                                     </span>
                                                 ))}
                                             </div>
