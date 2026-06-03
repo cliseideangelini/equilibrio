@@ -13,8 +13,10 @@ let waSocket = null;
 let isConnected = false;
 let currentQR = null;
 
+const SESSION_DIR = process.env.SESSION_DIR || 'auth_info_baileys';
+
 async function connectToWhatsApp() {
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+    const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
     const { version } = await fetchLatestBaileysVersion();
     
     const logger = pino({ level: 'silent' });
@@ -24,7 +26,9 @@ async function connectToWhatsApp() {
         auth: state,
         logger,
         printQRInTerminal: true,
-        browser: ['Equilibrio Sender', 'Chrome', '1.0.0']
+        browser: ['Equilibrio Sender', 'Chrome', '1.0.0'],
+        syncFullHistory: false, // Evitar travamentos por carregar histórico antigo
+        generateHighQualityLinkPreview: false
     });
 
     waSocket.ev.on('creds.update', saveCreds);
@@ -81,8 +85,8 @@ app.post('/logout', async (req, res) => {
         currentQR = null;
         
         // Apaga a pasta de sessão para forçar novo QR Code
-        if (fs.existsSync('auth_info_baileys')) {
-            fs.rmSync('auth_info_baileys', { recursive: true, force: true });
+        if (fs.existsSync(SESSION_DIR)) {
+            fs.rmSync(SESSION_DIR, { recursive: true, force: true });
         }
         
         // Inicia novamente para gerar novo QR Code
