@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { addToWaitingList } from "@/lib/actions";
-import { Loader2, CalendarHeart, CheckCircle2, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { addToWaitingList, getAvailableSlots } from "@/lib/actions";
+import { Loader2, CalendarHeart, CheckCircle2, Clock, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDay } from "date-fns";
 
@@ -75,10 +75,28 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
         return workingDays.includes(getDay(date));
     }, [formData.specificDate, workingDays]);
 
+    const [realAvailableSlots, setRealAvailableSlots] = useState<string[]>([]);
+    const [isCheckingSlots, setIsCheckingSlots] = useState(false);
+
+    useEffect(() => {
+        if (mode === "specific" && formData.specificDate && isDayValid) {
+            setIsCheckingSlots(true);
+            const isoDate = new Date(formData.specificDate + "T00:00:00").toISOString();
+            getAvailableSlots(isoDate)
+                .then(slots => setRealAvailableSlots(slots))
+                .catch(() => setRealAvailableSlots([]))
+                .finally(() => setIsCheckingSlots(false));
+        } else {
+            setRealAvailableSlots([]);
+        }
+    }, [formData.specificDate, mode, isDayValid]);
+
+    const hasAvailableSlots = realAvailableSlots.length > 0;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name || !formData.phone) return;
-        if (mode === "specific" && !isDayValid) return;
+        if (mode === "specific" && (!isDayValid || hasAvailableSlots)) return;
 
         setIsPending(true);
         try {
@@ -240,31 +258,52 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                                     <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-1">
                                                         <Clock size={10} /> Hora Exata
                                                     </label>
-                                                    <select
-                                                        required={mode === "specific"}
-                                                        disabled={!formData.specificDate || !isDayValid}
-                                                        value={formData.specificTime}
-                                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, specificTime: e.target.value })}
-                                                        className="rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:ring-primary/20 h-12 px-3 text-sm text-white outline-none appearance-none disabled:opacity-30 disabled:cursor-not-allowed"
-                                                    >
-                                                        <option value="" className="bg-[#1A1C23] text-white">Selecione...</option>
-                                                        {availableSlotsForDate.map(slot => (
-                                                            <option key={slot} value={slot} className="bg-[#1A1C23] text-white">{slot}</option>
-                                                        ))}
-                                                    </select>
+                                                    {isCheckingSlots ? (
+                                                        <div className="flex items-center justify-center h-12 bg-white/5 border border-white/10 rounded-xl">
+                                                            <Loader2 size={16} className="animate-spin text-muted-foreground" />
+                                                        </div>
+                                                    ) : hasAvailableSlots ? (
+                                                        <div className="flex flex-col justify-center h-12 px-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
+                                                            <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest leading-tight">Vagas abertas!</p>
+                                                            <p className="text-[8px] text-emerald-400/80 leading-tight mt-0.5">Agende pelo calendário.</p>
+                                                        </div>
+                                                    ) : (
+                                                        <select
+                                                            required={mode === "specific"}
+                                                            disabled={!formData.specificDate || !isDayValid}
+                                                            value={formData.specificTime}
+                                                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, specificTime: e.target.value })}
+                                                            className="rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:ring-primary/20 h-12 px-3 text-sm text-white outline-none appearance-none disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        >
+                                                            <option value="" className="bg-[#1A1C23] text-white">Selecione...</option>
+                                                            {availableSlotsForDate.map(slot => (
+                                                                <option key={slot} value={slot} className="bg-[#1A1C23] text-white">{slot}</option>
+                                                            ))}
+                                                        </select>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                                 <DialogFooter className="mt-8">
-                                    <Button
-                                        type="submit"
-                                        disabled={isPending}
-                                        className="w-full bg-white text-black hover:bg-stone-200 rounded-2xl h-14 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
-                                    >
-                                        {isPending ? <Loader2 size={16} className="animate-spin text-black" /> : "Confirmar na Lista de Espera"}
-                                    </Button>
+                                    {mode === "specific" && hasAvailableSlots ? (
+                                        <Button
+                                            type="button"
+                                            onClick={() => setOpen(false)}
+                                            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl h-14 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all gap-2"
+                                        >
+                                            Ir para Agendamento <ArrowRight size={14} />
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            type="submit"
+                                            disabled={isPending || (mode === "specific" && !isDayValid)}
+                                            className="w-full bg-white text-black hover:bg-stone-200 rounded-2xl h-14 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                                        >
+                                            {isPending ? <Loader2 size={16} className="animate-spin text-black" /> : "Confirmar na Lista de Espera"}
+                                        </Button>
+                                    )}
                                 </DialogFooter>
                             </>
                         )}
