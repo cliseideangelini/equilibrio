@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { WaitingListDialog } from "@/components/WaitingListDialog";
 
 const SCHEDULE_CONFIG = {
     WINDOW_DAYS: 15,
@@ -122,6 +123,7 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
+                    <WaitingListDialog rules={availabilityRules} />
                     <div className="text-right hidden sm:block">
                         <p className="text-[10px] font-black uppercase tracking-widest text-white">{patientName}</p>
                         <p className="text-[8px] font-bold text-muted-foreground italic">Sessão Autenticada e Segura</p>
