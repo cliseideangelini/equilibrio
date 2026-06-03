@@ -123,7 +123,6 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
-                    <WaitingListDialog rules={availabilityRules} />
                     <div className="text-right hidden sm:block">
                         <p className="text-[10px] font-black uppercase tracking-widest text-white">{patientName}</p>
                         <p className="text-[8px] font-bold text-muted-foreground italic">Sessão Autenticada e Segura</p>
@@ -154,6 +153,10 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
                             locale={ptBR}
                             className="text-white"
                         />
+                    </div>
+                    
+                    <div className="relative z-10 flex justify-center mt-6 pt-6 border-t border-white/5">
+                        <WaitingListDialog rules={availabilityRules} patientName={patientName} patientPhone={patientPhone} />
                     </div>
                 </div>
 

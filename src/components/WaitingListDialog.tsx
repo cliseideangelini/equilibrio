@@ -24,17 +24,19 @@ interface AvailabilityRule {
 
 interface WaitingListDialogProps {
     rules: AvailabilityRule[];
+    patientName?: string;
+    patientPhone?: string;
 }
 
-export function WaitingListDialog({ rules }: WaitingListDialogProps) {
+export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingListDialogProps) {
     const [open, setOpen] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [mode, setMode] = useState<"general" | "specific">("general");
 
     const [formData, setFormData] = useState({
-        name: "",
-        phone: "",
+        name: patientName || "",
+        phone: patientPhone || "",
         email: "",
         preferredDays: "",
         specificDate: "",
