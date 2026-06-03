@@ -33,7 +33,7 @@ export function LogoutButton() {
                     onClick={async () => {
                         if (window.confirm("Tem certeza que deseja deslogar da sua conta?")) {
                             await logout();
-                            window.location.href = "/paciente/login";
+                            window.location.replace("/paciente/login");
                         }
                     }}
                 >

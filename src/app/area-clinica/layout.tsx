@@ -89,7 +89,7 @@ export default function AreaClinicaLayout({ children }: { children: React.ReactN
                         onClick={async () => {
                             if (window.confirm("Tem certeza que deseja sair do painel?")) {
                                 await logout();
-                                window.location.href = "/login";
+                                window.location.replace("/login");
                             }
                         }}
                         className="flex items-center gap-2 px-3 py-2 text-muted-fg hover:text-rose-500 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all rounded-xl group"

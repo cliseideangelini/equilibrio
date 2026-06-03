@@ -772,6 +772,7 @@ export async function logout() {
     const cookieStore = await cookies();
     cookieStore.delete('admin_id');
     cookieStore.delete('patient_id');
+    revalidatePath('/', 'layout');
     return { success: true };
 }
 

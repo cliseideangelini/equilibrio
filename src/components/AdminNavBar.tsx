@@ -13,7 +13,7 @@ export function AdminNavBar() {
     const handleLogout = async () => {
         if (window.confirm("Tem certeza que deseja sair do painel?")) {
             await logout();
-            window.location.href = "/login";
+            window.location.replace("/login");
         }
     };
 
