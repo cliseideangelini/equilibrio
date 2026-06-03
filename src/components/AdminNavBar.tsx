@@ -11,8 +11,10 @@ export function AdminNavBar() {
     const router = useRouter();
 
     const handleLogout = async () => {
-        await logout();
-        window.location.href = "/login";
+        if (window.confirm("Tem certeza que deseja sair do painel?")) {
+            await logout();
+            window.location.href = "/login";
+        }
     };
 
     return (

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LogOut, Home, LogOut as LogOutIcon, X } from "lucide-react";
+import { logout } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 
 export function LogoutButton() {
@@ -29,9 +30,11 @@ export function LogoutButton() {
                 <Button
                     variant="ghost"
                     className="w-full justify-start gap-3 h-10 rounded-xl bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-transparent transition-all"
-                    onClick={() => {
-                        document.cookie = "patient_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                        window.location.href = "/paciente/login";
+                    onClick={async () => {
+                        if (window.confirm("Tem certeza que deseja deslogar da sua conta?")) {
+                            await logout();
+                            window.location.href = "/paciente/login";
+                        }
                     }}
                 >
                     <LogOutIcon size={16} />
