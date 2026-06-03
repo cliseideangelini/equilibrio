@@ -324,26 +324,38 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                     
                                     {/* Exibir horários já na fila */}
                                     {myWaitingList.length > 0 && (
-                                        <div className="mt-4 p-4 rounded-xl bg-white/5 border border-white/10">
-                                            <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
-                                                <CalendarHeart size={12} /> Você já está na fila para:
+                                        <div className="mt-6 p-5 rounded-2xl bg-[#13151A] border border-white/10">
+                                            <p className="text-xs font-bold text-white mb-2 flex items-center gap-2">
+                                                <CalendarHeart size={16} className="text-primary" /> Meus Pedidos na Fila
                                             </p>
-                                            <div className="flex flex-wrap gap-2">
+                                            <p className="text-[10px] text-muted-foreground mb-4">
+                                                Para trocar o dia ou horário, primeiro cancele o pedido atual abaixo e depois faça um novo pedido no formulário acima.
+                                            </p>
+                                            <div className="flex flex-col gap-3">
                                                 {myWaitingList.map(item => (
-                                                    <span key={item.id} className="group px-2 py-1 bg-white/10 rounded-md text-[10px] text-white flex items-center gap-1 transition-all">
-                                                        {item.specificDate ? (
-                                                            `${new Date(item.specificDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} às ${item.specificTime}`
-                                                        ) : (
-                                                            `${item.preferredDays || 'Qualquer dia'} - ${item.preferredShift === 'MANHA' ? 'Manhã' : 'Tarde'}`
-                                                        )}
+                                                    <div key={item.id} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-bold text-white">
+                                                                {item.specificDate ? (
+                                                                    `${new Date(item.specificDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} às ${item.specificTime}`
+                                                                ) : (
+                                                                    `${item.preferredDays || 'Qualquer dia'}`
+                                                                )}
+                                                            </span>
+                                                            {!item.specificDate && (
+                                                                <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
+                                                                    {item.preferredShift === 'MANHA' ? 'Turno: Manhã' : 'Turno: Tarde'}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                         <button 
                                                             type="button" 
                                                             onClick={() => handleDeleteWaitlist(item.id)}
-                                                            className="text-muted-foreground hover:text-red-400 p-0.5 rounded-full hover:bg-white/10 transition-colors ml-1"
+                                                            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg text-xs font-bold transition-colors"
                                                         >
-                                                            <X size={10} />
+                                                            <X size={14} /> Cancelar
                                                         </button>
-                                                    </span>
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
