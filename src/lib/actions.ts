@@ -406,6 +406,24 @@ export async function addToWaitingList(data: {
         }
     });
 
+    try {
+        let prefs = "";
+        if (data.specificDate) {
+            prefs = `📅 Data: ${format(data.specificDate, 'dd/MM/yyyy')}`;
+            if (data.specificTime) prefs += `\n⏰ Horário: ${data.specificTime}`;
+        } else {
+            prefs = `📅 Dias: ${data.preferredDays || 'Qualquer dia'}\n⏰ Turno: ${data.preferredShift === 'MANHA' ? 'Manhã' : 'Tarde'}`;
+        }
+
+        const firstName = data.name.split(' ')[0];
+        await notifyPatient(
+            data.phone,
+            `Olá ${firstName}! Recebemos o seu pedido para a *Lista de Espera* da Clínica Equilíbrio.\n\n*Suas Preferências:*\n${prefs}\n\nAssim que surgir uma vaga, avisaremos você por aqui! 🌟`
+        );
+    } catch (e) {
+        console.error("Erro ao notificar paciente da entrada na lista de espera:", e);
+    }
+
     revalidatePath('/area-clinica/lista-espera');
     return { success: true };
 }
