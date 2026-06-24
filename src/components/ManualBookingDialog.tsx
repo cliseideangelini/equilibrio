@@ -10,7 +10,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusCircle, Loader2, Search, Calendar, Clock, Video, MapPin } from "lucide-react";
-import { createManualAppointment } from "@/lib/actions";
+import { createManualAppointment, getAvailableSlots } from "@/lib/actions";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -33,10 +33,32 @@ export function ManualBookingDialog({ patients }: ManualBookingDialogProps) {
     const [date, setDate] = useState("");
     const [time, setTime] = useState("09:00");
     const [type, setType] = useState<"ONLINE" | "PRESENCIAL">("ONLINE");
+    const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+    const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
     useEffect(() => {
         setDate(format(new Date(), "yyyy-MM-dd"));
     }, []);
+
+    useEffect(() => {
+        if (!date) return;
+        const fetchSlots = async () => {
+            setIsLoadingSlots(true);
+            try {
+                const slots = await getAvailableSlots(date);
+                setAvailableSlots(slots);
+                if (slots.length > 0 && !slots.includes(time)) {
+                    setTime(slots[0]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch slots", error);
+                setAvailableSlots([]);
+            } finally {
+                setIsLoadingSlots(false);
+            }
+        };
+        fetchSlots();
+    }, [date]);
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -136,13 +158,22 @@ export function ManualBookingDialog({ patients }: ManualBookingDialogProps) {
                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 px-1">Hora</label>
                             <div className="relative">
                                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 w-4 h-4 pointer-events-none" />
-                                <input
-                                    type="time"
-                                    step="1800"
+                                <select
                                     value={time}
                                     onChange={(e) => setTime(e.target.value)}
-                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all cursor-pointer"
-                                />
+                                    disabled={isLoadingSlots || availableSlots.length === 0}
+                                    className="w-full h-12 pl-12 pr-4 bg-stone-50 border border-stone-100 rounded-2xl text-sm font-medium text-stone-900 outline-none focus:ring-2 focus:ring-stone-100 transition-all cursor-pointer appearance-none"
+                                >
+                                    {isLoadingSlots ? (
+                                        <option value="">Carregando...</option>
+                                    ) : availableSlots.length > 0 ? (
+                                        availableSlots.map((slot) => (
+                                            <option key={slot} value={slot}>{slot}</option>
+                                        ))
+                                    ) : (
+                                        <option value="">Sem horários</option>
+                                    )}
+                                </select>
                             </div>
                         </div>
                     </div>
