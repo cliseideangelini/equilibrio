@@ -1098,7 +1098,7 @@ export async function getScheduleBlocks() {
     });
 }
 
-export async function createScheduleBlock(adminId: string, startDate: Date, endDate: Date | null, reason?: string) {
+export async function createScheduleBlock(adminId: string, startDate: Date, endDate: Date | null, reason?: string, cancelOverlapping: boolean = false) {
     try {
         await prisma.scheduleBlock.create({
             data: {
@@ -1108,6 +1108,26 @@ export async function createScheduleBlock(adminId: string, startDate: Date, endD
                 reason
             }
         });
+
+        if (cancelOverlapping && endDate) {
+            // Cancelar agendamentos que caem dentro deste período
+            await prisma.appointment.updateMany({
+                where: {
+                    psychologistId: adminId,
+                    startTime: {
+                        gte: startDate,
+                        lt: endDate
+                    },
+                    status: {
+                        in: ['PENDING', 'CONFIRMED']
+                    }
+                },
+                data: {
+                    status: 'CANCELLED'
+                }
+            });
+        }
+
         revalidatePath('/area-clinica');
         revalidatePath('/');
         return { success: true };

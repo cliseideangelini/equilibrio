@@ -21,6 +21,8 @@ export function PauseScheduleButton({ adminId }: Props) {
     const [startDate, setStartDate] = useState("");
     const [startTime, setStartTime] = useState("");
     const [isAutoUnlock, setIsAutoUnlock] = useState(false);
+    const [isFullDay, setIsFullDay] = useState(false);
+    const [cancelOverlapping, setCancelOverlapping] = useState(true);
     const [endDate, setEndDate] = useState("");
     const [endTime, setEndTime] = useState("");
     const [reason, setReason] = useState("");
@@ -48,17 +50,30 @@ export function PauseScheduleButton({ adminId }: Props) {
             }
         };
         fetchSlots();
-    }, [startDate]);
+    }, [startDate, startTime]);
 
     useEffect(() => {
-        if (!endDate) return;
+        if (!endDate && !isFullDay) return;
+        const dateToFetch = isFullDay ? startDate : endDate;
+        if (!dateToFetch) return;
+
         const fetchSlots = async () => {
             setIsLoadingEndSlots(true);
             try {
-                const slots = await getAvailableSlots(endDate);
-                setEndAvailableSlots(slots);
-                if (slots.length > 0 && !slots.includes(endTime)) {
-                    setEndTime(slots[0]);
+                const slots = await getAvailableSlots(dateToFetch);
+                
+                // Filtra os slots para garantir que o endTime seja maior que o startTime se for o mesmo dia
+                let filteredSlots = slots;
+                if ((isFullDay || startDate === endDate) && startTime) {
+                    filteredSlots = slots.filter(slot => slot > startTime);
+                }
+
+                setEndAvailableSlots(filteredSlots);
+                
+                if (filteredSlots.length > 0 && !filteredSlots.includes(endTime)) {
+                    setEndTime(filteredSlots[0]);
+                } else if (filteredSlots.length === 0) {
+                    setEndTime("");
                 }
             } catch (error) {
                 console.error("Failed to fetch slots", error);
@@ -68,7 +83,7 @@ export function PauseScheduleButton({ adminId }: Props) {
             }
         };
         fetchSlots();
-    }, [endDate]);
+    }, [endDate, startDate, startTime, endTime, isFullDay]);
 
     const fetchBlocks = async () => {
         const data = await getScheduleBlocks();
@@ -84,30 +99,42 @@ export function PauseScheduleButton({ adminId }: Props) {
     const handleCreateBlock = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (!startDate || !startTime) {
-            toast.error("Data e hora de início são obrigatórias.");
+        if (!startDate) {
+            toast.error("A data é obrigatória.");
+            return;
+        }
+        
+        if (!isFullDay && !startTime) {
+            toast.error("A hora de início é obrigatória.");
             return;
         }
 
-        const startDateTime = new Date(`${startDate}T${startTime}:00-03:00`);
-        let endDateTime = null;
+        let startDateTime: Date;
+        let endDateTime: Date | null = null;
 
-        if (isAutoUnlock) {
-            if (!endDate || !endTime) {
-                toast.error("Data e hora de fim são obrigatórias para desbloqueio automático.");
-                return;
-            }
-            endDateTime = new Date(`${endDate}T${endTime}:00-03:00`);
+        if (isFullDay) {
+            startDateTime = new Date(`${startDate}T00:00:00-03:00`);
+            endDateTime = new Date(`${startDate}T23:59:59-03:00`);
+        } else {
+            startDateTime = new Date(`${startDate}T${startTime}:00-03:00`);
             
-            if (endDateTime <= startDateTime) {
-                toast.error("A data de fim deve ser posterior à data de início.");
-                return;
+            if (isAutoUnlock) {
+                if (!endDate || !endTime) {
+                    toast.error("Data e hora de fim são obrigatórias para desbloqueio automático.");
+                    return;
+                }
+                endDateTime = new Date(`${endDate}T${endTime}:00-03:00`);
+                
+                if (endDateTime <= startDateTime) {
+                    toast.error("A data de fim deve ser posterior à data de início.");
+                    return;
+                }
             }
         }
 
         setLoading(true);
         try {
-            const result = await createScheduleBlock(adminId, startDateTime, endDateTime, reason);
+            const result = await createScheduleBlock(adminId, startDateTime, endDateTime, reason, cancelOverlapping);
             if (result.success) {
                 toast.success("Bloqueio adicionado com sucesso!");
                 setStartDate("");
@@ -186,28 +213,44 @@ export function PauseScheduleButton({ adminId }: Props) {
                                     <label className="text-xs text-muted-fg">Data Início</label>
                                     <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs text-muted-fg">Hora Início</label>
-                                    <select value={startTime} onChange={e => setStartTime(e.target.value)} required disabled={isLoadingStartSlots || startAvailableSlots.length === 0} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
-                                        {isLoadingStartSlots ? (
-                                            <option value="">Carregando...</option>
-                                        ) : startAvailableSlots.length > 0 ? (
-                                            startAvailableSlots.map(time => (
-                                                <option key={`start-${time}`} value={time}>{time}</option>
-                                            ))
-                                        ) : (
-                                            <option value="">Sem horários</option>
-                                        )}
-                                    </select>
-                                </div>
+                                {!isFullDay && (
+                                    <div className="space-y-1.5 animate-in fade-in">
+                                        <label className="text-xs text-muted-fg">Hora Início</label>
+                                        <select value={startTime} onChange={e => setStartTime(e.target.value)} required disabled={isLoadingStartSlots || startAvailableSlots.length === 0} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+                                            {isLoadingStartSlots ? (
+                                                <option value="">Carregando...</option>
+                                            ) : startAvailableSlots.length > 0 ? (
+                                                startAvailableSlots.map(time => (
+                                                    <option key={`start-${time}`} value={time}>{time}</option>
+                                                ))
+                                            ) : (
+                                                <option value="">Sem horários</option>
+                                            )}
+                                        </select>
+                                    </div>
+                                )}
                             </div>
 
-                            <label className="flex items-center gap-2 cursor-pointer mt-2">
-                                <input type="checkbox" checked={isAutoUnlock} onChange={e => setIsAutoUnlock(e.target.checked)} className="rounded border-white/20 bg-black/40 text-primary focus:ring-primary/20" />
-                                <span className="text-sm text-muted-fg">Retorno Automático (Destravar)</span>
-                            </label>
+                            <div className="flex flex-col gap-3 py-2 border-y border-white/5">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked={isFullDay} onChange={e => setIsFullDay(e.target.checked)} className="rounded border-white/20 bg-black/40 text-primary focus:ring-primary/20" />
+                                    <span className="text-sm text-muted-fg">Bloquear Dia Inteiro</span>
+                                </label>
+                                
+                                {!isFullDay && (
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" checked={isAutoUnlock} onChange={e => setIsAutoUnlock(e.target.checked)} className="rounded border-white/20 bg-black/40 text-primary focus:ring-primary/20" />
+                                        <span className="text-sm text-muted-fg">Retorno Automático (Destravar)</span>
+                                    </label>
+                                )}
 
-                            {isAutoUnlock && (
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked={cancelOverlapping} onChange={e => setCancelOverlapping(e.target.checked)} className="rounded border-white/20 bg-black/40 text-primary focus:ring-primary/20" />
+                                    <span className="text-sm text-muted-fg">Cancelar agendamentos conflitantes no período</span>
+                                </label>
+                            </div>
+
+                            {isAutoUnlock && !isFullDay && (
                                 <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                                     <div className="space-y-1.5">
                                         <label className="text-xs text-muted-fg">Data Fim</label>
