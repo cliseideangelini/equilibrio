@@ -25,6 +25,13 @@ export function PauseScheduleButton({ adminId }: Props) {
     const [endTime, setEndTime] = useState("");
     const [reason, setReason] = useState("");
 
+    // Generate time options (06:00 to 22:00)
+    const timeOptions = [];
+    for (let h = 6; h <= 22; h++) {
+        timeOptions.push(`${String(h).padStart(2, '0')}:00`);
+        timeOptions.push(`${String(h).padStart(2, '0')}:30`);
+    }
+
     const fetchBlocks = async () => {
         const data = await getScheduleBlocks();
         setBlocks(data);
@@ -143,7 +150,12 @@ export function PauseScheduleButton({ adminId }: Props) {
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs text-muted-fg">Hora Início</label>
-                                    <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+                                    <select value={startTime} onChange={e => setStartTime(e.target.value)} required className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+                                        <option value="" disabled>Selecione</option>
+                                        {timeOptions.map(time => (
+                                            <option key={`start-${time}`} value={time}>{time}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -160,7 +172,12 @@ export function PauseScheduleButton({ adminId }: Props) {
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-xs text-muted-fg">Hora Fim</label>
-                                        <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+                                        <select value={endTime} onChange={e => setEndTime(e.target.value)} required className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+                                            <option value="" disabled>Selecione</option>
+                                            {timeOptions.map(time => (
+                                                <option key={`end-${time}`} value={time}>{time}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                             )}
