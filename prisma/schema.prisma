@@ -143,3 +143,11 @@ model WaitingList {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
+
+model WhatsAppSession {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  state     String   @default("MENU") // MENU, SCHEDULING, TRANSBORDO
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
