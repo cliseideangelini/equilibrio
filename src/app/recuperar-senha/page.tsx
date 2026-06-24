@@ -17,7 +17,7 @@ function PasswordRecoveryForm() {
     const token = searchParams.get("token");
 
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState("");
+    const [identifier, setIdentifier] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [success, setSuccess] = useState(false);
@@ -31,17 +31,17 @@ function PasswordRecoveryForm() {
         e.preventDefault();
         setLoading(true);
         try {
-            const result = await forgotPassword(email, "PATIENT");
+            const result = await forgotPassword(identifier, "PATIENT");
             if (result.success) {
                 setSuccess(true);
-                toast.success("E-mail enviado!");
+                toast.success(result.message);
             } else {
-                const adminResult = await forgotPassword(email, "PSYCHOLOGIST");
+                const adminResult = await forgotPassword(identifier, "PSYCHOLOGIST");
                 if (adminResult.success) {
                     setSuccess(true);
-                    toast.success("E-mail enviado!");
+                    toast.success(adminResult.message);
                 } else {
-                    toast.error("E-mail não encontrado no sistema.");
+                    toast.error("Cadastro não encontrado no sistema.");
                 }
             }
         } catch (error) {
@@ -88,31 +88,30 @@ function PasswordRecoveryForm() {
                     <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto text-emerald-500">
                         <CheckCircle2 size={40} />
                     </div>
-                    <h2 className="text-2xl font-serif italic text-stone-800">Verifique seu e-mail</h2>
+                    <h2 className="text-2xl font-serif italic text-stone-800">Verifique seu WhatsApp ou E-mail</h2>
                     <p className="text-sm text-stone-500 leading-relaxed">
-                        Enviamos as instruções de recuperação para <strong>{email}</strong>. 
-                        Não esqueça de verificar a pasta de spam.
+                        Enviamos as instruções de recuperação para <strong>{identifier}</strong>.
                     </p>
                     <Button variant="outline" onClick={() => setSuccess(false)} className="rounded-xl border-stone-100 text-stone-400 hover:bg-stone-50 h-12 px-8 uppercase text-[10px] font-black tracking-widest">
-                        Tentar outro e-mail
+                        Tentar outro contato
                     </Button>
                 </div>
             ) : mode === "REQUEST" ? (
                 <>
                     <div className="text-center mb-10">
                         <h1 className="text-3xl font-serif italic text-stone-800 mb-3">Recuperar Senha</h1>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Enviaremos um link seguro para seu e-mail</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Enviaremos as instruções de acesso</p>
                     </div>
                     <form onSubmit={handleRequest} className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">E-mail Cadastrado</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">E-mail ou WhatsApp (Apenas Números)</label>
                             <div className="relative">
                                 <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
                                 <Input 
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="seu@email.com"
+                                    type="text"
+                                    value={identifier}
+                                    onChange={(e) => setIdentifier(e.target.value)}
+                                    placeholder="Ex: (00) 00000-0000 ou email@exemplo.com"
                                     className="h-14 pl-12 rounded-2xl border-stone-100 bg-stone-50/50 focus:ring-[#94A694]/20"
                                     required
                                 />

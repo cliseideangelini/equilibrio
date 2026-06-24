@@ -279,9 +279,12 @@ export async function createAppointment(formData: {
 }
 
 export async function loginPatient(phone: string, password: string) {
-    const patient: any = await prisma.patient.findUnique({
-        where: { phone, deletedAt: null }
+    const cleanPhone = phone.replace(/\D/g, '');
+    const patients = await prisma.patient.findMany({
+        where: { deletedAt: null }
     });
+    
+    const patient: any = patients.find((p: any) => p.phone.replace(/\D/g, '') === cleanPhone);
 
     if (!patient || !patient.password) {
         return { success: false, error: "Usuário não encontrado ou sem senha cadastrada." };
@@ -328,30 +331,49 @@ export async function loginPsychologist(identifier: string, password: string) {
     };
 }
 
-export async function forgotPassword(email: string, type: "PATIENT" | "PSYCHOLOGIST") {
-    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    const expiry = new Date(Date.now() + 3600000); // 1 hora
-
+export async function forgotPassword(identifier: string, type: "PATIENT" | "PSYCHOLOGIST") {
     if (type === "PSYCHOLOGIST") {
-        const user = await prisma.psychologist.findUnique({ where: { email } });
+        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const expiry = new Date(Date.now() + 3600000); // 1 hora
+        
+        const user = await prisma.psychologist.findUnique({ where: { email: identifier } });
         if (!user) return { success: false, error: "Usuário não encontrado." };
         await prisma.psychologist.update({
-            where: { email },
+            where: { email: identifier },
             data: { resetToken: token, resetTokenExpiry: expiry }
         });
+        
+        // Simulação de envio de e-mail
+        console.log(`[EMAIL] Link de recuperação para ${identifier}: https://equilibrio-psi.vercel.app/recuperar-senha?token=${token}`);
+        
+        return { success: true, message: "E-mail de recuperação enviado." };
     } else {
-        const user = await prisma.patient.findUnique({ where: { email } });
-        if (!user) return { success: false, error: "Usuário não encontrado." };
+        // Patient recovery via WhatsApp
+        const cleanPhone = identifier.replace(/\D/g, '');
+        const patients = await prisma.patient.findMany({ where: { deletedAt: null } });
+        const user: any = patients.find((p: any) => p.phone.replace(/\D/g, '') === cleanPhone);
+        
+        if (!user) return { success: false, error: "Paciente não encontrado com este número." };
+        
+        // Generate 6 digit temporary pin
+        const tempPin = Math.floor(100000 + Math.random() * 900000).toString();
+        const hashedPassword = await bcrypt.hash(tempPin, 10);
+        
         await prisma.patient.update({
-            where: { email },
-            data: { resetToken: token, resetTokenExpiry: expiry }
+            where: { id: user.id },
+            data: { 
+                password: hashedPassword,
+                mustChangePassword: true 
+            }
         });
+        
+        await notifyPatient(
+            user.phone,
+            `Olá ${user.name.split(' ')[0]}, recebemos uma solicitação de recuperação de senha.\n\nSua nova senha temporária é: *${tempPin}*\n\nAcesse o portal e você será solicitado a criar uma nova senha definitiva.`
+        );
+        
+        return { success: true, message: "Senha temporária enviada para o seu WhatsApp!" };
     }
-
-    // Simulação de envio de e-mail
-    console.log(`[EMAIL] Link de recuperação para ${email}: https://equilibrio-psi.vercel.app/recuperar-senha?token=${token}`);
-    
-    return { success: true, message: "E-mail de recuperação enviado." };
 }
 
 export async function resetPassword(token: string, newPassword: string) {
