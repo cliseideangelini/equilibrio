@@ -175,6 +175,15 @@ export default async function AreaClinicaDashboard() {
                                                         </button>
                                                     </Link>
 
+                                                    {app.type === 'ONLINE' && app.meetLink && (
+                                                        <a href={app.meetLink} target="_blank" rel="noopener noreferrer">
+                                                            <button className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2">
+                                                                <Video className="w-4 h-4" />
+                                                                Entrar na Sala
+                                                            </button>
+                                                        </a>
+                                                    )}
+
                                                     {(!isCompleted && !isAbsent && !isCancelled) && (
                                                         <>
                                                             <CompleteAppointmentButton appointmentId={app.id} />

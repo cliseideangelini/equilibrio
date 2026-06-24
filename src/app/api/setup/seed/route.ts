@@ -77,12 +77,15 @@ export async function GET() {
         else status = 'CANCELLED';
       }
 
+      const meetLink = type === 'ONLINE' ? `https://meet.google.com/${Math.random().toString(36).substring(2,5)}-${Math.random().toString(36).substring(2,6)}-${Math.random().toString(36).substring(2,5)}` : null;
+
       await prisma.appointment.create({
         data: {
           startTime: startDate,
           endTime: endDate,
           status: status,
           type: type,
+          meetLink: meetLink,
           psychologistId: psychologist.id,
           patientId: patient.id,
         },
