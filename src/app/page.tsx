@@ -153,7 +153,7 @@ export default function HomePage() {
             <div className="flex flex-col gap-6 order-2 lg:order-1">
               {/* Badge */}
               <div className="animate-fade-up">
-                <SectionLabel>Psicologia Clínica · TCC · CRP 06/XXXXX</SectionLabel>
+                <SectionLabel>Psicologia Clínica · TCC · CRP 123230</SectionLabel>
               </div>
 
               {/* Headline */}
@@ -729,7 +729,7 @@ export default function HomePage() {
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-primary/70" />
-                CRP 06/XXXXX
+                CRP 123230
               </li>
             </ul>
           </div>
