@@ -44,7 +44,7 @@ export async function GET() {
 
     const now = new Date();
     const statuses: AppointmentStatus[] = ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'];
-    const types: AppointmentType[] = ['ONLINE', 'PRESENTIAL', 'RETORNO', 'SUPERVISAO'];
+    const types: AppointmentType[] = ['ONLINE', 'PRESENCIAL'];
 
     for (let i = 0; i < 40; i++) {
       const patient = patients[Math.floor(Math.random() * patients.length)];
