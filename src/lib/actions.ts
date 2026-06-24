@@ -29,10 +29,6 @@ export async function getPsychologistAvailability() {
 }
 
 export async function getAvailableSlots(dateString: string) {
-    const psychologist = await prisma.psychologist.findFirst();
-    if (psychologist?.isSchedulePaused) {
-        return { success: false, error: "PAUSED", message: "A agenda está temporariamente pausada para novos agendamentos." };
-    }
 
     const dateClean = dateString.substring(0, 10);
     const dayOfWeek = new Date(`${dateClean}T12:00:00Z`).getUTCDay();
@@ -98,6 +94,15 @@ export async function getAvailableSlots(dateString: string) {
         }
     });
 
+    const scheduleBlocks = await prisma.scheduleBlock.findMany({
+        where: {
+            OR: [
+                { endDate: null },
+                { endDate: { gt: now } }
+            ]
+        }
+    });
+
     const slots = [];
     const sessionDuration = 30;
     const buffer = 0;
@@ -144,8 +149,15 @@ export async function getAvailableSlots(dateString: string) {
                     );
                 });
 
+                const isBlocked = scheduleBlocks.some((block: any) => {
+                    if (block.endDate === null) {
+                        return slotStart >= new Date(block.startDate);
+                    }
+                    return slotStart >= new Date(block.startDate) && slotStart < new Date(block.endDate);
+                });
+
                 const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                if (!isOccupied && !fixedTimes.includes(timeStr)) {
+                if (!isOccupied && !fixedTimes.includes(timeStr) && !isBlocked) {
                     slots.push(timeStr);
                 }
             }
@@ -1069,17 +1081,41 @@ export async function updatePsychologistProfile(data: {
     return { success: true };
 }
 
-export async function toggleSchedulePause(adminId: string, pause: boolean) {
+export async function getScheduleBlocks() {
+    return prisma.scheduleBlock.findMany({
+        orderBy: { startDate: 'asc' }
+    });
+}
+
+export async function createScheduleBlock(adminId: string, startDate: Date, endDate: Date | null, reason?: string) {
     try {
-        await prisma.psychologist.update({
-            where: { id: adminId },
-            data: { isSchedulePaused: pause }
+        await prisma.scheduleBlock.create({
+            data: {
+                psychologistId: adminId,
+                startDate,
+                endDate,
+                reason
+            }
         });
         revalidatePath('/area-clinica');
         revalidatePath('/');
         return { success: true };
     } catch (e: any) {
-        console.error("Failed to toggle schedule pause:", e);
-        return { success: false, error: e.message || "Erro ao atualizar a agenda." };
+        console.error("Failed to create schedule block:", e);
+        return { success: false, error: e.message || "Erro ao criar bloqueio na agenda." };
+    }
+}
+
+export async function deleteScheduleBlock(blockId: string) {
+    try {
+        await prisma.scheduleBlock.delete({
+            where: { id: blockId }
+        });
+        revalidatePath('/area-clinica');
+        revalidatePath('/');
+        return { success: true };
+    } catch (e: any) {
+        console.error("Failed to delete schedule block:", e);
+        return { success: false, error: e.message || "Erro ao remover bloqueio da agenda." };
     }
 }

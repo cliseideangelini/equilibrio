@@ -58,7 +58,7 @@ export default async function AreaClinicaDashboard() {
                         <DashboardClock />
                     </div>
                     {psychologist && (
-                        <PauseScheduleButton adminId={psychologist.id} isPaused={psychologist.isSchedulePaused} />
+                        <PauseScheduleButton adminId={psychologist.id} />
                     )}
                 </div>
                 <h1 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mt-4">

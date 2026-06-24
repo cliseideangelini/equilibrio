@@ -38,9 +38,9 @@ model Psychologist {
   whatsappApiKey         String?
   resetToken             String?        @unique
   resetTokenExpiry       DateTime?
-  isSchedulePaused       Boolean        @default(false)
   availabilities         Availability[]
   appointments           Appointment[]
+  scheduleBlocks         ScheduleBlock[]
   createdAt              DateTime       @default(now())
   updatedAt              DateTime       @updatedAt
 }
@@ -150,4 +150,14 @@ model WhatsAppSession {
   state     String   @default("MENU") // MENU, SCHEDULING, TRANSBORDO
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ScheduleBlock {
+  id             String       @id @default(cuid())
+  psychologistId String
+  psychologist   Psychologist @relation(fields: [psychologistId], references: [id])
+  startDate      DateTime
+  endDate        DateTime?
+  reason         String?
+  createdAt      DateTime     @default(now())
 }
