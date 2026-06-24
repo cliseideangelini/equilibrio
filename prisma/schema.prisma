@@ -38,6 +38,7 @@ model Psychologist {
   whatsappApiKey         String?
   resetToken             String?        @unique
   resetTokenExpiry       DateTime?
+  isSchedulePaused       Boolean        @default(false)
   availabilities         Availability[]
   appointments           Appointment[]
   createdAt              DateTime       @default(now())

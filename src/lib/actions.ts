@@ -29,6 +29,11 @@ export async function getPsychologistAvailability() {
 }
 
 export async function getAvailableSlots(dateString: string) {
+    const psychologist = await prisma.psychologist.findFirst();
+    if (psychologist?.isSchedulePaused) {
+        return { success: false, error: "PAUSED", message: "A agenda está temporariamente pausada para novos agendamentos." };
+    }
+
     const dateClean = dateString.substring(0, 10);
     const dayOfWeek = new Date(`${dateClean}T12:00:00Z`).getUTCDay();
     const now = new Date(); // Standard actual UTC now
@@ -1064,3 +1069,17 @@ export async function updatePsychologistProfile(data: {
     return { success: true };
 }
 
+export async function toggleSchedulePause(adminId: string, pause: boolean) {
+    try {
+        await prisma.psychologist.update({
+            where: { id: adminId },
+            data: { isSchedulePaused: pause }
+        });
+        revalidatePath('/area-clinica');
+        revalidatePath('/');
+        return { success: true };
+    } catch (e: any) {
+        console.error("Failed to toggle schedule pause:", e);
+        return { success: false, error: e.message || "Erro ao atualizar a agenda." };
+    }
+}

@@ -55,8 +55,13 @@ export default function HomeBookingForm() {
         if (selectedDate) {
             setSelectedSlot(null);
             startTransition(async () => {
-                const result = await getAvailableSlots(selectedDate.toISOString());
-                setSlots(result);
+                const result: any = await getAvailableSlots(selectedDate.toISOString());
+                if (result?.error === "PAUSED") {
+                    setSlots([]);
+                    toast.error(result.message || "Agenda temporariamente pausada.");
+                } else {
+                    setSlots(result);
+                }
             });
         }
     }, [selectedDate]);

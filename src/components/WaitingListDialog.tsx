@@ -91,7 +91,13 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
             setIsCheckingSlots(true);
             const isoDate = new Date(formData.specificDate + "T00:00:00").toISOString();
             getAvailableSlots(isoDate)
-                .then(slots => setRealAvailableSlots(slots))
+                .then((res: any) => {
+                    if (res?.error === "PAUSED") {
+                        setRealAvailableSlots([]);
+                    } else {
+                        setRealAvailableSlots(res);
+                    }
+                })
                 .catch(() => setRealAvailableSlots([]))
                 .finally(() => setIsCheckingSlots(false));
         } else {

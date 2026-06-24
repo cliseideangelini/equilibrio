@@ -77,7 +77,14 @@ export default function SimpleBookingForm({ availabilityRules, patientName, pati
             setSlotsLoading(true);
             setSelectedTime(null);
             getAvailableSlots(selectedDate.toISOString())
-                .then(setAvailableSlots)
+                .then((res: any) => {
+                    if (res?.error === "PAUSED") {
+                        setAvailableSlots([]);
+                        toast.error(res.message || "Agenda temporariamente pausada.");
+                    } else {
+                        setAvailableSlots(res);
+                    }
+                })
                 .finally(() => setSlotsLoading(false));
         }
     }, [selectedDate]);
