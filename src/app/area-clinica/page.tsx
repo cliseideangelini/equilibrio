@@ -7,6 +7,7 @@ import Link from "next/link";
 import { CompleteAppointmentButton } from "@/components/CompleteAppointmentButton";
 import { AbsentButton } from "@/components/AbsentButton";
 import { CancellationButton } from "@/components/CancellationButton";
+import { RevertStatusButton } from "@/components/RevertStatusButton";
 import { NotifyAbsentButton } from "@/components/NotifyAbsentButton";
 import { PsiDivider } from "@/components/PsiDivider";
 
@@ -184,12 +185,16 @@ export default async function AreaClinicaDashboard() {
                                                         </a>
                                                     )}
 
-                                                    {(!isCompleted && !isAbsent && !isCancelled) && (
+                                                    {(!isCompleted && !isAbsent && !isCancelled) ? (
                                                         <>
                                                             <CompleteAppointmentButton appointmentId={app.id} />
                                                             <AbsentButton appointmentId={app.id} />
                                                             <CancellationButton appointmentId={app.id} startTime={app.startTime.toISOString()} isProfessional={true} />
                                                         </>
+                                                    ) : (
+                                                        <div className="ml-auto">
+                                                            <RevertStatusButton appointmentId={app.id} />
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>

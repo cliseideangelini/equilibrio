@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { CancellationButton } from "@/components/CancellationButton";
 import { AbsentButton } from "@/components/AbsentButton";
 import { CompleteAppointmentButton } from "@/components/CompleteAppointmentButton";
+import { RevertStatusButton } from "@/components/RevertStatusButton";
 import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -199,9 +200,20 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                     </td>
                                     <td className="py-6 px-8 whitespace-nowrap">
                                             {app.status === 'COMPLETED' ? (
-                                                <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-4">Sessão Finalizada</span>
+                                                <div className="flex items-center justify-end">
+                                                    <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-2">Sessão Finalizada</span>
+                                                    <RevertStatusButton appointmentId={app.id} />
+                                                </div>
                                             ) : app.status === 'CANCELLED' ? (
-                                                <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-4">Cancelada</span>
+                                                <div className="flex items-center justify-end">
+                                                    <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-2">Cancelada</span>
+                                                    <RevertStatusButton appointmentId={app.id} />
+                                                </div>
+                                            ) : app.status === 'ABSENT' ? (
+                                                <div className="flex items-center justify-end">
+                                                    <span className="text-[10px] font-bold uppercase text-muted-fg tracking-widest italic pr-2">Paciente Faltou</span>
+                                                    <RevertStatusButton appointmentId={app.id} />
+                                                </div>
                                             ) : (
                                                 <div className="flex items-center justify-end gap-2 pr-2">
                                                     {app.status === 'CONFIRMED' && (

@@ -705,6 +705,17 @@ export async function completeAppointment(id: string) {
     return { success: true };
 }
 
+export async function revertAppointmentStatus(id: string) {
+    const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
+    await prisma.appointment.update({
+        where: { id: resolvedId },
+        data: { status: AppointmentStatus.CONFIRMED },
+    });
+    revalidatePath("/area-clinica");
+    revalidatePath('/area-clinica/agenda');
+    return { success: true };
+}
+
 export async function saveEvolution(patientId: string, appointmentId: string, content: string, date?: Date, isDraft: boolean = false) {
     if (!content.trim()) {
         try {
