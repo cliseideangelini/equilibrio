@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Lock, Unlock, Loader2, Calendar, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { createScheduleBlock, deleteScheduleBlock, getScheduleBlocks } from "@/lib/actions";
+import { createScheduleBlock, deleteScheduleBlock, getScheduleBlocks, getAvailableSlots } from "@/lib/actions";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -25,12 +25,50 @@ export function PauseScheduleButton({ adminId }: Props) {
     const [endTime, setEndTime] = useState("");
     const [reason, setReason] = useState("");
 
-    // Generate time options (06:00 to 22:00)
-    const timeOptions = [];
-    for (let h = 6; h <= 22; h++) {
-        timeOptions.push(`${String(h).padStart(2, '0')}:00`);
-        timeOptions.push(`${String(h).padStart(2, '0')}:30`);
-    }
+    const [startAvailableSlots, setStartAvailableSlots] = useState<string[]>([]);
+    const [endAvailableSlots, setEndAvailableSlots] = useState<string[]>([]);
+    const [isLoadingStartSlots, setIsLoadingStartSlots] = useState(false);
+    const [isLoadingEndSlots, setIsLoadingEndSlots] = useState(false);
+
+    useEffect(() => {
+        if (!startDate) return;
+        const fetchSlots = async () => {
+            setIsLoadingStartSlots(true);
+            try {
+                const slots = await getAvailableSlots(startDate);
+                setStartAvailableSlots(slots);
+                if (slots.length > 0 && !slots.includes(startTime)) {
+                    setStartTime(slots[0]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch slots", error);
+                setStartAvailableSlots([]);
+            } finally {
+                setIsLoadingStartSlots(false);
+            }
+        };
+        fetchSlots();
+    }, [startDate]);
+
+    useEffect(() => {
+        if (!endDate) return;
+        const fetchSlots = async () => {
+            setIsLoadingEndSlots(true);
+            try {
+                const slots = await getAvailableSlots(endDate);
+                setEndAvailableSlots(slots);
+                if (slots.length > 0 && !slots.includes(endTime)) {
+                    setEndTime(slots[0]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch slots", error);
+                setEndAvailableSlots([]);
+            } finally {
+                setIsLoadingEndSlots(false);
+            }
+        };
+        fetchSlots();
+    }, [endDate]);
 
     const fetchBlocks = async () => {
         const data = await getScheduleBlocks();
@@ -150,11 +188,16 @@ export function PauseScheduleButton({ adminId }: Props) {
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs text-muted-fg">Hora Início</label>
-                                    <select value={startTime} onChange={e => setStartTime(e.target.value)} required className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
-                                        <option value="" disabled>Selecione</option>
-                                        {timeOptions.map(time => (
-                                            <option key={`start-${time}`} value={time}>{time}</option>
-                                        ))}
+                                    <select value={startTime} onChange={e => setStartTime(e.target.value)} required disabled={isLoadingStartSlots || startAvailableSlots.length === 0} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+                                        {isLoadingStartSlots ? (
+                                            <option value="">Carregando...</option>
+                                        ) : startAvailableSlots.length > 0 ? (
+                                            startAvailableSlots.map(time => (
+                                                <option key={`start-${time}`} value={time}>{time}</option>
+                                            ))
+                                        ) : (
+                                            <option value="">Sem horários</option>
+                                        )}
                                     </select>
                                 </div>
                             </div>
@@ -172,11 +215,16 @@ export function PauseScheduleButton({ adminId }: Props) {
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-xs text-muted-fg">Hora Fim</label>
-                                        <select value={endTime} onChange={e => setEndTime(e.target.value)} required className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
-                                            <option value="" disabled>Selecione</option>
-                                            {timeOptions.map(time => (
-                                                <option key={`end-${time}`} value={time}>{time}</option>
-                                            ))}
+                                        <select value={endTime} onChange={e => setEndTime(e.target.value)} required disabled={isLoadingEndSlots || endAvailableSlots.length === 0} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+                                            {isLoadingEndSlots ? (
+                                                <option value="">Carregando...</option>
+                                            ) : endAvailableSlots.length > 0 ? (
+                                                endAvailableSlots.map(time => (
+                                                    <option key={`end-${time}`} value={time}>{time}</option>
+                                                ))
+                                            ) : (
+                                                <option value="">Sem horários</option>
+                                            )}
                                         </select>
                                     </div>
                                 </div>
