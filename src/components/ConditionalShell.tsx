@@ -8,7 +8,7 @@ export function ConditionalShell() {
                     <span>© 2026 Equilíbrio Psicologia Clínica</span>
                 </div>
                 <div className="flex-1 text-center text-muted-foreground/40">
-                    <span className="normal-case tracking-normal font-medium text-[10px]">Desenvolvido com carinho para o bem-estar. (By Pedro Gabriel)</span>
+                    <span className="normal-case tracking-normal font-medium text-[10px]">Desenvolvido com carinho para o bem-estar por <a href="https://spavdigital.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">PAVDigital</a></span>
                 </div>
                 <div className="flex-1 text-center md:text-right">
                     <span className="bg-white/5 border border-white/10 px-2 py-1 rounded-full text-[8px]">V2.0</span>

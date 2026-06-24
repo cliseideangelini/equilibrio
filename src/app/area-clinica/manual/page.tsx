@@ -186,7 +186,7 @@ export default function ManualPage() {
             
             <div className="mt-16 text-center">
                 <p className="text-muted-fg text-sm">
-                    Desenvolvido com excelência para <span className="font-serif text-gradient font-bold text-base">Equilíbrio</span>
+                    Desenvolvido por <a href="https://spavdigital.com.br/" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">PAVDigital</a>
                 </p>
             </div>
         </div>
