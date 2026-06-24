@@ -46,6 +46,9 @@ export async function GET() {
     const statuses: AppointmentStatus[] = ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'];
     const types: AppointmentType[] = ['ONLINE', 'PRESENCIAL'];
 
+    // Limpar agendamentos antigos para não acumular
+    await prisma.appointment.deleteMany({});
+
     for (let i = 0; i < 40; i++) {
       const patient = patients[Math.floor(Math.random() * patients.length)];
       const daysToAdd = Math.floor(Math.random() * 14) - 2; // -2 to 12 days
@@ -55,8 +58,22 @@ export async function GET() {
       const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysToAdd, hour, minutes, 0);
       const endDate = new Date(startDate.getTime() + 30 * 60000);
 
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
       const type = types[Math.floor(Math.random() * types.length)];
+      
+      let status: AppointmentStatus;
+      if (startDate < now) {
+        // Passado: COMPLETED (70%), ABSENT (20%), CANCELLED (10%)
+        const rand = Math.random();
+        if (rand < 0.7) status = 'COMPLETED';
+        else if (rand < 0.9) status = 'ABSENT';
+        else status = 'CANCELLED';
+      } else {
+        // Futuro: PENDING (50%), CONFIRMED (40%), CANCELLED (10%)
+        const rand = Math.random();
+        if (rand < 0.5) status = 'PENDING';
+        else if (rand < 0.9) status = 'CONFIRMED';
+        else status = 'CANCELLED';
+      }
 
       await prisma.appointment.create({
         data: {
