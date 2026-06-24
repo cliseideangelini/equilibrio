@@ -38,36 +38,9 @@ export default async function PatientDashboardBento() {
     }
 
     const now = new Date();
-    
-    // Injetar mock data para validação do layout caso o paciente não tenha consultas
-    if (!patient.appointments || patient.appointments.length === 0) {
-        patient.appointments = [
-            {
-                id: "mock1",
-                patientId: patient.id,
-                startTime: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-                type: "ONLINE",
-                status: "SCHEDULED",
-                meetLink: "https://meet.google.com/abc-defg-hij",
-                payment: { status: "PENDING", value: 150 }
-            },
-            {
-                id: "mock2",
-                patientId: patient.id,
-                startTime: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-                type: "PRESENCIAL",
-                status: "COMPLETED",
-                payment: { status: "PAID", value: 150 }
-            },
-            {
-                id: "mock3",
-                patientId: patient.id,
-                startTime: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-                type: "ONLINE",
-                status: "CANCELLED",
-                payment: null
-            }
-        ];
+    // Removemos os mocks pois causavam erro ao tentar interagir com consultas fictícias.
+    if (!patient.appointments) {
+        patient.appointments = [];
     }
 
     // Sort future appointments ascending so the [0] is the closest one
