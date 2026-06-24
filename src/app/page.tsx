@@ -165,12 +165,7 @@ export default function HomePage() {
 
               {/* Sub */}
               <p className="animate-fade-up delay-200 text-base sm:text-lg text-muted-foreground leading-relaxed max-w-lg">
-                <strong className="text-foreground/90 font-semibold">12 anos</strong> de experiência
-                clínica com base na{" "}
-                <strong className="text-foreground/90 font-semibold">
-                  Terapia Cognitivo-Comportamental (TCC)
-                </strong>
-                . Um espaço seguro e acolhedor para você redescobrir suas forças e viver com mais qualidade.
+                profissional especialista em terapia cognitivo comportamental
               </p>
 
               {/* CTA buttons */}
@@ -240,7 +235,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground/90">Cliseide S. Angelini</p>
-                      <p className="text-xs text-muted-foreground">Psicóloga Clínica · 12 anos de experiência</p>
+                      <p className="text-xs text-muted-foreground">Psicóloga · CRP 123230</p>
                     </div>
                   </div>
                 </div>
@@ -271,7 +266,7 @@ export default function HomePage() {
             </h2>
             <div className="section-divider" />
             <p className="text-muted-foreground text-base leading-relaxed">
-              Psicóloga clínica com sólida formação acadêmica e 12 anos dedicados
+              Psicóloga clínica com sólida formação acadêmica e dedicada
               ao cuidado da saúde mental.
             </p>
           </div>
