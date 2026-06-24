@@ -14,6 +14,7 @@ import { getAppointmentsWithFixed } from "@/lib/actions";
 import { getLocalNow } from "@/lib/utils";
 import { DashboardClock } from "@/components/DashboardClock";
 import { PauseScheduleButton } from "@/components/PauseScheduleButton";
+import { DashboardStatsCards } from "@/components/DashboardStatsCards";
 
 export const dynamic = "force-dynamic";
 
@@ -70,24 +71,12 @@ export default async function AreaClinicaDashboard() {
             </header>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                    { label: "A Realizar", value: pendingAppointments.length, icon: Clock, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
-                    { label: "Realizadas", value: completedAppointments.length, icon: CheckCircle, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
-                    { label: "Ausências/Canceladas", value: absentAppointments.length, icon: AlertCircle, color: "text-rose-400", bg: "bg-rose-400/10", border: "border-rose-400/20" },
-                    { label: "Total do Dia", value: dailyAppointments.length, icon: FileText, color: "text-warm", bg: "bg-warm/10", border: "border-warm/20" },
-                ].map((s, i) => (
-                    <div key={i} className={cn("bg-surface/40 border rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md hover:translate-y-[-2px] transition-all duration-300", s.border)}>
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-fg">{s.label}</span>
-                            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center border", s.bg, s.border)}>
-                                <s.icon className={cn("w-4 h-4", s.color)} />
-                            </div>
-                        </div>
-                        <p className="text-3xl font-light text-foreground">{s.value}</p>
-                    </div>
-                ))}
-            </div>
+            <DashboardStatsCards 
+                pendingAppointments={pendingAppointments}
+                completedAppointments={completedAppointments}
+                absentAppointments={absentAppointments}
+                dailyAppointments={dailyAppointments}
+            />
 
             <PsiDivider />
 
