@@ -21,7 +21,8 @@ import {
   Users,
   Award,
   MessageCircle,
-  User
+  User,
+  BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PsiDivider } from "@/components/PsiDivider";
@@ -62,6 +63,17 @@ const SERVICES = [
     description:
       "Foco estratégico corporativo (B2B), trânsito e transportadoras, além de diagnósticos clínicos com instrumentos psicométricos validados.",
     items: ["Empresas e corporativo", "Trânsito e transportadoras", "Psicossocial", "Laudos e relatórios"],
+  },
+  {
+    icon: BookOpen,
+    title: "Supervisão Clínica (TCC)",
+    color: "text-purple-400",
+    bg: "bg-purple-400/10",
+    border: "border-purple-400/20",
+    hoverBorder: "hover:border-purple-400/50",
+    description:
+      "Encontros de orientação de 1h a 1h30 voltados para profissionais recém-formados ou com dúvidas em casos complexos dentro da abordagem TCC.",
+    items: ["Discussão de casos reais", "Manejo clínico avançado", "Apoio a recém-formados", "Prática baseada em evidências"],
   },
 ];
 
