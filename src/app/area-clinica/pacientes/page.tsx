@@ -57,15 +57,8 @@ export default async function PatientsList() {
         };
     });
 
-    // Ordenar: Próxima consulta (mais próxima para mais longe), depois sem consulta
-    patients.sort((a, b) => {
-        if (a.nextAppointmentDate && b.nextAppointmentDate) {
-            return a.nextAppointmentDate.getTime() - b.nextAppointmentDate.getTime();
-        }
-        if (a.nextAppointmentDate) return -1;
-        if (b.nextAppointmentDate) return 1;
-        return a.name.localeCompare(b.name);
-    });
+    // Ordenar alfabeticamente
+    patients.sort((a, b) => a.name.localeCompare(b.name));
 
     return (
         <div className="space-y-10 relative z-10">

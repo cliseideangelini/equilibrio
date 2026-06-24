@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, ChevronRight, User, Calendar } from "lucide-react";
+import { Search, ChevronRight, ChevronLeft, User, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -26,6 +26,8 @@ interface PatientsClientProps {
 
 export function PatientsClient({ initialPatients }: PatientsClientProps) {
     const [search, setSearch] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const filteredPatients = useMemo(() => {
         const query = search.toLowerCase().trim();
@@ -41,6 +43,17 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
             p.phone.includes(query)
         );
     }, [initialPatients, search]);
+
+    // Reset para página 1 quando buscar
+    useMemo(() => {
+        setCurrentPage(1);
+    }, [search]);
+
+    const totalPages = Math.ceil(filteredPatients.length / itemsPerPage);
+    const paginatedPatients = filteredPatients.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     return (
         <div className="space-y-8">
@@ -72,7 +85,7 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border/40">
-                            {filteredPatients.length > 0 ? filteredPatients.map((patient, idx) => (
+                            {paginatedPatients.length > 0 ? paginatedPatients.map((patient, idx) => (
                                 <tr key={patient.id} className={cn(
                                     "hover:bg-surface/40 transition-all group border-b border-border/40",
                                     idx % 2 === 1 ? "bg-surface/10" : "bg-transparent"
@@ -134,6 +147,38 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-3">
+                    <p className="text-xs text-muted-fg font-medium">
+                        Mostrando <span className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</span> a <span className="text-foreground">{Math.min(currentPage * itemsPerPage, filteredPatients.length)}</span> de <span className="text-foreground">{filteredPatients.length}</span> pacientes
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            className="h-8 w-8 p-0 rounded-lg border-border/80"
+                        >
+                            <ChevronLeft size={14} />
+                        </Button>
+                        <span className="text-xs font-bold text-foreground mx-2">
+                            {currentPage} / {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            className="h-8 w-8 p-0 rounded-lg border-border/80"
+                        >
+                            <ChevronRight size={14} />
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
