@@ -386,7 +386,7 @@ export default function HomePage() {
         className="py-8 sm:py-12 px-4 sm:px-6 bg-surface/20"
         aria-label="Especialidades e serviços"
       >
-        <div className="w-full mx-auto">
+        <div className="max-w-7xl mx-auto">
 
           {/* Header */}
           <div className="max-w-2xl mb-16 reveal">
@@ -402,7 +402,7 @@ export default function HomePage() {
           </div>
 
           {/* Cards grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {SERVICES.map(({ icon: Icon, title, color, bg, border, hoverBorder, description, items }, idx) => (
               <article
                 key={title}
