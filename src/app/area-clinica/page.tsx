@@ -13,6 +13,7 @@ import { PsiDivider } from "@/components/PsiDivider";
 import { getAppointmentsWithFixed } from "@/lib/actions";
 import { getLocalNow } from "@/lib/utils";
 import { DashboardClock } from "@/components/DashboardClock";
+import { LocalTime } from "@/components/LocalTime";
 import { PauseScheduleButton } from "@/components/PauseScheduleButton";
 import { DashboardStatsCards } from "@/components/DashboardStatsCards";
 
@@ -135,7 +136,7 @@ export default async function AreaClinicaDashboard() {
                                                 <div className="flex items-center gap-5">
                                                     <div className="text-center min-w-[70px]">
                                                         <span className="block text-2xl font-light text-foreground leading-none">
-                                                            {format(app.startTime, "HH:mm")}
+                                                            <LocalTime date={app.startTime} formatStr="HH:mm" />
                                                         </span>
                                                         <span className={cn(
                                                             "text-[9px] font-bold uppercase tracking-wider mt-2 px-1.5 py-0.5 rounded-full inline-block",
@@ -204,7 +205,7 @@ export default async function AreaClinicaDashboard() {
                                 <div key={app.id} className="bg-rose-400/5 border border-rose-400/20 rounded-2xl p-4 flex flex-col gap-3 backdrop-blur-md">
                                     <div>
                                         <p className="text-sm font-bold text-foreground">{app.patient?.name || "Paciente Removido"} faltou.</p>
-                                        <p className="text-xs text-muted-fg mt-0.5">Sessão de {format(app.startTime, "HH:mm")}</p>
+                                        <p className="text-xs text-muted-fg mt-0.5">Sessão de <LocalTime date={app.startTime} formatStr="HH:mm" /></p>
                                     </div>
                                     <NotifyAbsentButton phone={app.patient?.phone || ""} patientName={app.patient?.name || "Paciente"} />
                                 </div>

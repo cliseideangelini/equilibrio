@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CancellationButton } from "@/components/CancellationButton";
 import { AbsentButton } from "@/components/AbsentButton";
+import { CompleteAppointmentButton } from "@/components/CompleteAppointmentButton";
 import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -204,11 +205,14 @@ export function AgendaClient({ initialAppointments, initialDate }: AgendaClientP
                                             ) : (
                                                 <div className="flex items-center justify-end gap-2 pr-2">
                                                     {app.status === 'CONFIRMED' && (
-                                                        <AbsentButton
-                                                            appointmentId={app.id}
-                                                            variant="outline"
-                                                            className="h-8 px-4 rounded-xl border-amber-500/25 bg-amber-500/5 text-[9px] font-black uppercase tracking-widest text-amber-400 hover:bg-amber-500/15 hover:border-amber-500/40 hover:text-amber-300 transition-all"
-                                                        />
+                                                        <>
+                                                            <CompleteAppointmentButton appointmentId={app.id} />
+                                                            <AbsentButton
+                                                                appointmentId={app.id}
+                                                                variant="outline"
+                                                                className="h-8 px-4 rounded-xl border-amber-500/25 bg-amber-500/5 text-[9px] font-black uppercase tracking-widest text-amber-400 hover:bg-amber-500/15 hover:border-amber-500/40 hover:text-amber-300 transition-all"
+                                                            />
+                                                        </>
                                                     )}
                                                     <CancellationButton
                                                         appointmentId={app.id}
