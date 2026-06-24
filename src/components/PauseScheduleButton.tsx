@@ -155,7 +155,7 @@ export function PauseScheduleButton({ adminId }: Props) {
     };
 
     const handleDeleteBlock = async (id: string) => {
-        if (!window.confirm("Remover este bloqueio? A agenda voltará ao normal neste período.")) return;
+        if (!window.confirm("Remover este bloqueio? A agenda voltará ao normal e as consultas canceladas neste período serão restauradas automaticamente.")) return;
         
         try {
             const result = await deleteScheduleBlock(id);

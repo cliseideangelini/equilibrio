@@ -1139,9 +1139,29 @@ export async function createScheduleBlock(adminId: string, startDate: Date, endD
 
 export async function deleteScheduleBlock(blockId: string) {
     try {
+        const block = await prisma.scheduleBlock.findUnique({ where: { id: blockId } });
+        
         await prisma.scheduleBlock.delete({
             where: { id: blockId }
         });
+
+        if (block && block.endDate) {
+            // Restaurar agendamentos que foram cancelados devido a este bloqueio
+            await prisma.appointment.updateMany({
+                where: {
+                    psychologistId: block.psychologistId,
+                    startTime: {
+                        gte: block.startDate,
+                        lt: block.endDate
+                    },
+                    status: 'CANCELLED'
+                },
+                data: {
+                    status: 'CONFIRMED'
+                }
+            });
+        }
+
         revalidatePath('/area-clinica');
         revalidatePath('/');
         return { success: true };
