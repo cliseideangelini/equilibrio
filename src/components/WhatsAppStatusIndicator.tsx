@@ -9,7 +9,7 @@ export function WhatsAppStatusIndicator() {
 
     const checkStatus = async () => {
         try {
-            const res = await fetch("https://equilibrio-production.up.railway.app/status");
+            const res = await fetch("https://equilibrio-whatsapp-bridge.onrender.com/status");
             const data = await res.json();
             if (data.connected) {
                 setStatus("connected");

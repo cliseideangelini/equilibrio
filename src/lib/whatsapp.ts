@@ -35,7 +35,7 @@ export async function notifyPsychologist(message: string) {
     try {
         console.log(`💬 [WhatsApp Baileys] Enviando aviso para a psicóloga no número ${phone}...`);
 
-        const apiUrl = `https://equilibrio-production.up.railway.app/send`;
+        const apiUrl = `https://equilibrio-whatsapp-bridge.onrender.com/send`;
 
         const response = await fetch(apiUrl, {
             method: "POST",
@@ -72,7 +72,7 @@ export async function notifyPatient(patientPhone: string, message: string) {
     try {
         console.log(`💬 [WhatsApp Baileys] Enviando mensagem para o paciente ${phone}...`);
 
-        const apiUrl = `https://equilibrio-production.up.railway.app/send`;
+        const apiUrl = `https://equilibrio-whatsapp-bridge.onrender.com/send`;
 
         const response = await fetch(apiUrl, {
             method: "POST",
