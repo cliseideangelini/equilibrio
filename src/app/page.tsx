@@ -12,8 +12,6 @@ import {
   Clock,
   MapPin,
   Phone,
-  Instagram,
-  Linkedin,
   Star,
   CheckCircle,
   Sparkles,
@@ -644,24 +642,6 @@ export default function HomePage() {
             </p>
             {/* Social */}
             <div className="flex items-center gap-3 pt-1">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-surface hover:border-primary/40 transition-all"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-surface hover:border-primary/40 transition-all"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
               <a
                 href="https://wa.me/5519988275290"
                 target="_blank"

@@ -14,6 +14,7 @@ interface WaitingEntry {
     phone: string;
     preferredDays: string | null;
     preferredHours: string | null;
+    preferredShift: string | null;
     specificDate: Date | string | null;
     specificTime: string | null;
     status: string;
@@ -114,7 +115,7 @@ export function WaitingListClient({ initialList }: WaitingListClientProps) {
                                                         {entry.preferredDays ? entry.preferredDays.split(",").join(", ") : "Qualquer dia"}
                                                     </div>
                                                     <div className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">
-                                                        {entry.preferredHours || "Qualquer turno"}
+                                                        {entry.preferredShift === 'MANHA' ? 'Manhã' : entry.preferredShift === 'TARDE' ? 'Tarde' : 'Qualquer turno'}
                                                     </div>
                                                 </>
                                             )}

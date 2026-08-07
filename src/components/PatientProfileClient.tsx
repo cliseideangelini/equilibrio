@@ -91,7 +91,6 @@ export default function PatientProfilePage({ patient }: { patient: any }) {
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="seu@email.com"
                                     className="h-14 pl-12 rounded-2xl border-white/10 bg-white/5 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-white/20"
-                                    required
                                 />
                             </div>
                         </div>

@@ -127,28 +127,23 @@ export default async function AdminDashboard() {
                         </div>
                     </section>
 
-                    {/* Notificações e Atividades */}
+                    {/* Pendências */}
                     <section>
                         <div className="glass-card p-10 h-full rounded-[3rem]">
-                            <h3 className="text-2xl font-serif mb-8 text-foreground">Atividades Recentes</h3>
-                            <div className="space-y-8">
-                                {[
-                                    { type: 'new', msg: 'Novo agendamento: Ricardo Santos', time: 'Há 10 min' },
-                                    { type: 'cancel', msg: 'Ana Paula cancelou a sessão de amanhã', time: 'Há 2 horas' },
-                                    { type: 'confirm', msg: 'Mensagem de confirmação enviada', time: 'Há 1 dia' }
-                                ].map((activity: any, i) => (
-                                    <div key={i} className="flex gap-4 group">
-                                        <div className={cn(
-                                            "w-3 h-3 rounded-full mt-1.5 shrink-0 shadow-sm transition-transform group-hover:scale-125 duration-300",
-                                            activity.type === 'new' ? "bg-primary shadow-glow" : activity.type === 'cancel' ? "bg-red-500" : "bg-warm"
-                                        )} />
-                                        <div>
-                                            <p className="text-sm font-bold text-foreground/90">{activity.msg}</p>
-                                            <span className="text-xs text-muted-foreground font-medium">{activity.time}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            <h3 className="text-2xl font-serif mb-8 text-foreground">Aguardando Confirmação</h3>
+                            {pendingAppointments > 0 ? (
+                                <div className="flex items-center gap-4">
+                                    <AlertCircle className="w-8 h-8 text-warm shrink-0" />
+                                    <p className="text-sm font-bold text-foreground/90">
+                                        Você tem {pendingAppointments} agendamento{pendingAppointments > 1 ? "s" : ""} pendente{pendingAppointments > 1 ? "s" : ""} de confirmação.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="py-10 text-center">
+                                    <CheckCircle2 className="w-10 h-10 text-muted-foreground/40 mx-auto mb-4" />
+                                    <p className="text-muted-foreground font-medium">Nenhuma pendência. Tudo sob controle.</p>
+                                </div>
+                            )}
                         </div>
                     </section>
                 </div>

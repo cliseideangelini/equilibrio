@@ -1114,7 +1114,7 @@ export async function updatePatientProfile(data: { name: string, email: string, 
     const patientId = cookieStore.get('patient_id')?.value;
     if (!patientId) return { success: false, error: 'Não autorizado' };
 
-    const updateData: any = { name: data.name, email: data.email };
+    const updateData: any = { name: data.name, email: data.email?.trim() || null };
     if (data.password) {
         updateData.password = await bcrypt.hash(data.password, 10);
         updateData.mustChangePassword = false;

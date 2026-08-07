@@ -40,6 +40,19 @@ export function Navbar() {
   /* ── Close mobile menu on route change ── */
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
+  /* ── Same-page hash links: Next's <Link> doesn't reliably scroll when only the hash changes ── */
+  const handleNavLinkClick = (e: React.MouseEvent, href: string) => {
+    if (pathname === "/" && href.startsWith("/#")) {
+      const id = href.slice(2);
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth" });
+        window.history.pushState(null, "", href);
+      }
+    }
+  };
+
   /* ── Hidden on internal app pages ── */
   const hiddenRoutes = [
     "/paciente/minha-agenda",
@@ -88,6 +101,7 @@ export function Navbar() {
                 <Link
                   key={label}
                   href={href}
+                  onClick={(e) => handleNavLinkClick(e, href)}
                   className="link-underline text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors duration-300"
                 >
                   {label}
@@ -163,7 +177,7 @@ export function Navbar() {
               key={label}
               href={href}
               className="py-3.5 px-4 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-surface transition-all"
-              onClick={() => setMenuOpen(false)}
+              onClick={(e) => { handleNavLinkClick(e, href); setMenuOpen(false); }}
             >
               {label}
             </Link>
