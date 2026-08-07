@@ -292,6 +292,8 @@ export async function createAppointment(formData: {
         console.error("Failed to notify patient of booking:", e);
     }
 
+    await markWaitingListBookedForPhone(patient.phone);
+
     revalidatePath('/paciente/minha-agenda');
     return { success: true, appointmentId: appointment.id, meetLink };
 }
@@ -585,13 +587,45 @@ const WEEKDAY_LABELS: Record<number, string> = {
 
 function matchesPreferredDay(preferredDays: string | null, dayOfWeek: number): boolean {
     if (!preferredDays) return true; // "Qualquer dia"
-    return WEEKDAY_NAME_TO_NUM[preferredDays] === dayOfWeek;
+    const days = preferredDays.split(",").map(d => d.trim()).filter(Boolean);
+    if (days.length === 0) return true;
+    return days.some(d => WEEKDAY_NAME_TO_NUM[d] === dayOfWeek);
 }
 
 function matchesPreferredShift(preferredShift: string | null, hour: number): boolean {
     if (!preferredShift) return true;
     const isMorning = hour < 12;
     return preferredShift === "MANHA" ? isMorning : !isMorning;
+}
+
+function normalizePhoneForCompare(phone: string): string {
+    const digits = phone.replace(/\D/g, "");
+    return digits.length > 11 ? digits.slice(-11) : digits;
+}
+
+// Marca como "BOOKED" quem estava PENDING/NOTIFIED na lista de espera e acabou de conseguir agendar
+async function markWaitingListBookedForPhone(phone: string) {
+    try {
+        const target = normalizePhoneForCompare(phone);
+        if (!target) return;
+
+        const candidates = await prisma.waitingList.findMany({
+            where: { status: { in: ["PENDING", "NOTIFIED"] } }
+        });
+
+        const matchIds = candidates
+            .filter(w => normalizePhoneForCompare(w.phone) === target)
+            .map(w => w.id);
+
+        if (matchIds.length > 0) {
+            await prisma.waitingList.updateMany({
+                where: { id: { in: matchIds } },
+                data: { status: "BOOKED" }
+            });
+        }
+    } catch (e) {
+        console.error("Erro ao marcar lista de espera como agendada:", e);
+    }
 }
 
 export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false, isProfessional: boolean = false) {
@@ -929,6 +963,8 @@ export async function createManualAppointment(data: {
         } catch (e) {
             console.error("Failed to notify patient of manual booking:", e);
         }
+
+        await markWaitingListBookedForPhone(patient.phone);
     }
 
     revalidatePath('/area-clinica');

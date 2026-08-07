@@ -22,6 +22,8 @@ interface AvailabilityRule {
     endTime: number;
 }
 
+const WEEKDAY_OPTIONS = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
+
 interface WaitingListDialogProps {
     rules: AvailabilityRule[];
     patientName?: string;
@@ -45,6 +47,14 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
     });
 
     const [myWaitingList, setMyWaitingList] = useState<any[]>([]);
+
+    const selectedDays = formData.preferredDays ? formData.preferredDays.split(",") : [];
+    const toggleDay = (day: string) => {
+        const next = selectedDays.includes(day)
+            ? selectedDays.filter(d => d !== day)
+            : [...selectedDays, day];
+        setFormData({ ...formData, preferredDays: next.join(",") });
+    };
 
     useEffect(() => {
         if (open && formData.phone) {
@@ -227,23 +237,28 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                     {/* Campos Condicionais */}
                                     <div className="min-h-[140px] animate-in fade-in slide-in-from-top-2 duration-300">
                                         {mode === "general" ? (
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 gap-4">
                                                 <div className="grid gap-2">
                                                     <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-1">
-                                                        <CalendarIcon size={10} /> Dias Preferidos
+                                                        <CalendarIcon size={10} /> Dias Preferidos <span className="normal-case font-medium text-muted-foreground/70">(deixe vazio para qualquer dia)</span>
                                                     </label>
-                                                    <select
-                                                        value={formData.preferredDays}
-                                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, preferredDays: e.target.value })}
-                                                        className="rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:ring-primary/20 h-12 px-3 text-sm text-white outline-none appearance-none"
-                                                    >
-                                                        <option value="" className="bg-[#1A1C23] text-white">Qualquer dia</option>
-                                                        <option value="Segunda-feira" className="bg-[#1A1C23] text-white">Segunda-feira</option>
-                                                        <option value="Terça-feira" className="bg-[#1A1C23] text-white">Terça-feira</option>
-                                                        <option value="Quarta-feira" className="bg-[#1A1C23] text-white">Quarta-feira</option>
-                                                        <option value="Quinta-feira" className="bg-[#1A1C23] text-white">Quinta-feira</option>
-                                                        <option value="Sexta-feira" className="bg-[#1A1C23] text-white">Sexta-feira</option>
-                                                    </select>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {WEEKDAY_OPTIONS.map(day => (
+                                                            <button
+                                                                key={day}
+                                                                type="button"
+                                                                onClick={() => toggleDay(day)}
+                                                                className={cn(
+                                                                    "px-3 py-2 rounded-xl text-xs font-bold transition-all border",
+                                                                    selectedDays.includes(day)
+                                                                        ? "bg-primary text-white border-primary"
+                                                                        : "bg-white/5 text-muted-foreground border-white/10 hover:border-white/30"
+                                                                )}
+                                                            >
+                                                                {day.replace("-feira", "")}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                                 <div className="grid gap-2">
                                                     <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-1">
@@ -339,7 +354,7 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                                                                 {item.specificDate ? (
                                                                     `${new Date(item.specificDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} às ${item.specificTime}`
                                                                 ) : (
-                                                                    `${item.preferredDays || 'Qualquer dia'}`
+                                                                    `${item.preferredDays ? item.preferredDays.split(",").join(", ") : 'Qualquer dia'}`
                                                                 )}
                                                             </span>
                                                             {!item.specificDate && (

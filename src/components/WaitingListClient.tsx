@@ -111,7 +111,7 @@ export function WaitingListClient({ initialList }: WaitingListClientProps) {
                                             ) : (
                                                 <>
                                                     <div className="text-stone-900 font-medium">
-                                                        {entry.preferredDays || "Qualquer dia"}
+                                                        {entry.preferredDays ? entry.preferredDays.split(",").join(", ") : "Qualquer dia"}
                                                     </div>
                                                     <div className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">
                                                         {entry.preferredHours || "Qualquer turno"}
