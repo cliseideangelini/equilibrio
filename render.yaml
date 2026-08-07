@@ -1,0 +1,15 @@
+services:
+  - name: equilibrio-whatsapp-bridge
+    type: web
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: whatsapp-sender
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: BRIDGE_SECRET
+        sync: false
+      - key: MAIN_APP_URL
+        sync: false
