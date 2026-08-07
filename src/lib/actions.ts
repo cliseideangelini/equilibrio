@@ -468,13 +468,31 @@ export async function addToWaitingList(data: {
     return { success: true };
 }
 
+// Devolve para PENDING quem foi avisado de uma vaga mas o horário dela já passou sem agendar
+export async function requeueExpiredWaitingListNotifications() {
+    const now = getLocalNow();
+    await prisma.waitingList.updateMany({
+        where: {
+            status: "NOTIFIED",
+            notifiedForDate: { lt: now }
+        },
+        data: {
+            status: "PENDING",
+            notifiedAt: null,
+            notifiedForDate: null
+        }
+    });
+}
+
 export async function getWaitingList() {
+    await requeueExpiredWaitingListNotifications();
     return await prisma.waitingList.findMany({
         orderBy: { createdAt: 'desc' }
     });
 }
 
 export async function getPatientWaitingList(phone: string) {
+    await requeueExpiredWaitingListNotifications();
     return await prisma.waitingList.findMany({
         where: { phone, status: "PENDING" },
         orderBy: { createdAt: 'desc' }
@@ -545,6 +563,37 @@ export async function resolveFixedVirtualAppointment(id: string, defaultStatus: 
     return id;
 }
 
+const WEEKDAY_NAME_TO_NUM: Record<string, number> = {
+    "Domingo": 0,
+    "Segunda-feira": 1,
+    "Terça-feira": 2,
+    "Quarta-feira": 3,
+    "Quinta-feira": 4,
+    "Sexta-feira": 5,
+    "Sábado": 6,
+};
+
+const WEEKDAY_LABELS: Record<number, string> = {
+    0: "domingo",
+    1: "segunda-feira",
+    2: "terça-feira",
+    3: "quarta-feira",
+    4: "quinta-feira",
+    5: "sexta-feira",
+    6: "sábado",
+};
+
+function matchesPreferredDay(preferredDays: string | null, dayOfWeek: number): boolean {
+    if (!preferredDays) return true; // "Qualquer dia"
+    return WEEKDAY_NAME_TO_NUM[preferredDays] === dayOfWeek;
+}
+
+function matchesPreferredShift(preferredShift: string | null, hour: number): boolean {
+    if (!preferredShift) return true;
+    const isMorning = hour < 12;
+    return preferredShift === "MANHA" ? isMorning : !isMorning;
+}
+
 export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false, isProfessional: boolean = false) {
     const resolvedId = await resolveFixedVirtualAppointment(appointmentId, AppointmentStatus.CONFIRMED);
     const appointment = await prisma.appointment.findUnique({
@@ -577,11 +626,16 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         type: appointment.type
     });
 
+    const isLateCancellation = !isProfessional && hoursUntilSession <= 3;
+
     // Notify psychologist of cancellation
     try {
         const byWho = isProfessional ? "pela Profissional" : "pelo Paciente";
+        const lateNotice = isLateCancellation
+            ? "\n\n💰 *Cobrança*: Cancelamento com menos de 3h de antecedência — o paciente foi avisado que a consulta será cobrada integralmente."
+            : "";
         await notifyPsychologist(
-            `❌ *Sessão Cancelada!*\n\n👤 *Paciente*: ${appointment.patient.name}\n📞 *Telefone*: ${appointment.patient.phone}\n${formattedDetails}\n🚫 *Motivo*: Cancelado ${byWho}`
+            `❌ *Sessão Cancelada!*\n\n👤 *Paciente*: ${appointment.patient.name}\n📞 *Telefone*: ${appointment.patient.phone}\n${formattedDetails}\n🚫 *Motivo*: Cancelado ${byWho}${lateNotice}`
         );
     } catch (e) {
         console.error("Failed to notify psychologist of cancellation:", e);
@@ -589,10 +643,9 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     // Notify patient of cancellation via local Baileys API
     try {
-        let chargeNotice = "";
-        if (!isProfessional && hoursUntilSession <= 3) {
-            chargeNotice = "\n\n⚠️ *Aviso Importante*: Como o cancelamento foi realizado com menos de 3 horas de antecedência, informamos que o valor da consulta será cobrado integralmente, conforme nossa política de agendamentos.";
-        }
+        const chargeNotice = isLateCancellation
+            ? "\n\n⚠️ *Aviso Importante*: Como o cancelamento foi realizado com menos de 3 horas de antecedência, informamos que o valor da consulta será cobrado integralmente, conforme nossa política de agendamentos."
+            : "";
 
         await notifyPatient(
             appointment.patient.phone,
@@ -604,9 +657,10 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 
     // Lógica de Lista de Espera: Notificar interessados
     try {
+        await requeueExpiredWaitingListNotifications();
+
         const timeStr = format(appointment.startTime, 'HH:mm');
-        const startTimeStr = format(appointment.startTime, 'yyyy-MM-dd');
-        
+
         // 1. Prioridade: Quem pediu ESSE horário específico
         const specificInterested = await prisma.waitingList.findMany({
             where: {
@@ -619,21 +673,28 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
             }
         });
 
-        // 2. Geral: Quem está na lista esperando qualquer vaga
-        const generalInterested = await prisma.waitingList.findMany({
+        // 2. Geral: Quem está na lista esperando qualquer vaga, filtrado pelo dia/turno de preferência
+        const generalCandidates = await prisma.waitingList.findMany({
             where: {
                 status: "PENDING",
                 specificDate: null
             }
         });
 
+        const dayOfWeek = appointment.startTime.getDay();
+        const hour = appointment.startTime.getHours();
+        const generalInterested = generalCandidates.filter(w =>
+            matchesPreferredDay(w.preferredDays, dayOfWeek) &&
+            matchesPreferredShift(w.preferredShift, hour)
+        );
+
         const allToNotify = [...specificInterested, ...generalInterested];
 
         if (allToNotify.length > 0) {
-            // Marcar como notificados
+            // Marcar como notificados, guardando a data/hora da vaga avisada
             await prisma.waitingList.updateMany({
                 where: { id: { in: allToNotify.map(i => i.id) } },
-                data: { status: "NOTIFIED" }
+                data: { status: "NOTIFIED", notifiedAt: now, notifiedForDate: appointment.startTime }
             });
 
             // Disparar WhatsApp para todos (First come, first served)
@@ -674,10 +735,36 @@ export async function confirmAppointment(id: string) {
 
 export async function setAbsent(id: string) {
     const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
-    await prisma.appointment.update({
+    const appointment = await prisma.appointment.update({
         where: { id: resolvedId },
-        data: { status: AppointmentStatus.ABSENT }
+        data: { status: AppointmentStatus.ABSENT },
+        include: { patient: true }
     });
+
+    const formattedDetails = formatAppointmentDetailsForWhatsApp({
+        patient: appointment.patient,
+        startTime: appointment.startTime,
+        type: appointment.type
+    });
+
+    // Avisa o paciente sobre a cobrança integral por falta sem aviso
+    try {
+        await notifyPatient(
+            appointment.patient.phone,
+            `Olá ${appointment.patient.name}. Notamos que você não compareceu à sua sessão na Clínica Equilíbrio.\n\n${formattedDetails}\n\n⚠️ *Aviso Importante*: Como não houve aviso prévio de cancelamento, o valor da consulta será cobrado integralmente, conforme nossa política de agendamentos.`
+        );
+    } catch (e) {
+        console.error("Failed to notify patient of absence:", e);
+    }
+
+    // Avisa a psicóloga que a falta foi registrada e o paciente foi notificado da cobrança
+    try {
+        await notifyPsychologist(
+            `⚠️ *Falta Registrada!*\n\n👤 *Paciente*: ${appointment.patient.name}\n📞 *Telefone*: ${appointment.patient.phone}\n${formattedDetails}\n💰 O paciente foi avisado sobre a cobrança integral da sessão.`
+        );
+    } catch (e) {
+        console.error("Failed to notify psychologist of absence:", e);
+    }
 
     revalidatePath('/area-clinica');
     revalidatePath('/area-clinica/agenda');
@@ -977,7 +1064,7 @@ export async function updatePsychologistAvailability(availabilities: { dayOfWeek
 
 export async function updatePatientFixedSchedule(patientId: string, isFixed: boolean, fixedDayOfWeek?: number | null, fixedTime?: string | null) {
     try {
-        await prisma.patient.update({
+        const patient = await prisma.patient.update({
             where: { id: patientId },
             data: {
                 isFixed,
@@ -985,6 +1072,18 @@ export async function updatePatientFixedSchedule(patientId: string, isFixed: boo
                 fixedTime: isFixed ? fixedTime : null
             }
         });
+
+        if (isFixed && fixedDayOfWeek !== null && fixedDayOfWeek !== undefined && fixedTime) {
+            try {
+                const dayLabel = WEEKDAY_LABELS[fixedDayOfWeek] || `dia ${fixedDayOfWeek}`;
+                await notifyPatient(
+                    patient.phone,
+                    `Olá ${patient.name}! Seu horário fixo semanal na Clínica Equilíbrio foi confirmado: toda ${dayLabel} às ${fixedTime}. Esse horário fica reservado automaticamente para você todas as semanas. 🌟`
+                );
+            } catch (e) {
+                console.error("Failed to notify patient of fixed schedule:", e);
+            }
+        }
 
         revalidatePath('/area-clinica');
         revalidatePath('/area-clinica/agenda');
