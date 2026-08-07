@@ -154,6 +154,26 @@ model WhatsAppSession {
   updatedAt DateTime @updatedAt
 }
 
+// Backup durável da sessão do WhatsApp (Baileys) — sobrevive a reinícios/redeploys do robô,
+// já que o disco do serviço que roda o robô não é permanente.
+model WhatsAppBridgeSession {
+  id        String   @id @default("main")
+  data      String   // JSON com o conteúdo dos arquivos de credenciais do Baileys
+  updatedAt DateTime @updatedAt
+}
+
+// Fila de mensagens que falharam ao enviar (robô desconectado/fora do ar) para reenvio automático
+model PendingWhatsAppMessage {
+  id        String   @id @default(cuid())
+  phone     String
+  message   String
+  status    String   @default("PENDING") // PENDING, SENT, FAILED
+  attempts  Int      @default(0)
+  lastError String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model ScheduleBlock {
   id             String       @id @default(cuid())
   psychologistId String
