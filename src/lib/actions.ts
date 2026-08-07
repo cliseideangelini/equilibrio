@@ -817,21 +817,31 @@ export async function createManualAppointment(data: {
         }
     });
 
-    // Notify psychologist of manual booking
-    try {
-        const patient = await prisma.patient.findUnique({ where: { id: data.patientId } });
-        if (patient) {
-            const formattedDetails = formatAppointmentDetailsForWhatsApp({
-                patient,
-                startTime: appointment.startTime,
-                type: appointment.type
-            });
+    // Notify psychologist and patient of manual booking
+    const patient = await prisma.patient.findUnique({ where: { id: data.patientId } });
+    if (patient) {
+        const formattedDetails = formatAppointmentDetailsForWhatsApp({
+            patient,
+            startTime: appointment.startTime,
+            type: appointment.type
+        });
+
+        try {
             await notifyPsychologist(
                 `🔔 *Novo Agendamento Manual Realizado!*\n\n👤 *Paciente*: ${patient.name}\n📞 *Telefone*: ${patient.phone}\n${formattedDetails}`
             );
+        } catch (e) {
+            console.error("Failed to notify psychologist of manual booking:", e);
         }
-    } catch (e) {
-        console.error("Failed to notify psychologist of manual booking:", e);
+
+        try {
+            await notifyPatient(
+                patient.phone,
+                `Olá ${patient.name}! Seu agendamento na Clínica Equilíbrio foi confirmado com sucesso!\n\n${formattedDetails}`
+            );
+        } catch (e) {
+            console.error("Failed to notify patient of manual booking:", e);
+        }
     }
 
     revalidatePath('/area-clinica');

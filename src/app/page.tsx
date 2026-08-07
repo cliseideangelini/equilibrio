@@ -266,7 +266,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="sobre"
-        className="py-8 sm:py-12 px-4 sm:px-6"
+        className="py-8 sm:py-12 px-4 sm:px-6 scroll-mt-28"
         aria-label="Sobre Cliseide S. Angelini"
       >
         <div className="max-w-7xl mx-auto">
@@ -384,7 +384,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="servicos"
-        className="py-8 sm:py-12 px-4 sm:px-6 bg-surface/20"
+        className="py-8 sm:py-12 px-4 sm:px-6 bg-surface/20 scroll-mt-28"
         aria-label="Especialidades e serviços"
       >
         <div className="max-w-7xl mx-auto">
@@ -465,7 +465,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="faq"
-        className="py-8 sm:py-12 px-4 sm:px-6"
+        className="py-8 sm:py-12 px-4 sm:px-6 scroll-mt-28"
         aria-label="Dúvidas Frequentes"
       >
         <div className="max-w-4xl mx-auto">
@@ -516,7 +516,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section
         id="agendamento"
-        className="py-8 sm:py-12 px-4 sm:px-6"
+        className="py-8 sm:py-12 px-4 sm:px-6 scroll-mt-28"
         aria-label="Agendamento e contato"
       >
         <div className="max-w-7xl mx-auto">
@@ -535,7 +535,7 @@ export default function HomePage() {
           </div>
 
           {/* WhatsApp-first contact block */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="contato">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 scroll-mt-28" id="contato">
 
             {/* Patient Portal CTA */}
             <div className="reveal lg:col-span-2">

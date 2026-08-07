@@ -33,6 +33,10 @@
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply antialiased font-sans;
     background-color: hsl(var(--background));
