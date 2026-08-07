@@ -105,6 +105,7 @@ export function formatAppointmentDetailsForWhatsApp(app: {
     patient: { name: string };
     startTime: Date;
     type: string;
+    meetLink?: string | null;
 }) {
     const formatter = new Intl.DateTimeFormat("pt-BR", {
         timeZone: "America/Sao_Paulo",
@@ -114,7 +115,7 @@ export function formatAppointmentDetailsForWhatsApp(app: {
         minute: "2-digit",
         hour12: false
     });
-    
+
     const parts = formatter.formatToParts(new Date(app.startTime));
     const map = parts.reduce((acc, part) => {
         acc[part.type] = part.value;
@@ -123,7 +124,11 @@ export function formatAppointmentDetailsForWhatsApp(app: {
 
     const dateFormatted = `${map.day}/${map.month} às ${map.hour}:${map.minute}`;
     const modalidade = app.type === "ONLINE" ? "Online (Google Meet)" : "Presencial";
-    return `📅 Data: ${dateFormatted}\n💻 Modalidade: ${modalidade}`;
+    let details = `📅 Data: ${dateFormatted}\n💻 Modalidade: ${modalidade}`;
+    if (app.type === "ONLINE" && app.meetLink) {
+        details += `\n🔗 Link da reunião: ${app.meetLink}`;
+    }
+    return details;
 }
 
 export function formatDateTimeSimple(date: Date) {

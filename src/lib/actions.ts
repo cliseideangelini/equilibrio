@@ -294,7 +294,8 @@ export async function createAppointment(formData: {
     const formattedDetails = formatAppointmentDetailsForWhatsApp({
         patient,
         startTime: appointment.startTime,
-        type: appointment.type
+        type: appointment.type,
+        meetLink: appointment.meetLink
     });
 
     // Notify psychologist of new booking
@@ -1054,7 +1055,8 @@ export async function createManualAppointment(data: {
         const formattedDetails = formatAppointmentDetailsForWhatsApp({
             patient,
             startTime: appointment.startTime,
-            type: appointment.type
+            type: appointment.type,
+            meetLink: appointment.meetLink
         });
 
         try {
