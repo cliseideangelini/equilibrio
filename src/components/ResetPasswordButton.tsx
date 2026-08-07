@@ -14,14 +14,14 @@ export function ResetPasswordButton({ patientId }: ResetPasswordButtonProps) {
     const [isPending, setIsPending] = useState(false);
 
     const handleReset = async () => {
-        if (!confirm("Tem certeza de que deseja resetar a senha deste paciente para a senha padrão 'psicologa123'?\nO paciente será obrigado a cadastrar uma nova senha no próximo acesso.")) {
+        if (!confirm("Tem certeza de que deseja resetar a senha deste paciente?\nUma senha temporária será enviada por WhatsApp e ele será obrigado a cadastrar uma nova senha no próximo acesso.")) {
             return;
         }
         setIsPending(true);
         try {
             const res = await resetPatientPassword(patientId);
             if (res.success) {
-                toast.success("Senha redefinida para 'psicologa123' com sucesso!");
+                toast.success("Senha redefinida! Uma senha temporária foi enviada ao paciente por WhatsApp.");
             }
         } catch (error) {
             console.error(error);

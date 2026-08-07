@@ -38,7 +38,7 @@ export function PatientRegistrationDialog() {
                 email: formData.email,
                 username: cleanUsername,
                 dateOfBirth: "2000-01-01",
-                password: "psicologa123", // Senha padrão para primeiro acesso
+                generateTempPassword: true, // Senha temporária gerada e enviada por WhatsApp
             });
             setIsOpen(false);
             setFormData({ name: "", phone: "", email: "" });
@@ -119,7 +119,7 @@ export function PatientRegistrationDialog() {
                         {isPending ? <Loader2 className="animate-spin" /> : "Salvar Cadastro"}
                     </Button>
                     <p className="text-[9px] text-center text-stone-400 uppercase tracking-widest leading-relaxed px-4">
-                        O paciente poderá acessar o sistema usando o número de WhatsApp e a senha padrão <span className="text-stone-900 font-bold">psicologa123</span>
+                        Uma senha temporária será gerada e enviada automaticamente para o paciente por WhatsApp
                     </p>
                 </form>
             </DialogContent>

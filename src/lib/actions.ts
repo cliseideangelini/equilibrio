@@ -353,20 +353,31 @@ export async function loginPsychologist(identifier: string, password: string) {
 
 export async function forgotPassword(identifier: string, type: "PATIENT" | "PSYCHOLOGIST") {
     if (type === "PSYCHOLOGIST") {
-        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        const expiry = new Date(Date.now() + 3600000); // 1 hora
-        
-        const user = await prisma.psychologist.findUnique({ where: { email: identifier } });
-        if (!user) return { success: false, error: "Usuário não encontrado." };
-        await prisma.psychologist.update({
-            where: { email: identifier },
-            data: { resetToken: token, resetTokenExpiry: expiry }
+        const user = await prisma.psychologist.findFirst({
+            where: { OR: [{ email: identifier }, { username: identifier }] }
         });
-        
-        // Simulação de envio de e-mail
-        console.log(`[EMAIL] Link de recuperação para ${identifier}: https://equilibrio-psi.vercel.app/recuperar-senha?token=${token}`);
-        
-        return { success: true, message: "E-mail de recuperação enviado." };
+        if (!user) return { success: false, error: "Usuário não encontrado." };
+
+        const targetPhone = user.whatsappNumber || user.phone;
+        if (!targetPhone) {
+            return { success: false, error: "Nenhum WhatsApp cadastrado para recuperação. Entre em contato com o suporte." };
+        }
+
+        // Gera senha temporária e envia por WhatsApp (mesmo padrão usado para pacientes)
+        const tempPassword = Math.random().toString(36).slice(-8);
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        await prisma.psychologist.update({
+            where: { id: user.id },
+            data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null }
+        });
+
+        await notifyPatient(
+            targetPhone,
+            `Olá ${user.name.split(' ')[0]}! Recebemos uma solicitação de recuperação de senha da sua conta profissional na Clínica Equilíbrio.\n\nSua nova senha temporária é: *${tempPassword}*\n\nAcesse o painel e recomendamos trocar essa senha assim que possível.`
+        );
+
+        return { success: true, message: "Senha temporária enviada para o seu WhatsApp!" };
     } else {
         // Patient recovery via WhatsApp
         const cleanPhone = identifier.replace(/\D/g, '');
@@ -1029,14 +1040,22 @@ export async function registerPatient(formData: {
     username: string;
     dateOfBirth: string;
     password?: string;
+    generateTempPassword?: boolean; // usado quando a profissional cadastra o paciente manualmente
 }) {
-    const { name, email, phone, username, dateOfBirth, password } = formData;
-    
+    const { name, email, phone, username, dateOfBirth, generateTempPassword } = formData;
+    let password = formData.password;
+
     const existingPhone = await prisma.patient.findFirst({ where: { phone, deletedAt: null } });
     if (existingPhone) return { success: false, error: "Este WhatsApp já está cadastrado." };
-    
+
     const existingUsername = await prisma.patient.findFirst({ where: { username, deletedAt: null } });
     if (existingUsername) return { success: false, error: "Este Nome de Usuário já está em uso." };
+
+    let tempPassword: string | undefined;
+    if (generateTempPassword) {
+        tempPassword = Math.random().toString(36).slice(-8);
+        password = tempPassword;
+    }
 
     let hashedPassword = undefined;
     if (password) {
@@ -1051,15 +1070,26 @@ export async function registerPatient(formData: {
             username,
             dateOfBirth: new Date(dateOfBirth),
             password: hashedPassword,
-            mustChangePassword: password === "psicologa123"
+            mustChangePassword: !!generateTempPassword
         }
     });
 
-    // Auto-login setting cookie
-    const cookieStore = await cookies();
-    cookieStore.set("patient_id", patient.id, { httpOnly: true, secure: true, maxAge: 60 * 60 * 24 * 7 });
+    if (generateTempPassword && tempPassword) {
+        try {
+            await notifyPatient(
+                phone,
+                `Olá ${name.split(' ')[0]}! Sua conta na Clínica Equilíbrio foi criada.\n\nUsuário: ${username}\nSenha temporária: *${tempPassword}*\n\nAo entrar, você será solicitado a criar uma nova senha definitiva.`
+            );
+        } catch (e) {
+            console.error("Failed to notify patient of account creation:", e);
+        }
+    } else {
+        // Auto-login apenas no autocadastro feito pelo próprio paciente
+        const cookieStore = await cookies();
+        cookieStore.set("patient_id", patient.id, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 60 * 60 * 24 * 7 });
+    }
 
-    return { success: true, patient };
+    return { success: true, patient, tempPassword };
 }
 
 export async function updatePsychologistAvailability(availabilities: { dayOfWeek: number; startTimeStr: string; endTimeStr: string }[]) {
@@ -1198,7 +1228,12 @@ export async function getAppointmentsWithFixed(startDate: Date, endDate: Date) {
 }
 
 export async function resetPatientPassword(patientId: string) {
-    const hashedPassword = await bcrypt.hash("psicologa123", 10);
+    const patient = await prisma.patient.findUnique({ where: { id: patientId } });
+    if (!patient) return { success: false, error: "Paciente não encontrado." };
+
+    const tempPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
     await prisma.patient.update({
         where: { id: patientId },
         data: {
@@ -1206,8 +1241,18 @@ export async function resetPatientPassword(patientId: string) {
             mustChangePassword: true
         }
     });
+
+    try {
+        await notifyPatient(
+            patient.phone,
+            `Olá ${patient.name.split(' ')[0]}! Sua senha de acesso à Clínica Equilíbrio foi redefinida.\n\nSua nova senha temporária é: *${tempPassword}*\n\nAo entrar, você será solicitado a criar uma nova senha definitiva.`
+        );
+    } catch (e) {
+        console.error("Failed to notify patient of password reset:", e);
+    }
+
     revalidatePath(`/area-clinica/prontuarios/${patientId}`);
-    return { success: true };
+    return { success: true, tempPassword };
 }
 
 export async function updatePsychologistProfile(data: {

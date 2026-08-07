@@ -8,10 +8,20 @@ async function sendMenu(phone: string) {
     await notifyPatient(phone, menuMessage);
 }
 
+function isAuthorized(req: Request) {
+    const secret = process.env.WHATSAPP_BRIDGE_SECRET;
+    if (!secret) return false;
+    return req.headers.get("x-bridge-secret") === secret;
+}
+
 export async function POST(req: Request) {
+    if (!isAuthorized(req)) {
+        return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+
     try {
         const body = await req.json();
-        
+
         // Espera-se que o payload do Baileys tenha: { phone: "551999999999", text: "Mensagem do usuário" }
         const { phone, text } = body;
 
