@@ -11,10 +11,9 @@ import {
     setHours, 
     setMinutes,
 } from "date-fns";
-import { 
-    getAvailableSlots, 
-    createAppointment, 
-    getPatientByPhone,
+import {
+    getAvailableSlots,
+    createAppointment,
     loginPatient,
     registerPatient
 } from "@/lib/actions";

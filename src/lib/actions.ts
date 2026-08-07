@@ -21,6 +21,30 @@ import {
 } from "date-fns";
 import { getLocalNow } from "@/lib/utils";
 
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_MINUTES = 15;
+
+// Confirma que quem está chamando a ação é a profissional logada (cookie admin_id),
+// em vez de confiar em parâmetros vindos do cliente. Server Actions podem ser
+// chamadas diretamente pelo navegador, então essa checagem precisa estar aqui,
+// não só escondida atrás da navegação por página.
+async function requireAdmin(): Promise<string> {
+    const cookieStore = await cookies();
+    const adminId = cookieStore.get("admin_id")?.value;
+    if (!adminId) throw new Error("Não autorizado.");
+    return adminId;
+}
+
+async function getSessionPatientId(): Promise<string | null> {
+    const cookieStore = await cookies();
+    return cookieStore.get("patient_id")?.value || null;
+}
+
+async function getSessionAdminId(): Promise<string | null> {
+    const cookieStore = await cookies();
+    return cookieStore.get("admin_id")?.value || null;
+}
+
 export async function getPsychologistAvailability() {
     const psychologist = await prisma.psychologist.findFirst({
         include: { availabilities: true }
@@ -310,8 +334,34 @@ export async function loginPatient(phone: string, password: string) {
         return { success: false, error: "Usuário não encontrado ou sem senha cadastrada." };
     }
 
+    if (patient.lockedUntil && patient.lockedUntil > new Date()) {
+        const minutesLeft = Math.ceil((patient.lockedUntil.getTime() - Date.now()) / 60000);
+        return { success: false, error: `Muitas tentativas incorretas. Tente novamente em ${minutesLeft} minuto(s).` };
+    }
+
     const isValid = await bcrypt.compare(password, patient.password);
-    if (!isValid) return { success: false, error: "Senha incorreta." };
+    if (!isValid) {
+        const attempts = patient.failedLoginAttempts + 1;
+        const lockedOut = attempts >= MAX_LOGIN_ATTEMPTS;
+        await prisma.patient.update({
+            where: { id: patient.id },
+            data: {
+                failedLoginAttempts: lockedOut ? 0 : attempts,
+                lockedUntil: lockedOut ? new Date(Date.now() + LOCKOUT_MINUTES * 60000) : null
+            }
+        });
+        if (lockedOut) {
+            return { success: false, error: `Muitas tentativas incorretas. Tente novamente em ${LOCKOUT_MINUTES} minutos.` };
+        }
+        return { success: false, error: "Senha incorreta." };
+    }
+
+    if (patient.failedLoginAttempts > 0 || patient.lockedUntil) {
+        await prisma.patient.update({
+            where: { id: patient.id },
+            data: { failedLoginAttempts: 0, lockedUntil: null }
+        });
+    }
 
     const cookieStore = await cookies();
     cookieStore.set("patient_id", patient.id, { httpOnly: true, secure: true, sameSite: "strict" });
@@ -338,8 +388,34 @@ export async function loginPsychologist(identifier: string, password: string) {
         return { success: false, error: "Usuário ou senha inválidos." };
     }
 
+    if (psychologist.lockedUntil && psychologist.lockedUntil > new Date()) {
+        const minutesLeft = Math.ceil((psychologist.lockedUntil.getTime() - Date.now()) / 60000);
+        return { success: false, error: `Muitas tentativas incorretas. Tente novamente em ${minutesLeft} minuto(s).` };
+    }
+
     const isValid = await bcrypt.compare(password, psychologist.password);
-    if (!isValid) return { success: false, error: "Usuário ou senha inválidos." };
+    if (!isValid) {
+        const attempts = psychologist.failedLoginAttempts + 1;
+        const lockedOut = attempts >= MAX_LOGIN_ATTEMPTS;
+        await prisma.psychologist.update({
+            where: { id: psychologist.id },
+            data: {
+                failedLoginAttempts: lockedOut ? 0 : attempts,
+                lockedUntil: lockedOut ? new Date(Date.now() + LOCKOUT_MINUTES * 60000) : null
+            }
+        });
+        if (lockedOut) {
+            return { success: false, error: `Muitas tentativas incorretas. Tente novamente em ${LOCKOUT_MINUTES} minutos.` };
+        }
+        return { success: false, error: "Usuário ou senha inválidos." };
+    }
+
+    if (psychologist.failedLoginAttempts > 0 || psychologist.lockedUntil) {
+        await prisma.psychologist.update({
+            where: { id: psychologist.id },
+            data: { failedLoginAttempts: 0, lockedUntil: null }
+        });
+    }
 
     const cookieStore = await cookies();
     cookieStore.set("admin_id", psychologist.id, { httpOnly: true, secure: true, sameSite: "strict" });
@@ -498,6 +574,7 @@ export async function requeueExpiredWaitingListNotifications() {
 }
 
 export async function getWaitingList() {
+    await requireAdmin();
     await requeueExpiredWaitingListNotifications();
     return await prisma.waitingList.findMany({
         orderBy: { createdAt: 'desc' }
@@ -513,6 +590,7 @@ export async function getPatientWaitingList(phone: string) {
 }
 
 export async function updateWaitingListStatus(id: string, status: string) {
+    await requireAdmin();
     await prisma.waitingList.update({
         where: { id },
         data: { status }
@@ -639,7 +717,17 @@ async function markWaitingListBookedForPhone(phone: string) {
     }
 }
 
-export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false, isProfessional: boolean = false) {
+export async function cancelAppointment(appointmentId: string, confirmLateCharge: boolean = false, _clientIsProfessional: boolean = false) {
+    // isProfessional é determinado pela sessão no servidor, nunca pelo parâmetro vindo do cliente
+    // (esse parâmetro é ignorado — mantido só para não quebrar a assinatura usada pelo componente).
+    const adminId = await getSessionAdminId();
+    const patientSessionId = await getSessionPatientId();
+    const isProfessional = !!adminId;
+
+    if (!isProfessional && !patientSessionId) {
+        throw new Error("Não autorizado.");
+    }
+
     const resolvedId = await resolveFixedVirtualAppointment(appointmentId, AppointmentStatus.CONFIRMED);
     const appointment = await prisma.appointment.findUnique({
         where: { id: resolvedId },
@@ -647,6 +735,10 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
     });
 
     if (!appointment) throw new Error("Agendamento não encontrado");
+
+    if (!isProfessional && appointment.patientId !== patientSessionId) {
+        throw new Error("Não autorizado.");
+    }
 
     const now = getLocalNow();
     const hoursUntilSession = (appointment.startTime.getTime() - now.getTime()) / (1000 * 60 * 60);
@@ -767,6 +859,7 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
 }
 
 export async function confirmAppointment(id: string) {
+    await requireAdmin();
     const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
     const app = await prisma.appointment.update({
         where: { id: resolvedId },
@@ -779,6 +872,7 @@ export async function confirmAppointment(id: string) {
 }
 
 export async function setAbsent(id: string) {
+    await requireAdmin();
     const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
     const appointment = await prisma.appointment.update({
         where: { id: resolvedId },
@@ -817,6 +911,7 @@ export async function setAbsent(id: string) {
 }
 
 export async function completeAppointment(id: string) {
+    await requireAdmin();
     const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
     const updatedAppointment = await prisma.appointment.update({
         where: { id: resolvedId },
@@ -840,6 +935,7 @@ export async function completeAppointment(id: string) {
 }
 
 export async function revertAppointmentStatus(id: string) {
+    await requireAdmin();
     const resolvedId = await resolveFixedVirtualAppointment(id, AppointmentStatus.CONFIRMED);
     await prisma.appointment.update({
         where: { id: resolvedId },
@@ -851,6 +947,7 @@ export async function revertAppointmentStatus(id: string) {
 }
 
 export async function saveEvolution(patientId: string, appointmentId: string, content: string, date?: Date, isDraft: boolean = false) {
+    await requireAdmin();
     if (!content.trim()) {
         try {
             await prisma.evolution.delete({
@@ -884,6 +981,7 @@ export async function saveEvolution(patientId: string, appointmentId: string, co
 }
 
 export async function addAttachment(patientId: string, name: string, url: string, type: string) {
+    await requireAdmin();
     const attachment = await prisma.attachment.create({
         data: {
             name,
@@ -903,6 +1001,7 @@ export async function createManualAppointment(data: {
     type: "ONLINE" | "PRESENCIAL";
     meetLink?: string;
 }) {
+    await requireAdmin();
     const psychologist = await prisma.psychologist.findFirst();
 
     if (!psychologist) throw new Error("Psicóloga não encontrada");
@@ -983,7 +1082,12 @@ export async function createManualAppointment(data: {
     return { success: true, appointmentId: appointment.id };
 }
 
-export async function updatePatientPassword(patientId: string, newPassword: string) {
+export async function updatePatientPassword(_clientPatientId: string, newPassword: string) {
+    // O id do paciente vem da sessão (cookie), nunca do parâmetro vindo do cliente —
+    // caso contrário, qualquer paciente logado poderia trocar a senha de outro paciente.
+    const patientId = await getSessionPatientId();
+    if (!patientId) throw new Error("Não autorizado.");
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.patient.update({
@@ -995,13 +1099,6 @@ export async function updatePatientPassword(patientId: string, newPassword: stri
     });
 
     return { success: true };
-}
-
-
-export async function getPatientByPhone(phone: string) {
-    return await prisma.patient.findFirst({
-        where: { phone, deletedAt: null }
-    });
 }
 
 export async function logout() {
@@ -1044,6 +1141,12 @@ export async function registerPatient(formData: {
 }) {
     const { name, email, phone, username, dateOfBirth, generateTempPassword } = formData;
     let password = formData.password;
+
+    // O cadastro com senha temporária gerada é feito pela profissional (área clínica);
+    // o autocadastro do próprio paciente sempre informa a própria senha.
+    if (generateTempPassword) {
+        await requireAdmin();
+    }
 
     const existingPhone = await prisma.patient.findFirst({ where: { phone, deletedAt: null } });
     if (existingPhone) return { success: false, error: "Este WhatsApp já está cadastrado." };
@@ -1094,6 +1197,7 @@ export async function registerPatient(formData: {
 
 export async function updatePsychologistAvailability(availabilities: { dayOfWeek: number; startTimeStr: string; endTimeStr: string }[]) {
     try {
+        await requireAdmin();
         const psychologist = await prisma.psychologist.findFirst();
         if (!psychologist) throw new Error("Psicóloga não encontrada");
 
@@ -1130,6 +1234,7 @@ export async function updatePsychologistAvailability(availabilities: { dayOfWeek
 
 export async function updatePatientFixedSchedule(patientId: string, isFixed: boolean, fixedDayOfWeek?: number | null, fixedTime?: string | null) {
     try {
+        await requireAdmin();
         const patient = await prisma.patient.update({
             where: { id: patientId },
             data: {
@@ -1164,6 +1269,7 @@ export async function updatePatientFixedSchedule(patientId: string, isFixed: boo
 import { eachDayOfInterval } from "date-fns";
 
 export async function getAppointmentsWithFixed(startDate: Date, endDate: Date) {
+    await requireAdmin();
     const actualAppointments = await prisma.appointment.findMany({
         where: {
             startTime: {
@@ -1228,6 +1334,7 @@ export async function getAppointmentsWithFixed(startDate: Date, endDate: Date) {
 }
 
 export async function resetPatientPassword(patientId: string) {
+    await requireAdmin();
     const patient = await prisma.patient.findUnique({ where: { id: patientId } });
     if (!patient) return { success: false, error: "Paciente não encontrado." };
 
@@ -1264,6 +1371,7 @@ export async function updatePsychologistProfile(data: {
     whatsappNumber?: string;
     whatsappApiKey?: string;
 }) {
+    await requireAdmin();
     const psychologist = await prisma.psychologist.findFirst();
     if (!psychologist) throw new Error("Psicóloga não encontrada");
 
@@ -1285,13 +1393,15 @@ export async function updatePsychologistProfile(data: {
 }
 
 export async function getScheduleBlocks() {
+    await requireAdmin();
     return prisma.scheduleBlock.findMany({
         orderBy: { startDate: 'asc' }
     });
 }
 
-export async function createScheduleBlock(adminId: string, startDate: Date, endDate: Date | null, reason?: string, cancelOverlapping: boolean = false) {
+export async function createScheduleBlock(_clientAdminId: string, startDate: Date, endDate: Date | null, reason?: string, cancelOverlapping: boolean = false) {
     try {
+        const adminId = await requireAdmin();
         await prisma.scheduleBlock.create({
             data: {
                 psychologistId: adminId,
@@ -1331,6 +1441,7 @@ export async function createScheduleBlock(adminId: string, startDate: Date, endD
 
 export async function deleteScheduleBlock(blockId: string) {
     try {
+        await requireAdmin();
         const block = await prisma.scheduleBlock.findUnique({ where: { id: blockId } });
         
         await prisma.scheduleBlock.delete({

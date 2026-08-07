@@ -38,6 +38,8 @@ model Psychologist {
   whatsappApiKey         String?
   resetToken             String?        @unique
   resetTokenExpiry       DateTime?
+  failedLoginAttempts    Int            @default(0)
+  lockedUntil            DateTime?
   availabilities         Availability[]
   appointments           Appointment[]
   scheduleBlocks         ScheduleBlock[]
@@ -65,6 +67,8 @@ model Patient {
   username           String?       @unique
   resetToken         String?       @unique
   resetTokenExpiry   DateTime?
+  failedLoginAttempts Int          @default(0)
+  lockedUntil        DateTime?
   appointments       Appointment[]
   evolutions         Evolution[]
   attachments        Attachment[]
