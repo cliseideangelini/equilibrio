@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Proteção da Área Clínica (Psicóloga)
-  if (pathname.startsWith('/area-clinica')) {
+  // Proteção da Área Clínica (Psicóloga) e do Painel Admin
+  if (pathname.startsWith('/area-clinica') || pathname.startsWith('/admin')) {
     const adminId = request.cookies.get('admin_id')?.value;
     if (!adminId) {
       return NextResponse.redirect(new URL('/login', request.url));
@@ -24,5 +24,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/area-clinica/:path*', '/paciente/:path*'],
+  matcher: ['/area-clinica/:path*', '/paciente/:path*', '/admin/:path*'],
 };

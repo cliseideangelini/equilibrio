@@ -133,7 +133,7 @@ export function WaitingListDialog({ rules, patientName, patientPhone }: WaitingL
                 setOpen(false);
                 setIsSuccess(false);
             }, 3000);
-            setFormData({ name: "", phone: "", email: "", preferredDays: "", preferredHours: "", specificDate: "", specificTime: "" });
+            setFormData({ name: "", phone: "", email: "", preferredDays: "", specificDate: "", specificTime: "", preferredShift: "MANHA" });
         } catch (error) {
             console.error("Error joining waiting list:", error);
         } finally {

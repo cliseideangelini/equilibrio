@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { format, startOfDay, endOfDay, parseISO, startOfMonth, endOfMonth } from "date-fns";
+import { format, startOfDay, endOfDay, parseISO, startOfWeek, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
     Download,
@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AgendaClient } from "@/components/AgendaClient";
 import { ManualBookingDialog } from "@/components/ManualBookingDialog";
-import { MonthlyCalendarClient } from "@/components/MonthlyCalendarClient";
+import { WeeklyAgendaClient } from "@/components/WeeklyAgendaClient";
 import { AgendaConfigClient } from "@/components/AgendaConfigClient";
 import Link from "next/link";
 
@@ -22,7 +22,7 @@ import { getLocalNow } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-    searchParams: Promise<{ date?: string; view?: "day" | "month" | "config" }>;
+    searchParams: Promise<{ date?: string; view?: "day" | "week" | "config" }>;
 }
 
 export default async function ClinicianAgenda({ searchParams }: PageProps) {
@@ -40,14 +40,14 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
     }
     const view = params.view || "day";
 
-    // Buscar agendamentos do mês inteiro para o calendário mensal
-    const monthStart = startOfMonth(selectedDate);
-    const monthEnd = endOfMonth(selectedDate);
+    // Buscar agendamentos da semana (segunda a sábado) para a grade semanal
+    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const weekEnd = endOfDay(addDays(weekStart, 5));
 
-    const allAppointments = await getAppointmentsWithFixed(monthStart, monthEnd);
+    const allAppointments = await getAppointmentsWithFixed(weekStart, weekEnd);
 
     // Agendamentos específicos do dia para o AgendaClient
-    const dayAppointments = allAppointments.filter(app => 
+    const dayAppointments = allAppointments.filter(app =>
         format(new Date(app.startTime), "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd")
     ).map(app => ({
         id: app.id,
@@ -70,9 +70,10 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
         endTime: new Date(app.endTime).toISOString(),
         status: app.status,
         type: app.type,
-        patient: { 
-            id: app.patient?.id || "", 
-            name: app.patient?.name || "Paciente Removido" 
+        patient: {
+            id: app.patient?.id || "",
+            name: app.patient?.name || "Paciente Removido",
+            phone: app.patient?.phone || ""
         }
     }));
 
@@ -113,12 +114,12 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
                         </span>
                     </div>
                     <h2 className="text-4xl font-light text-foreground tracking-tight leading-tight">
-                        Agenda <span className="italic font-serif text-muted-fg">{view === 'day' ? 'do Dia' : view === 'month' ? 'Mensal' : 'Configurações'}</span>
+                        Agenda <span className="italic font-serif text-muted-fg">{view === 'day' ? 'do Dia' : view === 'week' ? 'Semanal' : 'Configurações'}</span>
                     </h2>
                     <p className="text-muted-fg font-medium text-xs mt-1 flex items-center gap-2">
                         {format(selectedDate, "MMMM yyyy", { locale: ptBR })}
                         <span className="w-1.5 h-1.5 rounded-full bg-border" />
-                        {view === 'day' ? `${dayAppointments.length} Sessões Hoje` : view === 'month' ? `${allAppointments.length} Sessões no Mês` : 'Gestão de Disponibilidade'}
+                        {view === 'day' ? `${dayAppointments.length} Sessões Hoje` : view === 'week' ? `${allAppointments.length} Sessões na Semana` : 'Gestão de Disponibilidade'}
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -129,9 +130,9 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
                             </Button>
                         </Link>
 
-                        <Link href={`/area-clinica/agenda?view=month&date=${params.date || ""}`}>
-                            <Button variant={view === 'month' ? 'default' : 'ghost'} size="sm" className="h-9 px-4 rounded-xl font-bold text-[9px] uppercase tracking-widest gap-2">
-                                <LayoutGrid size={14} /> Mês
+                        <Link href={`/area-clinica/agenda?view=week&date=${params.date || ""}`}>
+                            <Button variant={view === 'week' ? 'default' : 'ghost'} size="sm" className="h-9 px-4 rounded-xl font-bold text-[9px] uppercase tracking-widest gap-2">
+                                <LayoutGrid size={14} /> Semana
                             </Button>
                         </Link>
 
@@ -154,8 +155,14 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
 
             {view === 'day' ? (
                 <AgendaClient initialAppointments={dayAppointments as any} initialDate={selectedDate.toISOString()} />
-            ) : view === 'month' ? (
-                <MonthlyCalendarClient key={monthStart.toISOString()} initialAppointments={serializedAllAppointments as any} initialDate={selectedDate.toISOString()} />
+            ) : view === 'week' ? (
+                <WeeklyAgendaClient
+                    key={weekStart.toISOString()}
+                    initialAppointments={serializedAllAppointments as any}
+                    initialDate={selectedDate.toISOString()}
+                    availabilities={availabilities.map(a => ({ dayOfWeek: a.dayOfWeek, startTime: a.startTime, endTime: a.endTime }))}
+                    patients={patients}
+                />
             ) : (
                 <AgendaConfigClient initialAvailabilities={availabilities} patients={patients} />
             )}
@@ -165,7 +172,7 @@ export default async function ClinicianAgenda({ searchParams }: PageProps) {
                 <div className="flex items-center gap-6">
                     <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Sincronizado</span>
                     <span className="flex items-center gap-2">
-                        {view === 'day' ? `${dayAppointments.length} registros` : view === 'month' ? `${allAppointments.length} registros` : 'Modo Configuração Ativo'}
+                        {view === 'day' ? `${dayAppointments.length} registros` : view === 'week' ? `${allAppointments.length} registros` : 'Modo Configuração Ativo'}
                     </span>
                 </div>
                 <div>

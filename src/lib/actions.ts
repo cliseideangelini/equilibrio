@@ -267,13 +267,14 @@ export async function createAppointment(formData: {
         }
     });
 
+    const formattedDetails = formatAppointmentDetailsForWhatsApp({
+        patient,
+        startTime: appointment.startTime,
+        type: appointment.type
+    });
+
     // Notify psychologist of new booking
     try {
-        const formattedDetails = formatAppointmentDetailsForWhatsApp({
-            patient,
-            startTime: appointment.startTime,
-            type: appointment.type
-        });
         await notifyPsychologist(
             `🔔 *Novo Agendamento Realizado!*\n\n👤 *Paciente*: ${patient.name}\n📞 *Telefone*: ${patient.phone}\n${formattedDetails}`
         );
@@ -570,13 +571,14 @@ export async function cancelAppointment(appointmentId: string, confirmLateCharge
         data: { status: "CANCELLED" }
     });
 
+    const formattedDetails = formatAppointmentDetailsForWhatsApp({
+        patient: appointment.patient,
+        startTime: appointment.startTime,
+        type: appointment.type
+    });
+
     // Notify psychologist of cancellation
     try {
-        const formattedDetails = formatAppointmentDetailsForWhatsApp({
-            patient: appointment.patient,
-            startTime: appointment.startTime,
-            type: appointment.type
-        });
         const byWho = isProfessional ? "pela Profissional" : "pelo Paciente";
         await notifyPsychologist(
             `❌ *Sessão Cancelada!*\n\n👤 *Paciente*: ${appointment.patient.name}\n📞 *Telefone*: ${appointment.patient.phone}\n${formattedDetails}\n🚫 *Motivo*: Cancelado ${byWho}`

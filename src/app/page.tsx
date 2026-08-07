@@ -40,7 +40,7 @@ const SERVICES = [
     hoverBorder: "hover:border-primary/50",
     description:
       "Atendimento personalizado para crianças, adolescentes, adultos e idosos. Desenvolvemos juntos ferramentas práticas para superar desafios emocionais e comportamentais.",
-    items: ["Ansiedade e depressão", "Estresse e burnout", "Autoconhecimento", "Qualidade de vida"],
+    items: ["Ansiedade, depressão e outros transtornos", "Estresse e burnout", "Autoconhecimento", "Qualidade de vida"],
   },
   {
     icon: Heart,
@@ -82,13 +82,14 @@ const CREDENTIALS = [
   "Especialização em TCC",
   "Pós-graduação em Psicopedagogia",
   "Formação em Terapia de Casal",
+  "Formação em Psicooncologia",
 ];
 
 
 const CONTACT_INFO = [
   { icon: Phone,  label: "WhatsApp",    value: "(19) 98827-5290",              href: "https://wa.me/5519988275290" },
   { icon: MapPin, label: "Localização", value: "Limeira — SP (Presencial)",   href: "#" },
-  { icon: Clock,  label: "Horários",    value: "Seg–Sex: 8h às 18h",           href: "#" },
+  { icon: Clock,  label: "Horários",    value: "Seg–Sex: 7h às 18h",           href: "#" },
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -485,7 +486,7 @@ export default function HomePage() {
               },
               {
                 q: "Como funciona o cancelamento ou falta?",
-                a: "A sessão desmarcada sem antecedência ou em caso de falta será cobrada integralmente, pois o horário fica reservado exclusivamente para você."
+                a: "A sessão desmarcada sem aviso prévio, ou em caso de falta não informada, será cobrada integralmente, pois o horário fica reservado exclusivamente para você."
               },
               {
                 q: "Qual o valor da consulta e formas de pagamento?",
@@ -737,7 +738,7 @@ export default function HomePage() {
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Clock className="w-4 h-4 shrink-0 mt-0.5 text-primary/70" />
-                Seg–Sex: 8h às 18h
+                Seg–Sex: 7h às 18h
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-primary/70" />

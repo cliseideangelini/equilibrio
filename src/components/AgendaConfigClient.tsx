@@ -61,8 +61,8 @@ export function AgendaConfigClient({ initialAvailabilities, patients }: AgendaCo
 
     // Estado de controle para novas disponibilidades
     const [newDay, setNewDay] = useState<number>(1);
-    const [newStart, setNewStart] = useState<string>("08:00");
-    const [newEnd, setNewEnd] = useState<string>("18:00");
+    const [newStart, setNewStart] = useState<string>("07:00");
+    const [newEnd, setNewEnd] = useState<string>("17:30");
 
     // Estado dos pacientes e busca
     const [patientList, setPatientList] = useState<PatientItem[]>(patients);

@@ -35,11 +35,10 @@ export default async function AdminDashboard() {
 
     const pendingAppointments = await prisma.appointment.count({ where: { status: 'PENDING' } });
     const totalPatients = await prisma.patient.count();
-    const adminName = "Administrador";
 
     return (
         <div className="min-h-screen bg-background text-foreground font-sans relative overflow-hidden pb-20">
-            <AdminNavBar adminName={adminName} />
+            <AdminNavBar />
             
             {/* Ambient orbs */}
             <div className="absolute inset-0 z-0 pointer-events-none opacity-30">

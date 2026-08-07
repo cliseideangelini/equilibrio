@@ -26,6 +26,7 @@ interface PatientsClientProps {
 
 export function PatientsClient({ initialPatients }: PatientsClientProps) {
     const [search, setSearch] = useState("");
+    const [showAll, setShowAll] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -33,8 +34,8 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
         const query = search.toLowerCase().trim();
 
         if (!query) {
-            // Se não houver busca, mostrar APENAS os pacientes que têm consulta esta semana
-            return initialPatients.filter(p => p.hasAppointmentThisWeek);
+            // Sem busca: por padrão mostra só quem tem consulta esta semana, a menos que "Ver todos" esteja ativo
+            return showAll ? initialPatients : initialPatients.filter(p => p.hasAppointmentThisWeek);
         }
 
         // Se houver busca, mostrar todos que batem com o termo
@@ -42,12 +43,12 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
             p.name.toLowerCase().includes(query) ||
             p.phone.includes(query)
         );
-    }, [initialPatients, search]);
+    }, [initialPatients, search, showAll]);
 
-    // Reset para página 1 quando buscar
+    // Reset para página 1 quando buscar ou trocar o filtro
     useMemo(() => {
         setCurrentPage(1);
-    }, [search]);
+    }, [search, showAll]);
 
     const totalPages = Math.ceil(filteredPatients.length / itemsPerPage);
     const paginatedPatients = filteredPatients.slice(
@@ -69,6 +70,19 @@ export function PatientsClient({ initialPatients }: PatientsClientProps) {
                         className="bg-transparent border-0 outline-none text-sm font-semibold text-foreground placeholder:text-muted-fg w-full h-10"
                     />
                 </div>
+                {!search && (
+                    <button
+                        onClick={() => setShowAll(!showAll)}
+                        className={cn(
+                            "h-10 px-5 mr-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 whitespace-nowrap",
+                            showAll
+                                ? "bg-primary text-white shadow-sm"
+                                : "bg-surface/80 border border-border/80 text-muted-fg hover:text-foreground"
+                        )}
+                    >
+                        {showAll ? "Mostrando Todos" : "Ver Todos os Pacientes"}
+                    </button>
+                )}
             </div>
 
             {/* Patients Grid (Table Format) */}

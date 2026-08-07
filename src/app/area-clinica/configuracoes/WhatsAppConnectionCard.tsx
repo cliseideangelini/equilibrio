@@ -22,7 +22,7 @@ export function WhatsAppConnectionCard() {
             }
         } catch (error) {
             console.error("Erro ao verificar status do WhatsApp:", error);
-            setStatus("loading");
+            setStatus("disconnected");
         }
     };
 
@@ -50,10 +50,10 @@ export function WhatsAppConnectionCard() {
         }
     };
 
-    // Polling a cada 3 segundos para atualizar o status/QR
+    // Polling a cada 8 segundos para atualizar o status/QR
     useEffect(() => {
         checkStatus();
-        const interval = setInterval(checkStatus, 3000);
+        const interval = setInterval(checkStatus, 8000);
         return () => clearInterval(interval);
     }, []);
 

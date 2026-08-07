@@ -48,7 +48,7 @@ async function main() {
   console.log('Criando agendamentos...');
   
   const statuses: AppointmentStatus[] = ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'];
-  const types: AppointmentType[] = ['ONLINE', 'PRESENTIAL', 'RETORNO', 'SUPERVISAO'];
+  const types: AppointmentType[] = ['ONLINE', 'PRESENCIAL'];
 
   for (let i = 0; i < 20; i++) {
     // Escolher um paciente aleatório

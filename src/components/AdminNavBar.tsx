@@ -37,14 +37,18 @@ export function AdminNavBar() {
                             Início
                         </Button>
                     </Link>
-                    <Button variant="ghost" size="sm" className="gap-2 rounded-full text-muted-foreground hover:text-foreground font-semibold transition-all">
-                        <Calendar size={18} />
-                        Agenda
-                    </Button>
-                    <Button variant="ghost" size="sm" className="gap-2 rounded-full text-muted-foreground hover:text-foreground font-semibold transition-all">
-                        <Users size={18} />
-                        Pacientes
-                    </Button>
+                    <Link href="/area-clinica/agenda">
+                        <Button variant="ghost" size="sm" className="gap-2 rounded-full text-muted-foreground hover:text-foreground font-semibold transition-all">
+                            <Calendar size={18} />
+                            Agenda
+                        </Button>
+                    </Link>
+                    <Link href="/area-clinica/pacientes">
+                        <Button variant="ghost" size="sm" className="gap-2 rounded-full text-muted-foreground hover:text-foreground font-semibold transition-all">
+                            <Users size={18} />
+                            Pacientes
+                        </Button>
+                    </Link>
                 </nav>
                 <Button
                     variant="outline"
