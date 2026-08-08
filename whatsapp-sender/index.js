@@ -110,6 +110,23 @@ async function clearRemoteBackup() {
     }
 }
 
+// ── Espaçamento mínimo entre envios ──
+// Mandar várias mensagens em rajada (vários números novos em poucos minutos) é um
+// padrão clássico que aciona a detecção de spam do WhatsApp e pode gerar bloqueio
+// silencioso da conta (a mensagem "envia com sucesso" mas nunca chega). Isso garante
+// um intervalo mínimo entre cada mensagem que o robô manda, para se comportar de
+// forma mais parecida com um uso humano normal.
+const MIN_SEND_INTERVAL_MS = 4000;
+let lastSendAt = 0;
+
+async function waitForSendSlot() {
+    const elapsed = Date.now() - lastSendAt;
+    if (elapsed < MIN_SEND_INTERVAL_MS) {
+        await new Promise((resolve) => setTimeout(resolve, MIN_SEND_INTERVAL_MS - elapsed));
+    }
+    lastSendAt = Date.now();
+}
+
 // ── Fila de reenvio: mensagens que falharam por estarmos desconectados ──
 async function processPendingQueue() {
     if (!isConnected || !waSocket || !BRIDGE_SECRET) return;
@@ -131,6 +148,7 @@ async function processPendingQueue() {
                     cleanPhone = '55' + cleanPhone;
                 }
                 const jid = `${cleanPhone}@s.whatsapp.net`;
+                await waitForSendSlot();
                 await waSocket.sendMessage(jid, { text: item.message });
 
                 await fetch(`${MAIN_APP_URL}/api/whatsapp-bridge/pending`, {
@@ -272,6 +290,7 @@ app.post('/send', async (req, res) => {
         }
 
         const jid = `${cleanPhone}@s.whatsapp.net`;
+        await waitForSendSlot();
         await waSocket.sendMessage(jid, { text: message });
 
         res.status(200).json({ success: true, message: 'Mensagem enviada com sucesso!' });
